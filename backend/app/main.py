@@ -1,0 +1,71 @@
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.config import settings
+from app.core.dependencies import get_current_user, admin_only, vet_or_admin, require_role
+from app.api.v1 import auth as auth_router
+from app.models.user import User
+
+app = FastAPI(
+    title="MyPet API",
+    description="Backend API cho hệ thống Pet Care Management",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+# ─────────────────────────── CORS ───────────────────────────
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.FRONTEND_URL, "http://localhost:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ─────────────────────────── Routers ───────────────────────────
+
+app.include_router(auth_router.router, prefix="/api/v1")
+
+# Thêm routers mới theo cách này:
+# from app.api.v1 import pets
+# app.include_router(pets.router, prefix="/api/v1")
+
+
+# ─────────────────────────── Health ───────────────────────────
+
+@app.get("/", tags=["Health"])
+async def root():
+    return {"message": "MyPet API is running 🐾", "version": "1.0.0"}
+
+
+@app.get("/health", tags=["Health"])
+async def health_check():
+    return {"status": "ok"}
+
+
+# ─────────── Example: Protected routes với phân quyền ──────────
+
+@app.get("/api/v1/protected/user-only", tags=["Examples"])
+async def user_only_route(current_user: User = Depends(get_current_user)):
+    """Chỉ cần đăng nhập — mọi role đều truy cập được."""
+    return {"message": f"Xin chào {current_user.full_name}!", "role": current_user.role}
+
+
+@app.get("/api/v1/protected/vet-area", tags=["Examples"])
+async def vet_area(current_user: User = Depends(vet_or_admin)):
+    """Chỉ vet hoặc admin mới vào được."""
+    return {"message": "Khu vực bác sĩ thú y", "user": current_user.full_name}
+
+
+@app.get("/api/v1/protected/admin-only", tags=["Examples"])
+async def admin_only_route(current_user: User = Depends(admin_only)):
+    """Chỉ admin mới vào được."""
+    return {"message": "Khu vực quản trị", "user": current_user.full_name}
+
+
+@app.get("/api/v1/protected/custom-role", tags=["Examples"])
+async def custom_role_route(current_user: User = Depends(require_role("vet"))):
+    """Ví dụ dùng require_role() trực tiếp."""
+    return {"message": "Custom role check", "user": current_user.full_name}
