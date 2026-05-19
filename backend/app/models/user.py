@@ -28,7 +28,7 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="userrole"),
+        Enum(UserRole, name="user_role"),
         default=UserRole.owner,
         nullable=False,
     )
