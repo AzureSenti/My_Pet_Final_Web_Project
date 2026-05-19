@@ -55,7 +55,8 @@ CREATE TABLE users (
     email_verified_at   TIMESTAMPTZ,
     avatar_url          VARCHAR(500),
     last_login_at       TIMESTAMPTZ,
-    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
 
 COMMENT ON TABLE  users                     IS 'Tài khoản người dùng: chủ thú cưng, bác sĩ, quản trị viên';

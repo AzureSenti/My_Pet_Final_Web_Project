@@ -9,24 +9,33 @@ Chứa tất cả logic mã hoá:
 import uuid
 from datetime import datetime, timedelta, timezone
 
+import uuid
+from datetime import datetime, timedelta, timezone
+
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
-# ─────────────────────────── BCrypt ───────────────────────────
-
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+# ─────────────────────────── BCrypt (Direct) ───────────────────────────
 
 def hash_password(plain_password: str) -> str:
-    """Trả về bcrypt hash của plain_password."""
-    return _pwd_context.hash(plain_password)
+    """Mã hoá mật khẩu bằng bcrypt trực tiếp."""
+    # Bcrypt yêu cầu đầu vào là bytes
+    pwd_bytes = plain_password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """So sánh plain_password với hashed_password. Trả về True nếu khớp."""
-    return _pwd_context.verify(plain_password, hashed_password)
+    """Kiểm tra mật khẩu có khớp với bản hash không."""
+    try:
+        pwd_bytes = plain_password.encode('utf-8')
+        hashed_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(pwd_bytes, hashed_bytes)
+    except Exception:
+        return False
 
 
 # ─────────────────────────── JWT ───────────────────────────

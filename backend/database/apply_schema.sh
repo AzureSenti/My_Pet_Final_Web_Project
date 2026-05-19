@@ -38,9 +38,16 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 # Chế độ --reset: xoá và tạo lại DB
 if [ "$1" = "--reset" ]; then
     echo "⚠️  Chế độ RESET: xoá và tạo lại database '$PGDATABASE'..."
-    psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres \
-        -c "DROP DATABASE IF EXISTS $PGDATABASE;" \
-        -c "CREATE DATABASE $PGDATABASE OWNER $PGUSER ENCODING 'UTF8';"
+    psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres <<EOF
+        -- Ngắt tất cả các kết nối đang active tới DB này
+        SELECT pg_terminate_backend(pg_stat_activity.pid)
+        FROM pg_stat_activity
+        WHERE pg_stat_activity.datname = '$PGDATABASE'
+          AND pid <> pg_backend_pid();
+        
+        DROP DATABASE IF EXISTS $PGDATABASE;
+        CREATE DATABASE $PGDATABASE OWNER $PGUSER ENCODING 'UTF8';
+EOF
     echo "✅ Database đã được tạo lại."
 fi
 
