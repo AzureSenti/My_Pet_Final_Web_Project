@@ -105,6 +105,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 			</OIDCBounder>
 		),
 		menuHeaderRender: undefined,
+		menuFooterRender: (props: any) => {
+			if (props?.collapsed) return undefined;
+			return (
+				<div className="sidebar-user-card" style={{ margin: '0 10px' }} onClick={() => history.push('/user/profile')}>
+					<div className="sidebar-user-avatar">
+						<img src={initialState?.currentUser?.picture || "https://i.pravatar.cc/150?img=12"} alt="User" />
+					</div>
+					<div className="sidebar-user-info">
+						<div className="sidebar-user-name">{initialState?.currentUser?.name || 'Admin'}</div>
+						<div className="sidebar-user-role">Premium Plan ✨</div>
+					</div>
+				</div>
+			);
+		},
 		...initialState?.settings,
 	};
 };
