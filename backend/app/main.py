@@ -10,19 +10,29 @@ from app.api.v1 import vet as vet_router
 from app.models.user import User
 
 app = FastAPI(
-# ... 
+    title="MyPet API",
+    description="Backend API cho hệ thống Pet Care Management",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-# ...
+# ─────────────────────────── CORS ───────────────────────────
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.FRONTEND_URL, "http://localhost:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ─────────────────────────── Routers ───────────────────────────
 
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(admin_router.router, prefix="/api/v1")
 app.include_router(pet_admin_router.router, prefix="/api/v1")
 app.include_router(vet_router.router, prefix="/api/v1")
-
-# Thêm routers mới theo cách này:
-# from app.api.v1 import pets
-# app.include_router(pets.router, prefix="/api/v1")
 
 
 # ─────────────────────────── Health ───────────────────────────
@@ -55,9 +65,3 @@ async def vet_area(current_user: User = Depends(vet_or_admin)):
 async def admin_only_route(current_user: User = Depends(admin_only)):
     """Chỉ admin mới vào được."""
     return {"message": "Khu vực quản trị", "user": current_user.full_name}
-
-
-@app.get("/api/v1/protected/custom-role", tags=["Examples"])
-async def custom_role_route(current_user: User = Depends(require_role("vet"))):
-    """Ví dụ dùng require_role() trực tiếp."""
-    return {"message": "Custom role check", "user": current_user.full_name}
