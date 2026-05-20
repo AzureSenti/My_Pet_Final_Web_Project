@@ -2,55 +2,28 @@ import axios from '@/utils/axios';
 import {
 	ip3,
 	ipNotif,
-	keycloakClientID,
 	keycloakTokenEndpoint,
 	keycloakUserInfoEndpoint,
-	resourceServerClientId,
 } from '@/utils/ip';
-import queryString from 'query-string';
 import type { ESettingKey } from './constant';
 import type { ISetting } from './typing';
-
-// export async function getInfo() {
-//   return axios.get(`${ip3}/user/me`);
-// }
 
 export async function getUserInfo() {
 	return axios.get(keycloakUserInfoEndpoint);
 }
 
-export async function adminlogin(payload: { username?: string; password?: string }) {
-	return axios.post(`${ip3}/auth/login`, { ...payload, platform: 'Web' });
+export async function adminlogin(payload: { email?: string; password?: string }) {
+	// Xoá dấu gạch chéo thừa nếu có ở đầu endpoint
+	return axios.post(`${ip3}api/v1/auth/login`.replace(/([^:]\/)\/+/g, "$1"), payload);
 }
 
 export async function refreshAccesssToken(payload: { refreshToken: string }) {
-	const data = {
-		client_id: keycloakClientID,
-		grant_type: 'refresh_token',
-		refresh_token: payload.refreshToken,
-	};
-
-	return axios({
-		url: keycloakTokenEndpoint,
-		method: 'POST',
-		headers: { 'content-type': 'application/x-www-form-urlencoded' },
-		data: queryString.stringify(data),
-	});
+	return axios.post(keycloakTokenEndpoint, { refresh_token: payload.refreshToken });
 }
 
 export async function getPermission() {
-	const data = {
-		audience: resourceServerClientId,
-		grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
-		response_mode: 'permissions',
-	};
-
-	return axios({
-		url: keycloakTokenEndpoint,
-		method: 'POST',
-		headers: { 'content-type': 'application/x-www-form-urlencoded' },
-		data: queryString.stringify(data),
-	});
+	// Hệ thống mới dùng RBAC trực tiếp từ JWT
+	return [];
 }
 
 export async function initOneSignal(payload: { playerId: string }) {
