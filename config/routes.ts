@@ -1,4 +1,4 @@
-﻿export default [
+export default [
 	{
 		path: '/user',
 		layout: false,
@@ -24,14 +24,24 @@
 		component: './TrangChu',
 		icon: 'HomeOutlined',
 	},
-
-	// TODO: Sau này team tạo module nào thì cứ add thêm vào bên dưới
-	// {
-	// 	path: '/thu-cung',
-	// 	name: 'Quản Lý Thú Cưng',
-	// 	component: './ThuCung',
-	// 	icon: 'GitlabOutlined',
-	// },
+	{
+		path: '/quan-ly-nguoi-dung',
+		name: 'Quản Lý Người Dùng',
+		component: './QuanLyNguoiDung',
+		icon: 'UserOutlined',
+	},
+	{
+		path: '/quan-ly-thu-cung',
+		name: 'Quản Lý Thú Cưng',
+		component: './QuanLyThuCung',
+		icon: 'GitlabOutlined',
+	},
+	{
+		path: '/quan-ly-bac-si',
+		name: 'Quản Lý Bác Sĩ',
+		component: './QuanLyBacSi',
+		icon: 'SolutionOutlined',
+	},
 
 	{
 		path: '/',
