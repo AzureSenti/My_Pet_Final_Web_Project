@@ -90,7 +90,7 @@ const QuanLyBacSi: React.FC = () => {
 	};
 
 	const handleOpenEditModal = (doctor: DoctorType) => {
-		setEditingDoctorId(doctor.id);
+		setEditingDoctorId(doctor.vet_id); // Dùng vet_id để sửa
 		form.setFieldsValue({
 			full_name: doctor.full_name,
 			email: doctor.email,
@@ -116,8 +116,10 @@ const QuanLyBacSi: React.FC = () => {
 
 			let success = false;
 			if (editingDoctorId) {
+				// Backend: PUT /admin/vets/{vet_id}
 				success = await updateDoctor(editingDoctorId, values);
 			} else {
+				// Backend: POST /admin/vets
 				success = await createDoctor(values);
 			}
 
@@ -132,9 +134,9 @@ const QuanLyBacSi: React.FC = () => {
 		}
 	};
 
-	const handleDeleteDoctor = async (userId: string) => {
+	const handleDeleteDoctor = async (vetId: string) => {
 		try {
-			const success = await deleteDoctor(userId);
+			const success = await deleteDoctor(vetId);
 			if (success) {
 				loadDoctorsList();
 			}
@@ -143,12 +145,12 @@ const QuanLyBacSi: React.FC = () => {
 		}
 	};
 
-	const handleToggleStatus = async (userId: string, active: boolean) => {
+	const handleToggleStatus = async (vetId: string, active: boolean) => {
 		try {
-			const success = await toggleDoctorStatus(userId, active);
+			const success = await toggleDoctorStatus(vetId);
 			if (success) {
 				setDoctors((prev) =>
-					prev.map((d) => (d.id === userId ? { ...d, is_active: active } : d))
+					prev.map((d) => (d.vet_id === vetId ? { ...d, is_active: active } : d))
 				);
 			}
 		} catch (error) {
@@ -207,9 +209,9 @@ const QuanLyBacSi: React.FC = () => {
 			) : (
 				<div className='vet-grid'>
 					{doctors.map((doctor) => {
-						const isExpanded = expandedBios[doctor.id] || false;
+						const isExpanded = expandedBios[doctor.vet_id] || false;
 						return (
-							<div key={doctor.id} className='vet-bento-card'>
+							<div key={doctor.vet_id} className='vet-bento-card'>
 								{/* Header */}
 								<div className='vet-card-header'>
 									<Avatar
@@ -228,7 +230,7 @@ const QuanLyBacSi: React.FC = () => {
 										<Tooltip title={doctor.is_active ? 'Đang hoạt động - Nhấp để khóa' : 'Tạm ngưng - Nhấp để mở khóa'}>
 											<Switch
 												checked={doctor.is_active}
-												onChange={(checked) => handleToggleStatus(doctor.id, checked)}
+												onChange={(checked) => handleToggleStatus(doctor.vet_id, checked)}
 												size='small'
 											/>
 										</Tooltip>
@@ -242,7 +244,7 @@ const QuanLyBacSi: React.FC = () => {
 										{doctor.bio || 'Bác sĩ chưa cập nhật thông tin tiểu sử cá nhân.'}
 									</p>
 									{doctor.bio && doctor.bio.length > 100 && (
-										<span className='bio-toggle' onClick={() => toggleBio(doctor.id)}>
+										<span className='bio-toggle' onClick={() => toggleBio(doctor.vet_id)}>
 											{isExpanded ? ' Thu gọn' : ' Xem thêm'}
 										</span>
 									)}
@@ -289,7 +291,7 @@ const QuanLyBacSi: React.FC = () => {
 										okText='Xóa'
 										cancelText='Hủy'
 										okButtonProps={{ danger: true }}
-										onConfirm={() => handleDeleteDoctor(doctor.id)}
+										onConfirm={() => handleDeleteDoctor(doctor.vet_id)}
 									>
 										<Button
 											type='primary'
