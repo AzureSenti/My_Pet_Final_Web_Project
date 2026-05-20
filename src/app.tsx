@@ -1,4 +1,3 @@
-import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { notification } from 'antd';
 import 'moment/locale/vi';
@@ -6,16 +5,12 @@ import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { getIntl, getLocale, history } from 'umi';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import ErrorBoundary from './components/ErrorBoundary';
-// import LoadingPage from './components/Loading';
 import { OIDCBounder } from './components/OIDCBounder';
-import { unCheckPermissionPaths } from './components/OIDCBounder/constant';
-import OneSignalBounder from './components/OneSignalBounder';
-import TechnicalSupportBounder from './components/TechnicalSupportBounder';
 import NotAccessible from './pages/exception/403';
 import NotFoundContent from './pages/exception/404';
 import type { IInitialState } from './services/base/typing';
 import './styles/global.less';
-import { currentRole } from './utils/ip';
+// currentRole đã được loại bỏ cùng với Keycloak auth
 
 /**  loading */
 export const initialStateConfig = {
@@ -70,31 +65,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 	return {
 		unAccessible: (
 			<OIDCBounder>
-				<TechnicalSupportBounder>
-					<NotAccessible />
-				</TechnicalSupportBounder>
+				<NotAccessible />
 			</OIDCBounder>
 		),
 		noFound: <NotFoundContent />,
 		rightContentRender: () => <RightContent />,
 		disableContentMargin: false,
 
-		footerRender: () => <Footer />,
-
 		onPageChange: () => {
+			// Redirect / về /dashboard nếu đã đăng nhập
 			if (initialState?.currentUser) {
 				const { location } = history;
-				const isUncheckPath = unCheckPermissionPaths.some((path) => window.location.pathname.includes(path));
-
 				if (location.pathname === '/') {
 					history.replace('/dashboard');
-				} else if (
-					!isUncheckPath &&
-					currentRole &&
-					initialState?.authorizedPermissions?.length &&
-					!initialState?.authorizedPermissions?.find((item) => item.rsname === currentRole)
-				)
-					history.replace('/403');
+				}
 			}
 		},
 
@@ -116,9 +100,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 		childrenRender: (dom) => (
 			<OIDCBounder>
 				<ErrorBoundary>
-					{/* <TechnicalSupportBounder> */}
-					<OneSignalBounder>{dom}</OneSignalBounder>
-					{/* </TechnicalSupportBounder> */}
+					{dom}
 				</ErrorBoundary>
 			</OIDCBounder>
 		),
