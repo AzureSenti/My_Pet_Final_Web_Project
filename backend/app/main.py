@@ -5,18 +5,18 @@ from app.core.config import settings
 from app.core.dependencies import get_current_user, admin_only, vet_or_admin, require_role
 from app.api.v1 import auth as auth_router
 from app.api.v1 import admin as admin_router
+from app.api.v1 import pet_admin as pet_admin_router
 from app.models.user import User
 
 app = FastAPI(
-# ... (giữ nguyên các tham số FastAPI)
+# ... 
 )
 
-# ... (CORS logic giữ nguyên)
-
-# ─────────────────────────── Routers ───────────────────────────
+# ...
 
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(admin_router.router, prefix="/api/v1")
+app.include_router(pet_admin_router.router, prefix="/api/v1")
 
 # Thêm routers mới theo cách này:
 # from app.api.v1 import pets
