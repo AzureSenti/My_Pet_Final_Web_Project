@@ -39,6 +39,12 @@ class User(Base, TimestampMixin):
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(  # noqa: F821
         "RefreshToken", back_populates="user", cascade="all, delete-orphan"
     )
+    pets: Mapped[list["Pet"]] = relationship(  # noqa: F821
+        "Pet", back_populates="owner", cascade="all, delete-orphan"
+    )
+    vet_profile: Mapped["Veterinarian"] = relationship(  # noqa: F821
+        "Veterinarian", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email} role={self.role}>"
