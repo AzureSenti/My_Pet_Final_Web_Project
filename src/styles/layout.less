@@ -1,150 +1,295 @@
-.ant-pro-header-light {
-	.ant-pro-global-header-layout-mix {
-		background-color: var(--primary-color);
+@import '~antd/es/style/themes/default.less';
 
-		.ant-pro-global-header-logo a img {
-			height: 100%;
-			padding: 5px 0;
+// ============================================
+// 🎨 SaaS Layout — Sidebar + Header + Content
+// ============================================
 
-			@media (max-width: @screen-xs) {
-				max-width: 160px;
-			}
-		}
-	}
-}
+// ─── Design Tokens ────────────────────────────
+@layout-bg: #F3F4F6;
+@sidebar-bg: #FAFBFC;
+@sidebar-border: #ECEEF2;
+@card-white: #FFFFFF;
+@text-dark: #0F172A;
+@text-secondary: #64748B;
+@text-muted: #94A3B8;
+@accent-yellow: #F59E0B;
+@accent-yellow-hover: #D97706;
+@accent-yellow-bg: #FFFBEB;
+@accent-yellow-light: rgba(245, 158, 11, 0.08);
+@radius-menu: 12px;
+@transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
-.ant-pro-header-dark {
-	.ant-pro-global-header-layout-mix {
-		.ant-pro-global-header-logo a img {
-			height: 100%;
-			padding: 8px 0;
-		}
-	}
-}
-
-.ant-menu-light.ant-pro-sider-menu {
-	padding: 18px 0;
-	// font-weight: 600;
-
-	.ant-menu-item,
-	.ant-menu-submenu-title {
-		height: auto;
-		min-height: 36px;
-		padding: 5px 12px;
-		padding-left: 12px !important;
-		line-height: 1.5;
-		border-radius: 2px;
-
-		&::after {
-			border: none;
-		}
-	}
-
-	.ant-pro-menu-item {
-		white-space: break-spaces;
-	}
-
-	li.ant-menu-item-selected {
-		padding-left: 12px !important;
-		color: white;
-		// background-color: var(--primary-color);
-	}
-
-	.ant-menu-submenu {
-		&>.ant-menu-submenu-title {
-			padding-right: 24px !important;
-			padding-left: 12px !important;
-			border-radius: 2px;
-
-			.ant-menu-submenu-arrow {
-				right: 10px;
-			}
-		}
-
-		.ant-menu-sub {
-			padding-left: 12px;
-			background-color: #FFF8E7;
-			border-radius: 2px;
-
-			.ant-menu-sub {
-				.ant-menu-item-only-child {
-					padding-left: 12px !important;
-				}
-			}
-		}
-	}
-
-	&.ant-menu-inline-collapsed {
-		padding: 24px 0;
-
-		.ant-menu-item {
-			padding-left: calc(50% - 16px / 2) !important;
-		}
-
-		li.ant-menu-item-selected {
-			padding-left: calc(50% - 16px / 2) !important;
-		}
-
-		.ant-menu-submenu {
-			&>.ant-menu-submenu-title {
-				padding-left: calc(50% - 16px / 2) !important;
-			}
-		}
-	}
-}
-
-.ant-menu-dark.ant-pro-sider-menu {
-
-	.ant-menu-item,
-	.ant-menu-submenu-title {
-		height: auto !important;
-		min-height: 36px;
-		padding-top: 5px;
-		padding-bottom: 5px;
-		line-height: 1.5 !important;
-		border-radius: 2px;
-
-		&::after {
-			border: none;
-		}
-	}
-
-	.ant-pro-menu-item {
-		white-space: break-spaces;
-	}
-}
-
-.ant-pro-sider-menu.ant-menu-inline-collapsed {
-
-	.ant-menu-item,
-	.ant-menu-submenu-title {
-		height: 40px !important;
-		padding-top: 0;
-		padding-bottom: 0;
-	}
+// ─── Layout Root ──────────────────────────────
+.ant-layout {
+	min-height: 100vh;
+	background: @layout-bg !important;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .ant-layout-content {
-	margin: 18px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
 
-	@media (max-width: @screen-xs) {
-		margin: 12px !important;
+// ─── Sidebar Container ────────────────────────
+.ant-pro-sider.ant-layout-sider {
+	background: @sidebar-bg !important;
+	border-right: 1px solid @sidebar-border;
+	box-shadow: none;
+
+	.ant-layout-sider-children {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
 }
 
-.ant-layout {
-	min-height: 100vh;
-	background: #FFF8E7;
+// ─── Logo Area ────────────────────────────────
+.ant-pro-sider-logo {
+	background: @sidebar-bg !important;
+	padding: 18px 16px !important;
+	border-bottom: 1px solid @sidebar-border;
+	height: auto !important;
+
+	> a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+
+		img {
+			height: 32px !important;
+			width: 32px !important;
+			object-fit: contain;
+		}
+
+		h1 {
+			color: @text-dark !important;
+			font-weight: 800 !important;
+			font-size: 20px !important;
+			letter-spacing: -0.5px;
+			margin-bottom: 0 !important;
+		}
+	}
 }
 
+// ─── Sidebar Menu ─────────────────────────────
+.ant-menu-light.ant-pro-sider-menu {
+	padding: 14px 10px;
+	background: transparent;
+	border-right: none;
+	flex: 1;
+
+	.ant-menu-item,
+	.ant-menu-submenu-title {
+		height: 42px !important;
+		line-height: 42px !important;
+		margin-bottom: 4px !important;
+		margin-top: 0 !important;
+		padding: 0 14px !important;
+		border-radius: @radius-menu;
+		color: @text-secondary;
+		font-weight: 500;
+		font-size: 13.5px;
+		transition: @transition-smooth;
+		position: relative;
+
+		&::after {
+			display: none;
+		}
+
+		&:hover {
+			color: @text-dark;
+			background-color: #F1F3F5;
+
+			.anticon {
+				color: @text-dark;
+				transform: scale(1.08);
+			}
+		}
+
+		.anticon {
+			font-size: 17px;
+			min-width: 17px;
+			margin-right: 10px;
+			color: @text-muted;
+			transition: @transition-smooth;
+		}
+	}
+
+	// ─── Active / Selected Item ──────────────
+	li.ant-menu-item-selected {
+		background-color: @accent-yellow-bg !important;
+		color: @accent-yellow-hover !important;
+		font-weight: 600;
+
+		// Left accent bar
+		&::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 8px;
+			bottom: 8px;
+			width: 3px;
+			background: @accent-yellow;
+			border-radius: 0 3px 3px 0;
+		}
+
+		.anticon {
+			color: @accent-yellow !important;
+		}
+	}
+
+	.ant-menu-submenu-selected {
+		color: @text-dark;
+
+		.ant-menu-submenu-title {
+			color: @text-dark;
+			.anticon { color: @text-dark; }
+		}
+	}
+
+	// ─── Submenu ─────────────────────────────
+	.ant-menu-sub {
+		background: transparent !important;
+		padding-left: 0 !important;
+
+		.ant-menu-item {
+			padding-left: 44px !important;
+			height: 38px !important;
+			line-height: 38px !important;
+
+			&::before {
+				content: '';
+				position: absolute;
+				left: 22px;
+				top: 50%;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: #CBD5E1;
+				transform: translateY(-50%);
+				transition: @transition-smooth;
+			}
+
+			&:hover::before { background: @text-dark; }
+			&.ant-menu-item-selected::before { background: @accent-yellow; }
+		}
+	}
+
+	// ─── Collapsed ──────────────────────────
+	&.ant-menu-inline-collapsed {
+		padding: 14px 6px;
+
+		.ant-menu-item,
+		.ant-menu-submenu-title {
+			padding: 0 calc(50% - 9px) !important;
+			border-radius: @radius-menu;
+
+			.anticon { margin-right: 0; }
+		}
+
+		li.ant-menu-item-selected::before {
+			left: 0;
+			top: 6px;
+			bottom: 6px;
+		}
+	}
+}
+
+// ─── Sidebar Footer (User Card) ───────────────
+.ant-pro-sider-extra {
+	padding: 12px;
+	border-top: 1px solid @sidebar-border;
+}
+
+.sidebar-user-card {
+	background: linear-gradient(135deg, @accent-yellow-bg, #FEF3C7);
+	border-radius: 14px;
+	padding: 14px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	transition: @transition-smooth;
+	border: 1px solid rgba(245, 158, 11, 0.1);
+
+	&:hover {
+		box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+		transform: translateY(-1px);
+	}
+
+	.sidebar-user-avatar {
+		width: 36px;
+		height: 36px;
+		border-radius: 10px;
+		overflow: hidden;
+		flex-shrink: 0;
+		border: 2px solid rgba(245, 158, 11, 0.3);
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	.sidebar-user-info {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.sidebar-user-name {
+		font-size: 13px;
+		font-weight: 700;
+		color: @text-dark;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.3;
+	}
+
+	.sidebar-user-role {
+		font-size: 11px;
+		color: @accent-yellow-hover;
+		font-weight: 600;
+	}
+}
+
+// ─── Header ───────────────────────────────────
+.ant-pro-header-light {
+	.ant-pro-global-header,
+	.ant-pro-global-header-layout-mix {
+		background: @card-white !important;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+		border-bottom: 1px solid @sidebar-border;
+	}
+}
+
+.ant-pro-global-header-logo {
+	a img {
+		height: 28px !important;
+		padding: 0 !important;
+	}
+}
+
+// ─── Fix Sider ────────────────────────────────
 .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
 	left: unset;
 }
 
-// Compatible with IE11
-@media screen and(-ms-high-contrast: active),
-(-ms-high-contrast: none) {
-	body .ant-design-pro>.ant-layout {
+// ─── Global Card Override ─────────────────────
+.ant-card {
+	background: @card-white;
+	border-radius: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.04);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+// ─── IE11 compat ──────────────────────────────
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+	body .ant-design-pro > .ant-layout {
 		min-height: 100vh;
 	}
 }

@@ -1,0 +1,405 @@
+@import '~antd/es/style/themes/default.less';
+
+// ========== Design Tokens ==========
+@primary: #10B981; // Emerald
+@primary-dark: #059669;
+@primary-hover: #34D399;
+@primary-light: #ECFDF5;
+@primary-bg: #F0FDF4;
+@text-primary: #0F172A;
+@text-secondary: #64748B;
+@text-muted: #94A3B8;
+@surface: #FFFFFF;
+@surface-muted: #F8FAFC;
+@border-subtle: #F1F5F9;
+@border-default: #E2E8F0;
+@shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+@shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+@shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+@shadow-glow: 0 4px 14px rgba(16, 185, 129, 0.1);
+@radius-sm: 12px;
+@radius-md: 16px;
+@radius-lg: 20px;
+@radius-xl: 24px;
+@transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+@keyframes bentoFadeIn {
+	from { opacity: 0; transform: translateY(16px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatIn {
+	from { opacity: 0; transform: translateY(24px) scale(0.97); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.bento-cell() {
+	background: @surface;
+	border-radius: @radius-lg;
+	border: 1px solid @border-subtle;
+	box-shadow: @shadow-sm;
+	transition: @transition;
+	animation: bentoFadeIn 0.5s ease both;
+	overflow: hidden;
+
+	&:hover {
+		box-shadow: @shadow-lg;
+		border-color: fade(@primary, 30%);
+	}
+}
+
+// ========== Container ==========
+.vet-mgmt-container {
+	padding: 24px 32px;
+	background: transparent;
+	min-height: 100vh;
+
+	// Page Header
+	.page-header {
+		margin-bottom: 28px;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		animation: bentoFadeIn 0.4s ease both;
+
+		h1 {
+			font-size: 28px;
+			font-weight: 900;
+			color: @text-primary;
+			margin: 0;
+			display: flex;
+			align-items: center;
+			letter-spacing: -0.5px;
+
+			.header-icon {
+				margin-right: 14px;
+				font-size: 24px;
+				color: @primary-dark;
+				background: linear-gradient(135deg, @primary-bg, fade(@primary, 25%));
+				padding: 10px;
+				border-radius: @radius-sm;
+				box-shadow: 0 4px 12px rgba(246, 215, 118, 0.2);
+			}
+		}
+
+		.add-vet-btn {
+			border-radius: 12px;
+			background: @primary;
+			border: none;
+			color: #FFFFFF;
+			font-weight: 700;
+			height: 44px;
+			padding: 0 24px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+			transition: @transition;
+
+			&:hover, &:focus {
+				transform: translateY(-2px);
+				box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+				background: @primary-hover;
+			}
+		}
+	}
+
+	// ========== Doctor Grid ==========
+	.vet-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 24px;
+		margin-bottom: 28px;
+
+		.vet-bento-card {
+			.bento-cell();
+			display: flex;
+			flex-direction: column;
+			animation: floatIn 0.5s ease both;
+
+			// Cascading delays
+			&:nth-child(1) { animation-delay: 0.05s; }
+			&:nth-child(2) { animation-delay: 0.1s; }
+			&:nth-child(3) { animation-delay: 0.15s; }
+			&:nth-child(4) { animation-delay: 0.2s; }
+			&:nth-child(5) { animation-delay: 0.25s; }
+			&:nth-child(6) { animation-delay: 0.3s; }
+
+			&:hover {
+				transform: translateY(-6px);
+				box-shadow: @shadow-glow;
+			}
+
+			// Card Header (Avatar + Status)
+			.vet-card-header {
+				padding: 24px 24px 16px 24px;
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				background: linear-gradient(to bottom, @surface-muted, @surface);
+				border-bottom: 1px solid @border-subtle;
+				position: relative;
+
+				.vet-avatar {
+					border: 3px solid @primary-light;
+					box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+					background: @primary-bg;
+				}
+
+				.vet-header-text {
+					flex: 1;
+
+					h3 {
+						font-size: 18px;
+						font-weight: 800;
+						color: @text-primary;
+						margin: 0 0 6px 0;
+						letter-spacing: -0.3px;
+					}
+
+					.specialization-tag {
+						border-radius: 6px;
+						font-weight: 600;
+						margin: 0;
+					}
+				}
+
+				.status-switch-wrapper {
+					position: absolute;
+					top: 24px;
+					right: 24px;
+					
+					.ant-switch-checked {
+						background-color: #52c41a !important;
+					}
+				}
+			}
+
+			// Card Body
+			.vet-card-body {
+				padding: 20px 24px;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+
+				// Bio
+				.bio-box {
+					font-size: 13px;
+					color: @text-secondary;
+					line-height: 1.5;
+					margin: 0;
+					display: -webkit-box;
+					-webkit-line-clamp: 3;
+					-webkit-box-orient: vertical;
+					overflow: hidden;
+
+					&.expanded {
+						display: block;
+						overflow: visible;
+					}
+				}
+
+				.bio-toggle {
+					font-size: 12px;
+					color: @primary-dark;
+					font-weight: 700;
+					cursor: pointer;
+					margin-top: -8px;
+					align-self: flex-start;
+					transition: @transition;
+
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+
+				// Mini Bento Contact Box
+				.contact-bento-box {
+					background: @surface-muted;
+					border-radius: @radius-md;
+					padding: 12px 14px;
+					border: 1px solid @border-subtle;
+					display: flex;
+					flex-direction: column;
+					gap: 8px;
+
+					a {
+						color: @text-primary;
+						display: flex;
+						align-items: center;
+						gap: 10px;
+						font-size: 13px;
+						font-weight: 500;
+						transition: color 0.2s;
+
+						.contact-icon {
+							color: @primary-dark;
+							font-size: 14px;
+						}
+
+						&:hover {
+							color: @primary-dark;
+						}
+					}
+				}
+
+				// Certificate
+				.certificate-btn {
+					width: 100%;
+					border-radius: 10px;
+					background: @primary-bg;
+					border: 1px dashed fade(@primary, 60%);
+					color: @primary-dark;
+					font-weight: 700;
+					font-size: 13px;
+					height: 40px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					gap: 8px;
+					transition: @transition;
+
+					&:hover {
+						background: fade(@primary, 20%);
+						border-style: solid;
+						color: @text-primary;
+					}
+				}
+				
+				.no-certificate {
+					font-size: 11px;
+					color: @text-muted;
+					font-style: italic;
+					display: block;
+					text-align: center;
+					border: 1px dashed @border-default;
+					padding: 8px;
+					border-radius: 10px;
+					background: @surface-muted;
+				}
+			}
+
+			// Card Footer Actions
+			.vet-card-footer {
+				padding: 16px 24px;
+				background: @surface-muted;
+				border-top: 1px solid @border-subtle;
+				display: flex;
+				justify-content: flex-end;
+				gap: 12px;
+
+				.edit-btn {
+					border-radius: 8px;
+					border-color: @primary;
+					color: @primary-dark;
+					background: @primary-bg;
+					font-weight: 600;
+					height: 36px;
+					
+					&:hover {
+						background: @primary;
+						color: @text-primary;
+					}
+				}
+
+				.delete-btn {
+					border-radius: 8px;
+					font-weight: 600;
+					height: 36px;
+				}
+			}
+		}
+	}
+}
+
+// ========== Modal Custom Form ==========
+.vet-modal {
+	.ant-modal-content {
+		border-radius: @radius-xl;
+		overflow: hidden;
+		box-shadow: @shadow-lg;
+	}
+
+	.ant-modal-header {
+		background: linear-gradient(135deg, @surface-muted, @surface);
+		border-bottom: 1px solid @border-subtle;
+		padding: 20px 24px;
+	}
+
+	.ant-modal-title {
+		font-weight: 900;
+		color: @text-primary;
+		letter-spacing: -0.5px;
+	}
+
+	.ant-modal-body {
+		padding: 24px;
+	}
+
+	.ant-form-item-label > label {
+		font-weight: 700;
+		color: @text-secondary;
+	}
+
+	.form-input {
+		border-radius: 10px;
+		transition: @transition;
+		
+		&:hover, &:focus {
+			border-color: @primary;
+			box-shadow: 0 0 0 3px fade(@primary, 15%);
+		}
+	}
+
+	.ant-modal-footer {
+		padding: 16px 24px;
+		border-top: 1px solid @border-subtle;
+		background: @surface-muted;
+
+		.ant-btn {
+			border-radius: 10px;
+			font-weight: 600;
+			height: 40px;
+		}
+
+		.cancel-btn {
+			border-color: @border-default;
+			&:hover {
+				color: @primary-dark;
+				border-color: @primary-dark;
+			}
+		}
+
+		.submit-btn {
+			background: @primary;
+			border: none;
+			color: #FFFFFF;
+			font-weight: 700;
+
+			&:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+				background: @primary-hover;
+			}
+		}
+	}
+}
+
+// ========== Responsive ==========
+@media (max-width: 768px) {
+	.vet-mgmt-container {
+		padding: 16px;
+		
+		.page-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 16px;
+			
+			.add-vet-btn {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+	}
+}
