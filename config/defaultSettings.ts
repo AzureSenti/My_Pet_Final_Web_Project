@@ -8,10 +8,10 @@ const Settings: LayoutSettings & {
 } = {
 	navTheme: 'light',
 	primaryColor: process.env.APP_CONFIG_PRIMARY_COLOR,
-	borderRadiusBase: '2px',
+	borderRadiusBase: '12px',
 	layout: 'mix',
 	contentWidth: 'Fluid',
-	fixedHeader: false,
+	fixedHeader: true,
 	fixSiderbar: true,
 	colorWeak: false,
 	title: 'MyPet',
@@ -19,8 +19,8 @@ const Settings: LayoutSettings & {
 	logo: 'https://cdn-icons-png.flaticon.com/512/3565/3565860.png',
 	iconfontUrl: '',
 	headerTheme: 'light',
-	headerHeight: 60,
-	siderWidth: 220,
+	headerHeight: 56,
+	siderWidth: 200,
 };
 
 export default Settings;
