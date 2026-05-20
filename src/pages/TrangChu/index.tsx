@@ -347,10 +347,55 @@ const PetStatBar = ({ stat }: { stat: typeof PET_STATS[0] }) => {
 	);
 };
 
-// ─── Main Dashboard ───────────────────────────
+import { getDashboardStats } from '@/services/QuanLyPetStore';
+
 const TrangChu = () => {
-	const { data } = useModel('randomuser');
 	const [activePeriod, setActivePeriod] = useState('12T');
+	const [stats, setStats] = useState<any>(null);
+
+	useEffect(() => {
+		const fetchStats = async () => {
+			const data = await getDashboardStats();
+			setStats(data);
+		};
+		fetchStats();
+	}, []);
+
+	// Mapping dữ liệu từ API vào UI
+	const dynamicKPI = [
+		{
+			label: 'Tổng thú cưng',
+			value: stats?.total_pets || 0,
+			trend: '+12.5%',
+			trendDir: 'up',
+			icon: '🐾',
+			color: 'emerald',
+		},
+		{
+			label: 'Tổng khách hàng',
+			value: stats?.total_owners || 0,
+			trend: '+8.2%',
+			trendDir: 'up',
+			icon: '👥',
+			color: 'indigo',
+		},
+		{
+			label: 'Tổng bác sĩ',
+			value: stats?.total_vets || 0,
+			trend: '+5.7%',
+			trendDir: 'up',
+			icon: '🩺',
+			color: 'rose',
+		},
+		{
+			label: 'Tổng tài khoản',
+			value: stats?.total_users || 0,
+			trend: '+2.1%',
+			trendDir: 'up',
+			icon: '👤',
+			color: 'amber',
+		},
+	];
 
 	return (
 		<div className="saas-dashboard">
@@ -364,7 +409,7 @@ const TrangChu = () => {
 
 			{/* ── KPI Cards ───────────────────── */}
 			<div className="kpi-grid">
-				{KPI_DATA.map((item, idx) => (
+				{dynamicKPI.map((item, idx) => (
 					<KPICard key={idx} item={item} />
 				))}
 			</div>

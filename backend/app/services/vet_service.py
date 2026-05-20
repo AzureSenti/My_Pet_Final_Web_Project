@@ -52,8 +52,14 @@ async def create_vet(db: AsyncSession, data: VetCreateRequest) -> Veterinarian:
     )
     db.add(vet)
     await db.commit()
-    await db.refresh(vet)
-    return vet
+    
+    # Nạp lại dữ liệu vet kèm theo user để tránh lỗi lazy load
+    result = await db.execute(
+        select(Veterinarian)
+        .options(joinedload(Veterinarian.user))
+        .where(Veterinarian.id == vet.id)
+    )
+    return result.scalar_one()
 
 async def get_vet_by_id(db: AsyncSession, vet_id: uuid.UUID) -> Veterinarian:
     result = await db.execute(
