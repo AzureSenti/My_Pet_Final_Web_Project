@@ -33,19 +33,16 @@ import data from './data';
  * Chuyển sang xử lý access_token with OIDC auth ở Technical Support
  */
 // Add a request interceptor
-// axios.interceptors.request.use(
-//   (config) => {
-//     if (!config.headers.Authorization) {
-//       const token = localStorage.getItem('token');
-//       if (token) {
-//         // eslint-disable-next-line no-param-reassign
-//         config.headers.Authorization = `Bearer ${token}`;
-//       }
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error),
-// );
+axios.interceptors.request.use(
+	(config) => {
+		const token = localStorage.getItem('token');
+		if (token && config.headers) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+		return config;
+	},
+	(error) => Promise.reject(error),
+);
 
 // Add a response interceptor
 axios.interceptors.response.use(
@@ -63,11 +60,11 @@ axios.interceptors.response.use(
 			? er?.detail?.exception?.response?.message?.join(', ')
 			: // Sequelize validation Errors
 			Array.isArray(er?.detail?.exception?.errors)
-			? er?.detail?.exception?.errors?.map((e: any) => e?.message)?.join(', ')
-			: data.error[er?.detail?.errorCode || er?.errorCode] ||
-			  er?.detail?.message ||
-			  er?.message ||
-			  er?.errorDescription;
+				? er?.detail?.exception?.errors?.map((e: any) => e?.message)?.join(', ')
+				: data.error[er?.detail?.errorCode || er?.errorCode] ||
+				er?.detail?.message ||
+				er?.message ||
+				er?.errorDescription;
 
 		const originalRequest = error.config;
 		let originData = originalRequest?.data;

@@ -1,26 +1,20 @@
 import { AppModules, EModuleKey } from '@/services/base/constant';
 
-const ipRoot = APP_CONFIG_IP_ROOT; // ip dev
+const ipRoot = APP_CONFIG_IP_ROOT; // http://localhost:8080/ (từ .env)
 
-// Ip Chính => Mặc định dùng trong các useInitModel
-const ip3 = ipRoot + 'slink'; // ip dev
+// Ip Chính
+const ip3 = ipRoot;
 
-// Ip khác
-const ipNotif = ipRoot + 'notification'; // ip dev
-const ipSlink = ipRoot + 'slink'; // ip dev
+// Endpoints cho FastAPI Auth
+const keycloakAuthority = '';
+const keycloakUserInfoEndpoint = ipRoot + 'api/v1/auth/me';
+const keycloakTokenEndpoint = ipRoot + 'api/v1/auth/refresh';
 
+// Các cấu hình khác
+const ipNotif = ipRoot + 'api/v1/notification';
+const ipSlink = ipRoot + 'api/v1';
 const currentRole = EModuleKey.CONNECT;
 const oneSignalRole = EModuleKey.CONNECT;
-
-// DO NOT TOUCH
-const keycloakClientID = '';
-const keycloakAuthority = '';
-const resourceServerClientId = '';
-const keycloakAuthEndpoint = '';
-const keycloakTokenEndpoint = '';
-const keycloakUserInfoEndpoint = '';
-const sentryDSN = APP_CONFIG_SENTRY_DSN || '';
-const oneSignalClient = '';
 
 export {
 	ip3,
@@ -28,12 +22,7 @@ export {
 	ipSlink,
 	currentRole,
 	oneSignalRole,
-	keycloakClientID,
-	resourceServerClientId,
-	keycloakAuthEndpoint,
-	keycloakTokenEndpoint,
 	keycloakUserInfoEndpoint,
+	keycloakTokenEndpoint,
 	keycloakAuthority,
-	sentryDSN,
-	oneSignalClient,
 };
