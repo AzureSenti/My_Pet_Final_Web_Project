@@ -23,7 +23,21 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<IInitialState> {
 	return {
-		permissionLoading: true,
+		permissionLoading: false,
+		currentUser: {
+			sub: 'mock-id-123',
+			ssoId: 'mock-id-123',
+			email: 'admin@gmail.com',
+			email_verified: true,
+			realm_access: {
+				roles: ['admin'],
+			},
+			name: 'Admin Mock',
+			preferred_username: 'admin',
+			given_name: 'Admin',
+			family_name: 'Mock',
+			picture: 'https://i.pravatar.cc/150?img=12',
+		},
 	};
 }
 

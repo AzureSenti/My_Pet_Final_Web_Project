@@ -388,20 +388,38 @@ function setStorageItem<T>(key: string, data: T[]): void {
 //  SECTION 4 — EXPORTED SERVICE FUNCTIONS (Promise-based for Easy API Swapping)
 // =============================================================================
 
+import axios from '@/utils/axios';
+import { ip3 } from '@/utils/ip';
+
+// ... (giữ lại các interfaces)
+
+// --- DASHBOARD SERVICES ---
+
+export const getDashboardStats = async (): Promise<any> => {
+	const res = await axios.get(`${ip3}api/v1/admin/dashboard/stats`);
+	return res.data;
+};
+
 // --- USER (OWNER) SERVICES ---
 
 export const getOwners = async (): Promise<User[]> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	// Return only owners
-	return users.filter((u) => u.role === 'owner');
+	// Gọi API lấy danh sách user filter theo role owner
+	const res = await axios.get(`${ip3}api/v1/admin/users`, {
+		params: { role: 'owner', limit: 100 }
+	});
+	return res.data.items; // items từ backend schema
 };
 
 export const toggleUserStatus = async (id: string, active: boolean): Promise<boolean> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const updated = users.map((u) => (u.id === id ? { ...u, is_active: active } : u));
-	setStorageItem<User>('users', updated);
-	message.success(active ? 'Đã mở khóa tài khoản thành công!' : 'Đã khóa tài khoản thành công!');
-	return true;
+	const endpoint = active ? 'unlock' : 'lock';
+	try {
+		await axios.patch(`${ip3}api/v1/admin/users/${id}/${endpoint}`);
+		message.success(active ? 'Đã mở khóa tài khoản thành công!' : 'Đã khóa tài khoản thành công!');
+		return true;
+	} catch (error) {
+		message.error('Thực hiện thao tác thất bại!');
+		return false;
+	}
 };
 
 export const getOwnerDetails = async (ownerId: string): Promise<{
@@ -460,222 +478,85 @@ export const getOwnerDetails = async (ownerId: string): Promise<{
 
 // --- PET (VETERINARY MEDICAL PROFILE) SERVICES ---
 
-export const getPets = async (filters?: { searchOwner?: string; searchPet?: string; species?: string }): Promise<(Pet & { owner_name: string; owner_email: string; owner_phone: string })[]> => {
-	const pets = getStorageItem<Pet>('pets', INITIAL_PETS);
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-
-	let enrichedPets = pets.map((p) => {
-		const owner = users.find((u) => u.id === p.owner_id) || { full_name: 'Không có chủ', email: '', phone: '' };
-		return {
-			...p,
-			owner_name: owner.full_name,
-			owner_email: owner.email,
-			owner_phone: owner.phone || '',
-		};
+export const getPets = async (filters?: { searchPet?: string; species?: string }): Promise<any[]> => {
+	const res = await axios.get(`${ip3}api/v1/admin/pets`, {
+		params: {
+			search: filters?.searchPet,
+			species: filters?.species === 'ALL' ? undefined : filters?.species,
+			limit: 100
+		}
 	});
 
-	if (filters) {
-		const { searchOwner, searchPet, species } = filters;
-		if (searchPet) {
-			enrichedPets = enrichedPets.filter((p) => p.name.toLowerCase().includes(searchPet.toLowerCase()));
-		}
-		if (searchOwner) {
-			enrichedPets = enrichedPets.filter((p) =>
-				p.owner_name.toLowerCase().includes(searchOwner.toLowerCase()) ||
-				p.owner_email.toLowerCase().includes(searchOwner.toLowerCase()) ||
-				p.owner_phone.includes(searchOwner)
-			);
-		}
-		if (species && species !== 'ALL') {
-			enrichedPets = enrichedPets.filter((p) => p.species === species);
-		}
-	}
-
-	return enrichedPets;
+	// Backend trả về items có sẵn object owner
+	return res.data.items.map((p: any) => ({
+		...p,
+		owner_name: p.owner?.full_name || 'Không rõ',
+		owner_email: p.owner?.email || '',
+		owner_phone: p.owner?.phone || '',
+	}));
 };
 
-export const getPetMedicalRecords = async (petId: string): Promise<{
-	pet: Pet | null;
-	owner: User | null;
-	records: (MedicalRecord & { vet_name: string; service_name: string; scheduled_at: string })[];
-}> => {
-	const pets = getStorageItem<Pet>('pets', INITIAL_PETS);
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const appointments = getStorageItem<Appointment>('appointments', INITIAL_APPOINTMENTS);
-	const medicalRecords = getStorageItem<MedicalRecord>('medical_records', INITIAL_MEDICAL_RECORDS);
-	const services = getStorageItem<Service>('services', INITIAL_SERVICES);
-	const veterinarians = getStorageItem<Veterinarian>('veterinarians', INITIAL_VETERINARIANS);
-
-	const pet = pets.find((p) => p.id === petId) || null;
-	const owner = pet ? users.find((u) => u.id === pet.owner_id) || null : null;
-
-	const petRecords = medicalRecords
-		.filter((mr) => mr.pet_id === petId)
-		.map((mr) => {
-			const app = appointments.find((a) => a.id === mr.appointment_id);
-			const service = app ? services.find((s) => s.id === app.service_id) : null;
-			const vet = veterinarians.find((v) => v.id === mr.vet_id);
-			const vetUser = vet ? users.find((u) => u.id === vet.user_id) : null;
-
-			return {
-				...mr,
-				vet_name: vetUser ? vetUser.full_name : 'Bác sĩ điều trị',
-				service_name: service ? service.name : 'Khám lâm sàng',
-				scheduled_at: app ? app.scheduled_at : mr.recorded_at,
-			};
-		})
-		.sort((a, b) => new Date(b.recorded_at).getTime() - new Date(a.recorded_at).getTime()); // Newest first
-
+export const getPetMedicalRecords = async (petId: string): Promise<any> => {
+	// Hiện tại mới chỉ có API xem chi tiết Pet, chưa có API xem hồ sơ bệnh án riêng.
+	// Tôi sẽ gọi tạm API chi tiết để lấy thông tin Pet.
+	const res = await axios.get(`${ip3}api/v1/admin/pets/${petId}`);
 	return {
-		pet,
-		owner,
-		records: petRecords,
+		pet: res.data,
+		owner: res.data.owner,
+		records: [] // Phần này sẽ bổ sung khi xây dựng module Medical Records ở Backend
 	};
 };
 
 // --- VET / DOCTOR SERVICES ---
 
-export const getDoctors = async (): Promise<(User & { vet_id: string; specialization: string; bio: string; certificate_url: string })[]> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const veterinarians = getStorageItem<Veterinarian>('veterinarians', INITIAL_VETERINARIANS);
-
-	const vets = users.filter((u) => u.role === 'vet');
-	return vets.map((u) => {
-		const vetInfo = veterinarians.find((v) => v.user_id === u.id) || {
-			id: '',
-			specialization: 'Chưa cập nhật',
-			bio: 'Chưa cập nhật tiểu sử.',
-			certificate_url: '',
-		};
-		return {
-			...u,
-			vet_id: vetInfo.id,
-			specialization: vetInfo.specialization,
-			bio: vetInfo.bio || '',
-			certificate_url: vetInfo.certificate_url || '',
-		};
-	});
+export const getDoctors = async (): Promise<any[]> => {
+	const res = await axios.get(`${ip3}api/v1/admin/vets`, { params: { limit: 100 } });
+	return res.data.items.map((v: any) => ({
+		...v.user,
+		vet_id: v.id,
+		specialization: v.specialization,
+		bio: v.bio,
+		certificate_url: v.certificate_url,
+		is_active: v.is_active
+	}));
 };
 
-export const createDoctor = async (data: {
-	full_name: string;
-	email: string;
-	phone?: string;
-	avatar_url?: string;
-	specialization: string;
-	bio?: string;
-	certificate_url?: string;
-}): Promise<boolean> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const veterinarians = getStorageItem<Veterinarian>('veterinarians', INITIAL_VETERINARIANS);
-
-	// Check email uniqueness
-	if (users.some((u) => u.email.toLowerCase() === data.email.toLowerCase())) {
-		message.error('Email này đã được sử dụng!');
+export const createDoctor = async (data: any): Promise<boolean> => {
+	try {
+		await axios.post(`${ip3}api/v1/admin/vets`, data);
+		message.success('Thêm bác sĩ thú y mới thành công!');
+		return true;
+	} catch (error) {
 		return false;
 	}
-
-	const newUserId = `a0000000-0000-0000-0000-${Math.random().toString(36).substr(2, 12)}`;
-	const newVetId = `d0000000-0000-0000-0000-${Math.random().toString(36).substr(2, 12)}`;
-
-	const newUser: User = {
-		id: newUserId,
-		full_name: data.full_name,
-		email: data.email,
-		phone: data.phone,
-		role: 'vet',
-		is_active: true,
-		avatar_url: data.avatar_url || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200',
-		created_at: new Date().toISOString(),
-	};
-
-	const newVet: Veterinarian = {
-		id: newVetId,
-		user_id: newUserId,
-		specialization: data.specialization,
-		bio: data.bio || '',
-		certificate_url: data.certificate_url || '',
-		is_active: true,
-	};
-
-	setStorageItem<User>('users', [...users, newUser]);
-	setStorageItem<Veterinarian>('veterinarians', [...veterinarians, newVet]);
-
-	message.success('Thêm bác sĩ thú y mới thành công!');
-	return true;
 };
 
-export const updateDoctor = async (userId: string, data: {
-	full_name: string;
-	email: string;
-	phone?: string;
-	avatar_url?: string;
-	specialization: string;
-	bio?: string;
-	certificate_url?: string;
-}): Promise<boolean> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const veterinarians = getStorageItem<Veterinarian>('veterinarians', INITIAL_VETERINARIANS);
-
-	// Check email uniqueness if email changed
-	const existingUser = users.find((u) => u.id === userId);
-	if (existingUser && existingUser.email !== data.email) {
-		if (users.some((u) => u.email.toLowerCase() === data.email.toLowerCase())) {
-			message.error('Email này đã được sử dụng bởi tài khoản khác!');
-			return false;
-		}
+export const updateDoctor = async (vetId: string, data: any): Promise<boolean> => {
+	try {
+		await axios.put(`${ip3}api/v1/admin/vets/${vetId}`, data);
+		message.success('Cập nhật thông tin bác sĩ thành công!');
+		return true;
+	} catch (error) {
+		return false;
 	}
-
-	const updatedUsers = users.map((u) => {
-		if (u.id === userId) {
-			return {
-				...u,
-				full_name: data.full_name,
-				email: data.email,
-				phone: data.phone,
-				avatar_url: data.avatar_url,
-			};
-		}
-		return u;
-	});
-
-	const updatedVets = veterinarians.map((v) => {
-		if (v.user_id === userId) {
-			return {
-				...v,
-				specialization: data.specialization,
-				bio: data.bio,
-				certificate_url: data.certificate_url,
-			};
-		}
-		return v;
-	});
-
-	setStorageItem<User>('users', updatedUsers);
-	setStorageItem<Veterinarian>('veterinarians', updatedVets);
-
-	message.success('Cập nhật thông tin bác sĩ thành công!');
-	return true;
 };
 
-export const deleteDoctor = async (userId: string): Promise<boolean> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const veterinarians = getStorageItem<Veterinarian>('veterinarians', INITIAL_VETERINARIANS);
-
-	const updatedUsers = users.filter((u) => u.id !== userId);
-	const updatedVets = veterinarians.filter((v) => v.user_id !== userId);
-
-	setStorageItem<User>('users', updatedUsers);
-	setStorageItem<Veterinarian>('veterinarians', updatedVets);
-
-	message.success('Đã xóa bác sĩ khỏi hệ thống!');
-	return true;
+export const deleteDoctor = async (vetId: string): Promise<boolean> => {
+	try {
+		await axios.delete(`${ip3}api/v1/admin/vets/${vetId}`);
+		message.success('Đã xóa bác sĩ khỏi hệ thống!');
+		return true;
+	} catch (error) {
+		return false;
+	}
 };
 
-export const toggleDoctorStatus = async (userId: string, active: boolean): Promise<boolean> => {
-	const users = getStorageItem<User>('users', INITIAL_USERS);
-	const updated = users.map((u) => (u.id === userId ? { ...u, is_active: active } : u));
-	setStorageItem<User>('users', updated);
-	message.success(active ? 'Đã mở khóa hoạt động bác sĩ!' : 'Đã tạm ngưng hoạt động bác sĩ!');
-	return true;
+export const toggleDoctorStatus = async (vetId: string): Promise<boolean> => {
+	try {
+		await axios.patch(`${ip3}api/v1/admin/vets/${vetId}/toggle`);
+		message.success('Đã thay đổi trạng thái hoạt động của bác sĩ!');
+		return true;
+	} catch (error) {
+		return false;
+	}
 };
