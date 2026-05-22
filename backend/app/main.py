@@ -20,9 +20,20 @@ app = FastAPI(
 
 # ─────────────────────────── CORS ───────────────────────────
 
+# Định nghĩa danh sách các nguồn (origins) được phép truy cập vào backend này
+allowed_origins = [
+    settings.FRONTEND_URL,       # URL cấu hình từ file env công ty/cá nhân
+    "http://localhost:8000",     # Port cũ phòng hờ
+    "http://localhost:8001",     # Port thực tế backend đang chạy trong terminal của bạn
+    "http://localhost:3000",     # Port mặc định của React (Create React App)
+    "http://localhost:5173",     # Port mặc định của React (Vite)
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL, "http://localhost:8000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
