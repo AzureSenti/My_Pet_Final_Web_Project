@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useModel } from 'umi';
 import {
 	UserOutlined,
@@ -104,7 +104,7 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 			style: {
 				colors: ['#B5AFA5', '#B5AFA5', '#4A5B3E', '#B5AFA5', '#B5AFA5', '#B5AFA5', '#B5AFA5'], // Highlight T4
 				fontSize: '13px',
-				fontWeight: [500, 500, 800, 500, 500, 500, 500]
+				fontWeight: 500
 			}
 		},
 	},
@@ -239,6 +239,12 @@ const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
 	</div>
 );
 
+const ACTIVITIES = [
+	{ title: 'Lịch hẹn mới', desc: 'BS. Hoa, Chó "Bông"', time: 'Vừa xong', dot: 'blue' },
+	{ title: 'Thanh toán', desc: '500,000đ - Max', time: '2 giờ trước', dot: 'green' },
+	{ title: 'Hủy lịch', desc: 'Mèo "Luna"', time: '5 giờ trước', dot: 'red' },
+];
+
 const ActivityItem = ({ item, isLast }: { item: typeof ACTIVITIES[0]; isLast: boolean }) => (
 	<li className="activity-item">
 		<div className="activity-dot-wrapper">
@@ -251,6 +257,12 @@ const ActivityItem = ({ item, isLast }: { item: typeof ACTIVITIES[0]; isLast: bo
 		</div>
 	</li>
 );
+
+const TOP_USERS = [
+	{ name: 'Trần Thị Lan', pets: 3, spending: '4,200k', avatar: 'https://i.pravatar.cc/150?u=lan' },
+	{ name: 'Lê Văn Minh', pets: 2, spending: '3,800k', avatar: 'https://i.pravatar.cc/150?u=minh' },
+	{ name: 'Phạm Hồng Anh', pets: 4, spending: '2,900k', avatar: 'https://i.pravatar.cc/150?u=anh' },
+];
 
 const UserItem = ({ user, rank }: { user: typeof TOP_USERS[0]; rank: number }) => {
 	const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : 'default';
@@ -268,6 +280,11 @@ const UserItem = ({ user, rank }: { user: typeof TOP_USERS[0]; rank: number }) =
 		</li>
 	);
 };
+
+const PET_STATS = [
+	{ label: 'Chó', count: 124, total: 200, emoji: '🐶', color: 'blue' },
+	{ label: 'Mèo', count: 86, total: 200, emoji: '🐱', color: 'orange' },
+];
 
 const PetStatBar = ({ stat }: { stat: typeof PET_STATS[0] }) => {
 	const [width, setWidth] = useState(0);
@@ -298,10 +315,34 @@ const PetStatBar = ({ stat }: { stat: typeof PET_STATS[0] }) => {
 	);
 };
 
+const KPICard = ({ item }: { item: any }) => (
+	<div className={`pc-metric-card ${item.color}`}>
+		<div className="metric-icon-box">{item.icon}</div>
+		<div className="metric-content">
+			<div className="metric-label">{item.label}</div>
+			<div className="metric-value">
+				<CountUp end={item.value} duration={1.5} separator="," />
+			</div>
+			<div className="metric-sub" style={{ color: item.trendDir === 'up' ? '#059669' : '#E11D48' }}>
+				{item.trend} so với tháng trước
+			</div>
+		</div>
+	</div>
+);
+
+const LegendItem = ({ color, label, count }: { color: string; label: string; count: number }) => (
+	<div className="legend-item">
+		<div className="legend-dot" style={{ backgroundColor: color }} />
+		<span className="legend-label">{label}</span>
+		<span className="legend-count">{count}</span>
+	</div>
+);
+
 import { getDashboardStats } from '@/services/QuanLyPetStore';
 
 const TrangChu = () => {
 	const [activePeriod, setActivePeriod] = useState('12T');
+	const [filterPeriod, setFilterPeriod] = useState('7 days');
 	const [stats, setStats] = useState<any>(null);
 
 	useEffect(() => {
@@ -320,7 +361,7 @@ const TrangChu = () => {
 			trend: '+12.5%',
 			trendDir: 'up',
 			icon: '🐾',
-			color: 'emerald',
+			color: 'warm',
 		},
 		{
 			label: 'Tổng khách hàng',
@@ -328,7 +369,7 @@ const TrangChu = () => {
 			trend: '+8.2%',
 			trendDir: 'up',
 			icon: '👥',
-			color: 'indigo',
+			color: 'mint',
 		},
 		{
 			label: 'Tổng bác sĩ',
@@ -336,7 +377,7 @@ const TrangChu = () => {
 			trend: '+5.7%',
 			trendDir: 'up',
 			icon: '🩺',
-			color: 'rose',
+			color: 'pink',
 		},
 		{
 			label: 'Tổng tài khoản',
@@ -344,7 +385,7 @@ const TrangChu = () => {
 			trend: '+2.1%',
 			trendDir: 'up',
 			icon: '👤',
-			color: 'amber',
+			color: 'peach',
 		},
 	];
 
@@ -367,14 +408,14 @@ const TrangChu = () => {
 							<span className="pc-user-name">Administrator</span>
 						</div>
 						<div className="pc-user-avatar">
-							<img src={data?.results?.[0]?.picture?.thumbnail || "https://i.pravatar.cc/150?img=12"} alt="User Avatar" />
+							<img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" />
 						</div>
 					</div>
 				</div>
 			</div>
 
 			{/* ── KPI Cards ───────────────────── */}
-			<div className="kpi-grid">
+			<div className="pc-metrics-grid">
 				{dynamicKPI.map((item, idx) => (
 					<KPICard key={idx} item={item} />
 				))}
