@@ -7,20 +7,20 @@ const Settings: LayoutSettings & {
 	siderWidth: number;
 } = {
 	navTheme: 'light',
-	primaryColor: process.env.APP_CONFIG_PRIMARY_COLOR,
-	borderRadiusBase: '12px',
-	layout: 'mix',
+	primaryColor: '#8B7355',
+	borderRadiusBase: '16px',
+	layout: 'side',
 	contentWidth: 'Fluid',
 	fixedHeader: true,
 	fixSiderbar: true,
 	colorWeak: false,
-	title: 'MyPet',
+	title: 'PetCare',
 	pwa: false,
 	logo: 'https://cdn-icons-png.flaticon.com/512/3565/3565860.png',
 	iconfontUrl: '',
 	headerTheme: 'light',
-	headerHeight: 56,
-	siderWidth: 200,
+	headerHeight: 0,
+	siderWidth: 240,
 };
 
 export default Settings;

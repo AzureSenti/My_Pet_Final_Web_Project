@@ -20,27 +20,33 @@ export default [
 	// DEFAULT MENU
 	{
 		path: '/dashboard',
-		name: 'Trang Chủ',
+		name: 'Tổng quan',
 		component: './TrangChu',
-		icon: 'HomeOutlined',
+		icon: 'DashboardOutlined',
 	},
 	{
 		path: '/quan-ly-nguoi-dung',
-		name: 'Quản Lý Người Dùng',
+		name: 'Quản lý người dùng',
 		component: './QuanLyNguoiDung',
-		icon: 'UserOutlined',
-	},
-	{
-		path: '/quan-ly-thu-cung',
-		name: 'Quản Lý Thú Cưng',
-		component: './QuanLyThuCung',
-		icon: 'GitlabOutlined',
+		icon: 'TeamOutlined',
 	},
 	{
 		path: '/quan-ly-bac-si',
-		name: 'Quản Lý Bác Sĩ',
+		name: 'Quản lý bác sĩ',
 		component: './QuanLyBacSi',
-		icon: 'SolutionOutlined',
+		icon: 'MedicineBoxOutlined',
+	},
+	{
+		path: '/quan-ly-thu-cung',
+		name: 'Quản lý thú cưng',
+		component: './QuanLyThuCung',
+		icon: 'HeartOutlined',
+	},
+	{
+		path: '/appointments',
+		name: 'Quản lý lịch hẹn',
+		component: './TrangChu',
+		icon: 'CalendarOutlined',
 	},
 
 	{
