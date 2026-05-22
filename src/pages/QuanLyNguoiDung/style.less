@@ -1,643 +1,493 @@
 @import '~antd/es/style/themes/default.less';
 
-// ========== Design Tokens ==========
-@primary: #10B981; // Emerald
-@primary-dark: #059669;
-@primary-hover: #34D399;
-@primary-light: #ECFDF5;
-@primary-bg: #F0FDF4;
-@text-primary: #0F172A;
-@text-secondary: #64748B;
-@text-muted: #94A3B8;
-@surface: #FFFFFF;
-@surface-muted: #F8FAFC;
-@border-subtle: #F1F5F9;
-@border-default: #E2E8F0;
-@shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-@shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-@shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-@shadow-glow: 0 4px 14px rgba(16, 185, 129, 0.1);
-@radius-sm: 12px;
-@radius-md: 16px;
-@radius-lg: 20px;
-@radius-xl: 24px;
-@transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+// ─── Variables ──────────────────────────────────────────────
+@bg-color: #F8F9FA; // Off-white modern background
+@card-bg: #FFFFFF;
+@text-primary: #1A1A1A;
+@text-secondary: #6B7280;
+@border-color: #E5E7EB;
+@olive-green: #4A5B3E; // Olive green for buttons
+@olive-green-hover: #3A4731;
+@mustard-yellow: #F3D573;
+@mustard-yellow-light: #FEF3C7;
 
-// ========== Keyframes ==========
-@keyframes bentoFadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(16px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+// ─── Layout Container ──────────────────────────────────────
+.user-management-container {
+	padding: 0;
+	font-family: 'Inter', -apple-system, sans-serif;
+	color: @text-primary;
 }
 
-@keyframes shimmer {
-	0% { background-position: -200% 0; }
-	100% { background-position: 200% 0; }
-}
+// ─── Top Bar ───────────────────────────────────────────────
+.um-topbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 32px;
+	background: @card-bg;
+	border-bottom: 1px solid @border-color;
+	margin-bottom: 32px;
 
-@keyframes pulseGlow {
-	0%, 100% { box-shadow: 0 0 0 0 rgba(246, 215, 118, 0); }
-	50% { box-shadow: 0 0 0 6px rgba(246, 215, 118, 0.12); }
-}
-
-// ========== Bento Mixins ==========
-.bento-cell() {
-	background: @surface;
-	border-radius: @radius-lg;
-	border: 1px solid @border-subtle;
-	box-shadow: @shadow-sm;
-	transition: @transition;
-	animation: bentoFadeIn 0.5s ease both;
-	overflow: hidden;
-
-	&:hover {
-		box-shadow: @shadow-lg;
-		border-color: fade(@primary, 30%);
-		transform: translateY(-2px);
-	}
-}
-
-// ========== Container ==========
-.user-mgmt-container {
-	padding: 24px 32px;
-	background: transparent;
-	min-height: 100vh;
-
-	// ========== Page Header ==========
-	.page-header {
-		margin-bottom: 28px;
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		animation: bentoFadeIn 0.4s ease both;
-
-		h1 {
-			font-size: 28px;
-			font-weight: 900;
-			color: @text-primary;
-			margin: 0;
-			display: flex;
-			align-items: center;
-			letter-spacing: -0.5px;
-
-			.header-icon {
-				margin-right: 14px;
-				font-size: 24px;
-				color: @primary-dark;
-				background: linear-gradient(135deg, @primary-bg, fade(@primary, 25%));
-				padding: 10px;
-				border-radius: @radius-sm;
-				box-shadow: 0 4px 12px rgba(246, 215, 118, 0.2);
-			}
-		}
-	}
-
-	// ========== Bento Grid Layout ==========
-	.bento-grid {
-		display: grid;
-		grid-template-columns: repeat(12, 1fr);
-		grid-auto-rows: minmax(0, auto);
-		gap: 20px;
-		margin-bottom: 28px;
-	}
-
-	// ========== Stats Bento Cards ==========
-	.bento-stat {
-		.bento-cell();
-		padding: 24px;
-		position: relative;
-		cursor: default;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		min-height: 140px;
-
-		// Subtle gradient overlay
-		&::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			right: 0;
-			width: 120px;
-			height: 120px;
-			border-radius: 50%;
-			opacity: 0.06;
-			transform: translate(30%, -30%);
-			transition: @transition;
-		}
-
-		&:hover::before {
-			opacity: 0.1;
-			transform: translate(25%, -25%) scale(1.1);
-		}
-
-		&.stat-total {
-			grid-column: span 4;
-			animation-delay: 0.05s;
-			&::before { background: @primary; }
-		}
-		&.stat-active {
-			grid-column: span 4;
-			animation-delay: 0.1s;
-			&::before { background: #52c41a; }
-		}
-		&.stat-locked {
-			grid-column: span 4;
-			animation-delay: 0.15s;
-			&::before { background: #ff4d4f; }
-		}
-
-		.stat-top {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-		}
-
-		.stat-icon-box {
-			width: 48px;
-			height: 48px;
-			border-radius: @radius-sm;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 22px;
-			flex-shrink: 0;
-
-			&.icon-total {
-				background: @primary-light;
-				color: @primary-dark;
-			}
-			&.icon-active {
-				background: #EFF6FF;
-				color: #2563EB;
-			}
-			&.icon-locked {
-				background: #FEF2F2;
-				color: #DC2626;
-			}
-		}
-
-		.stat-badge {
-			font-size: 11px;
-			padding: 2px 10px;
-			border-radius: 20px;
-			font-weight: 600;
-			letter-spacing: 0.3px;
-
-			&.badge-total {
-				background: @primary-light;
-				color: @primary-dark;
-			}
-			&.badge-active {
-				background: #EFF6FF;
-				color: #2563EB;
-			}
-			&.badge-locked {
-				background: #FEF2F2;
-				color: #DC2626;
-			}
-		}
-
-		.stat-number {
-			font-size: 36px;
-			font-weight: 900;
-			color: @text-primary;
-			line-height: 1;
-			margin-top: 16px;
-			letter-spacing: -1px;
-		}
-
-		.stat-label {
-			font-size: 13px;
-			color: @text-secondary;
-			font-weight: 500;
-			margin-top: 4px;
-		}
-	}
-
-	// ========== Filter Bento Cell ==========
-	.bento-filter {
-		.bento-cell();
-		grid-column: span 12;
-		padding: 20px 24px;
-		animation-delay: 0.2s;
+	.um-search {
 		display: flex;
 		align-items: center;
-		gap: 16px;
-		flex-wrap: wrap;
+		background: #FFFBF0;
+		border-radius: 9999px;
+		padding: 0 20px;
+		width: 100%;
+		max-width: 480px;
+		height: 48px;
+		border: 1px solid @border-color;
+		transition: all 0.2s;
 
-		&:hover {
-			transform: none;
+		&:focus-within {
+			background: #FFFFFF;
+			border-color: @mustard-yellow;
+			box-shadow: 0 0 0 2px rgba(243, 213, 115, 0.2);
 		}
 
-		.filter-label {
-			font-size: 13px;
-			font-weight: 700;
-			color: @text-secondary;
-			white-space: nowrap;
-			display: flex;
-			align-items: center;
-			gap: 6px;
+		input {
+			border: none;
+			background: transparent;
+			outline: none;
+			width: 100%;
+			margin-left: 8px;
+			font-size: 14px;
+			color: @text-primary;
 
-			.anticon {
-				color: @primary-dark;
-			}
-		}
-
-		.search-input {
-			flex: 1;
-			min-width: 220px;
-			border-radius: 10px;
-			height: 38px;
-			border: 1px solid @border-default;
-			transition: @transition;
-
-			&:hover, &:focus {
-				border-color: @primary;
-				box-shadow: 0 0 0 3px fade(@primary, 15%);
-			}
-
-			.ant-input-prefix {
-				color: @text-muted;
+			&::placeholder {
+				color: #9CA3AF;
 			}
 		}
 
-		.status-select {
-			min-width: 160px;
-			.ant-select-selector {
-				border-radius: 10px !important;
-				height: 38px !important;
-				display: flex;
-				align-items: center;
-				border: 1px solid @border-default !important;
-				&:hover {
-					border-color: @primary !important;
-				}
-			}
-			&.ant-select-focused .ant-select-selector {
-				border-color: @primary !important;
-				box-shadow: 0 0 0 3px fade(@primary, 15%) !important;
-			}
-		}
-
-		.filter-actions {
-			display: flex;
-			gap: 10px;
-
-			.reset-btn {
-				border-radius: 10px;
-				height: 38px;
-				border: 1px solid @border-default;
-				color: @text-secondary;
-				font-weight: 600;
-				transition: @transition;
-
-				&:hover {
-					border-color: @primary;
-					color: @primary-dark;
-					background: @primary-bg;
-				}
-			}
+		svg {
+			color: #6B7280;
 		}
 	}
 
-	// ========== Table Bento Cell ==========
-	.bento-table {
-		.bento-cell();
-		grid-column: span 12;
-		animation-delay: 0.25s;
+	.um-topbar-right {
+		display: flex;
+		align-items: center;
+		gap: 24px;
 
-		&:hover {
-			transform: none;
-		}
+		.um-icon-btn {
+			cursor: pointer;
+			color: #4B5563;
+			transition: color 0.2s;
 
-		.ant-table-wrapper {
-			.ant-table {
-				border-radius: @radius-lg;
-				overflow: hidden;
-			}
-
-			.ant-table-thead > tr > th {
-				background: @surface-muted;
-				color: @text-secondary;
-				font-weight: 700;
-				font-size: 13px;
-				border-bottom: 1px solid @border-default;
-				padding: 14px 16px;
-				text-transform: uppercase;
-				letter-spacing: 0.3px;
-			}
-
-			.ant-table-tbody > tr {
-				transition: @transition;
-
-				& > td {
-					border-bottom: 1px solid fade(#000, 2%);
-					padding: 14px 16px;
-				}
-
-				&:hover > td {
-					background: fade(@primary, 5%) !important;
-				}
-
-				&:last-child > td {
-					border-bottom: none;
-				}
-			}
-
-			.ant-table-pagination {
-				padding: 16px 20px;
-				margin: 0;
+			&:hover {
+				color: @text-primary;
 			}
 		}
 
-		// User cell in table
-		.user-cell {
+		.um-profile {
 			display: flex;
 			align-items: center;
 			gap: 12px;
+			padding-left: 24px;
+			border-left: 1px solid @border-color;
 
-			.user-avatar {
-				border: 2px solid fade(@primary, 40%);
-				background: @primary-bg;
-				flex-shrink: 0;
+			.um-avatar {
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				object-fit: cover;
 			}
 
-			.user-info {
-				.user-name {
+			.um-profile-info {
+				display: flex;
+				flex-direction: column;
+
+				.um-profile-name {
 					font-weight: 700;
-					color: @text-primary;
 					font-size: 14px;
-					line-height: 1.3;
+					color: @text-primary;
 				}
-				.user-email {
+
+				.um-profile-role {
 					font-size: 12px;
-					color: @text-muted;
-					line-height: 1.3;
+					color: @text-secondary;
 				}
 			}
 		}
-
-		.status-tag {
-			border-radius: 20px;
-			padding: 2px 12px;
-			font-weight: 600;
-			font-size: 12px;
-			border: none;
-		}
-
-		.action-view-btn {
-			border-radius: 8px;
-			background: @primary-bg;
-			border: 1px solid fade(@primary, 40%);
-			color: @primary-dark;
-			transition: @transition;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-
-			&:hover {
-				background: @primary;
-				color: @text-primary;
-				border-color: @primary;
-				transform: scale(1.08);
-			}
-		}
-	}
-
-	// ========== Switch Override ==========
-	.ant-switch-checked {
-		background-color: #52c41a !important;
 	}
 }
 
-// ========== Drawer (outside container scope) ==========
-.owner-detail-drawer {
-	.ant-drawer-content-wrapper {
-		box-shadow: -10px 0 40px rgba(0, 0, 0, 0.06) !important;
+// ─── Page Header ───────────────────────────────────────────
+.um-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	margin: 0 32px 24px;
+
+	.um-header-title {
+		h1 {
+			font-size: 28px;
+			font-weight: 800;
+			margin: 0 0 8px;
+			color: @text-primary;
+			letter-spacing: -0.5px;
+		}
+		p {
+			margin: 0;
+			color: @text-secondary;
+			font-size: 14px;
+		}
 	}
 
-	.ant-drawer-header {
-		background: linear-gradient(135deg, @surface-muted, #fdfdf9);
-		border-bottom: 1px solid @border-subtle;
-		padding: 20px 24px;
-	}
-
-	.drawer-header-title {
+	.um-add-btn {
+		background: @olive-green;
+		color: #FFFFFF;
+		border: none;
+		border-radius: 8px;
+		padding: 10px 20px;
+		font-weight: 600;
+		font-size: 14px;
+		cursor: pointer;
+		transition: background 0.2s;
 		display: flex;
 		align-items: center;
+		gap: 8px;
 
-		.drawer-avatar {
-			border: 3px solid fade(@primary, 50%);
-			box-shadow: 0 4px 14px rgba(246, 215, 118, 0.25);
-			margin-right: 16px;
+		&:hover {
+			background: @olive-green-hover;
 		}
+	}
+}
 
-		.drawer-name {
-			font-size: 20px;
-			font-weight: 900;
+// ─── Filter Pills ──────────────────────────────────────────
+.um-filters {
+	display: flex;
+	gap: 12px;
+	margin: 0 32px 24px;
+
+	.um-filter-pill {
+		background: @card-bg;
+		border: 1px solid @border-color;
+		border-radius: 9999px;
+		padding: 6px 16px;
+		font-size: 13px;
+		font-weight: 500;
+		color: @text-secondary;
+		cursor: pointer;
+		transition: all 0.2s;
+
+		&:hover {
+			border-color: #D1D5DB;
 			color: @text-primary;
-			margin: 0 0 4px 0;
-			letter-spacing: -0.3px;
 		}
 
-		.drawer-email {
+		&.active {
+			background: @mustard-yellow-light;
+			border-color: @mustard-yellow;
+			color: @olive-green;
+			font-weight: 600;
+		}
+	}
+}
+
+// ─── Table Area ────────────────────────────────────────────
+.um-table-container {
+	margin: 0 32px 32px;
+	background: @card-bg;
+	border-radius: 16px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+
+	.ant-table-wrapper {
+		.ant-table {
+			background: transparent;
+		}
+
+		.ant-table-thead > tr > th {
+			background: #F9FAFB;
+			color: @text-secondary;
+			font-weight: 600;
 			font-size: 13px;
-			color: @text-muted;
+			border-bottom: 1px solid @border-color;
+			padding: 16px 24px;
+		}
+
+		.ant-table-tbody > tr > td {
+			padding: 16px 24px;
+			border-bottom: 1px solid @border-color;
+			font-size: 14px;
+		}
+
+		.ant-table-tbody > tr:last-child > td {
+			border-bottom: none;
 		}
 	}
 
-	// Tabs
-	.ant-tabs-nav {
-		margin-bottom: 20px;
-		&::before {
-			border-bottom: 1px solid @border-subtle;
-		}
+	// Custom Table Cells
+	.cell-user-profile {
+		display: flex;
+		align-items: center;
+		gap: 16px;
 
-		.ant-tabs-tab {
-			font-weight: 500;
-			padding: 12px 16px;
-			transition: @transition;
-			&:hover {
-				color: @primary-dark;
-			}
-		}
-
-		.ant-tabs-tab-active .ant-tabs-tab-btn {
-			color: @primary-dark;
-			font-weight: 700;
-		}
-
-		.ant-tabs-ink-bar {
-			background: linear-gradient(90deg, @primary, @primary-hover);
-			height: 3px;
-			border-radius: 3px;
-		}
-	}
-
-	// Profile Info Block (Bento style)
-	.detail-info-block {
-		background: @surface-muted;
-		padding: 20px;
-		border-radius: @radius-md;
-		border: 1px solid @border-subtle;
-		margin-bottom: 20px;
-
-		.info-row {
+		.avatar {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background: #E5E7EB;
 			display: flex;
-			margin-bottom: 14px;
 			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			color: #4B5563;
+		}
 
-			&:last-child {
-				margin-bottom: 0;
+		.info {
+			display: flex;
+			flex-direction: column;
+
+			.name {
+				font-weight: 600;
+				color: @text-primary;
+			}
+			.id {
+				font-size: 12px;
+				color: @text-secondary;
+			}
+		}
+	}
+
+	.cell-user-type {
+		display: inline-block;
+		padding: 4px 12px;
+		border-radius: 9999px;
+		font-size: 12px;
+		font-weight: 600;
+
+		&.pet-owner {
+			background: #E0F2FE;
+			color: #0369A1;
+		}
+		&.veterinarian {
+			background: #FCE7F3;
+			color: #BE185D;
+		}
+		&.staff {
+			background: #FEF3C7;
+			color: #92400E;
+		}
+	}
+
+	.cell-contact {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		color: #4B5563;
+		font-size: 13px;
+	}
+
+	.cell-status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-weight: 500;
+
+		.dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+
+			&.active { background: #10B981; }
+			&.suspended { background: #EF4444; }
+			&.pending { background: #F59E0B; }
+		}
+	}
+
+	.cell-actions {
+		color: #9CA3AF;
+		cursor: pointer;
+		display: flex;
+		justify-content: center;
+
+		&:hover {
+			color: @text-primary;
+		}
+	}
+}
+
+// ─── Pagination Footer ─────────────────────────────────────
+.um-pagination {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 24px;
+	border-top: 1px solid @border-color;
+	background: #FFFFFF;
+
+	.um-pagination-info {
+		color: @text-secondary;
+		font-size: 13px;
+	}
+
+	.um-pagination-controls {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		.page-btn {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			border: 1px solid transparent;
+			background: transparent;
+			color: @text-secondary;
+			font-weight: 500;
+			font-size: 13px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: all 0.2s;
+
+			&:hover {
+				background: #F3F4F6;
 			}
 
-			.info-label {
-				width: 140px;
-				color: @text-muted;
-				font-weight: 500;
-				font-size: 13px;
-				display: flex;
-				align-items: center;
-				gap: 6px;
-
-				.anticon {
-					color: @primary-dark;
-					font-size: 14px;
-				}
-			}
-
-			.info-value {
+			&.active {
+				background: @mustard-yellow;
 				color: @text-primary;
 				font-weight: 600;
+			}
+		}
+	}
+}
+
+// ─── Dashboard Footer ──────────────────────────────────────
+.um-dashboard-footer {
+	margin: 0 32px 32px;
+	display: flex;
+	gap: 24px;
+	align-items: stretch;
+	
+	.um-footer-card {
+		padding: 24px;
+		border-radius: 24px;
+		display: flex;
+	}
+
+	.um-card-left {
+		flex: 2;
+		background: #FEF9C3;
+		align-items: center;
+		gap: 32px;
+
+		.um-card-radial {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 12px;
+
+			.radial-text {
+				font-size: 24px;
+				font-weight: 800;
+				color: #854D0E;
+			}
+			.radial-subtext {
+				font-size: 13px;
+				font-weight: 700;
+				color: #854D0E;
+				letter-spacing: 1px;
+			}
+		}
+
+		.um-card-content {
+			display: flex;
+			flex-direction: column;
+			
+			h3 {
+				font-size: 18px;
+				font-weight: 700;
+				color: #3F6212;
+				margin: 0 0 12px;
+			}
+
+			p {
+				color: #4B5563;
+				line-height: 1.6;
+				margin: 0 0 16px;
 				font-size: 14px;
 			}
-		}
-	}
 
-	// Pet Grid in Drawer (mini bento)
-	.pet-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 14px;
-
-		.pet-card {
-			border-radius: @radius-md;
-			border: 1px solid @border-subtle;
-			background: @surface;
-			transition: @transition;
-			box-shadow: @shadow-sm;
-			overflow: hidden;
-
-			&:hover {
-				border-color: fade(@primary, 40%);
-				box-shadow: @shadow-glow;
-				transform: translateY(-3px);
-			}
-
-			.pet-header {
+			.um-card-link {
+				color: #A16207;
+				font-weight: 600;
+				font-size: 14px;
 				display: flex;
 				align-items: center;
-				padding: 14px;
-				border-bottom: 1px solid @border-subtle;
-				background: @surface-muted;
+				gap: 4px;
+				text-decoration: none;
 
-				.pet-avatar {
-					border: 2px solid fade(@primary, 40%);
-					margin-right: 12px;
+				&:hover {
+					text-decoration: underline;
 				}
+			}
+		}
+	}
 
-				.pet-name {
-					font-weight: 700;
-					color: @text-primary;
-					font-size: 15px;
+	.um-card-right {
+		flex: 1;
+		background: #D1FAE5;
+		flex-direction: column;
+		justify-content: space-between;
+
+		.um-card-right-top {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+			margin-bottom: 24px;
+
+			.shield-icon-wrapper {
+				width: 40px;
+				height: 40px;
+				background: #FFFFFF;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				
+				.shield-icon {
+					color: #059669;
+				}
+			}
+
+			.shield-title-wrapper {
+				display: flex;
+				flex-direction: column;
+
+				h3 {
 					margin: 0;
+					font-size: 16px;
+					font-weight: 700;
+					color: #064E3B;
 				}
 
-				.pet-species-badge {
-					font-size: 11px;
-					margin-top: 4px;
-					border-radius: 10px;
-				}
-			}
-
-			.pet-body {
-				padding: 14px;
-
-				.pet-info-item {
-					font-size: 12px;
-					color: @text-muted;
-					margin-bottom: 6px;
-					display: flex;
-					justify-content: space-between;
-
-					span {
-						color: @text-primary;
-						font-weight: 600;
-					}
-
-					&:last-child {
-						margin-bottom: 0;
-					}
+				span {
+					font-size: 13px;
+					color: #047857;
+					font-weight: 500;
 				}
 			}
 		}
-	}
 
-	// Payment table
-	.payment-table {
-		.ant-table-thead > tr > th {
-			background: @surface-muted;
-		}
-	}
-}
-
-// ========== Responsive ==========
-@media (max-width: 768px) {
-	.user-mgmt-container {
-		padding: 16px;
-
-		.bento-grid {
-			grid-template-columns: 1fr;
-			gap: 14px;
+		.um-card-right-middle {
+			margin-bottom: 24px;
 		}
 
-		.bento-stat {
-			&.stat-total,
-			&.stat-active,
-			&.stat-locked {
-				grid-column: span 1;
-			}
-		}
-
-		.bento-filter {
-			grid-column: span 1;
-			flex-direction: column;
-			align-items: stretch;
-
-			.search-input {
-				min-width: 100%;
-			}
-		}
-
-		.bento-table {
-			grid-column: span 1;
-		}
-	}
-}
-
-@media (min-width: 769px) and (max-width: 1200px) {
-	.user-mgmt-container {
-		.bento-stat {
-			&.stat-total,
-			&.stat-active,
-			&.stat-locked {
-				grid-column: span 4;
+		.um-card-right-bottom {
+			background: #047857;
+			padding: 12px 16px;
+			border-radius: 12px;
+			
+			i {
+				color: #D1FAE5;
+				font-size: 13px;
+				line-height: 1.4;
+				display: block;
 			}
 		}
 	}

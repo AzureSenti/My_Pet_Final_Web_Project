@@ -1,698 +1,266 @@
-import React, { useState, useEffect } from 'react';
-import {
-	Table,
-	Input,
-	Select,
-	Button,
-	Switch,
-	Tooltip,
-	Drawer,
-	Avatar,
-	Tabs,
-	Tag,
-	PopconfirmProps,
-	Popconfirm,
-	Spin,
-	Empty,
-	Badge,
-} from 'antd';
-import {
-	UserOutlined,
-	EyeOutlined,
-	SearchOutlined,
-	ReloadOutlined,
-	PhoneOutlined,
-	MailOutlined,
-	CalendarOutlined,
-	DollarCircleOutlined,
-	GitlabOutlined,
-	MedicineBoxOutlined,
-	CheckCircleOutlined,
-	StopOutlined,
-	FilterOutlined,
-} from '@ant-design/icons';
-import moment from 'moment';
-import {
-	getOwners,
-	toggleUserStatus,
-	getOwnerDetails,
-	User,
-	Pet,
-	Appointment,
-	Payment,
-} from '@/services/QuanLyPetStore';
+import React, { useState } from 'react';
+import { Table, Progress } from 'antd';
+import { Search, Bell, Settings, Plus, MoreVertical, ChevronRight, ArrowRight, ShieldCheck } from 'lucide-react';
 import './style.less';
 
-const { Option } = Select;
-const { TabPane } = Tabs;
+const MOCK_USERS = [
+	{
+		key: '1',
+		id: '#PC-9021',
+		name: 'James Wilson',
+		type: 'Chủ nuôi',
+		email: 'james.w@email.com',
+		phone: '+1 (555) 123-4567',
+		status: 'Hoạt động',
+		joined: 'Oct 12, 2023',
+		avatar: 'JW'
+	},
+	{
+		key: '2',
+		id: '#PC-4421',
+		name: 'Dr. Emily Chen',
+		type: 'Bác sĩ thú y',
+		email: 'dr.chen@petcare.com',
+		phone: '+1 (555) 987-6543',
+		status: 'Hoạt động',
+		joined: 'Jun 05, 2023',
+		avatar: 'EC'
+	},
+	{
+		key: '3',
+		id: '#PC-1122',
+		name: 'Michael Scott',
+		type: 'Nhân viên',
+		email: 'm.scott@office.com',
+		phone: '+1 (555) 234-5678',
+		status: 'Đình chỉ',
+		joined: 'Jan 15, 2024',
+		avatar: 'MS'
+	},
+	{
+		key: '4',
+		id: '#PC-7788',
+		name: 'Sarah Miller',
+		type: 'Chủ nuôi',
+		email: 'sarah.m@gmail.com',
+		phone: '+1 (555) 345-6789',
+		status: 'Chờ duyệt',
+		joined: 'Feb 28, 2024',
+		avatar: 'SM'
+	}
+];
 
-const QuanLyNguoiDung: React.FC = () => {
-	const [owners, setOwners] = useState<User[]>([]);
-	const [filteredOwners, setFilteredOwners] = useState<User[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [searchText, setSearchText] = useState<string>('');
-	const [statusFilter, setStatusFilter] = useState<string>('ALL');
+const FILTERS = ['Tất cả', 'Chủ nuôi', 'Bác sĩ thú y', 'Nhân viên', 'Chờ duyệt'];
 
-	// Drawer detail states
-	const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-	const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
-	const [drawerLoading, setDrawerLoading] = useState<boolean>(false);
-	const [ownerDetails, setOwnerDetails] = useState<{
-		user: User | null;
-		pets: Pet[];
-		appointments: (Appointment & { pet_name: string; service_name: string; vet_name: string })[];
-		payments: (Payment & { service_name: string })[];
-	} | null>(null);
-
-	const loadOwnersList = async () => {
-		setLoading(true);
-		try {
-			const res = await getOwners();
-			setOwners(res);
-			applyFilters(res, searchText, statusFilter);
-		} catch (error) {
-			console.error('Failed to load owners:', error);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		loadOwnersList();
-	}, []);
-
-	const applyFilters = (data: User[], search: string, status: string) => {
-		let result = [...data];
-		if (search) {
-			const lowerSearch = search.toLowerCase();
-			result = result.filter(
-				(item) =>
-					item.full_name.toLowerCase().includes(lowerSearch) ||
-					item.email.toLowerCase().includes(lowerSearch) ||
-					(item.phone && item.phone.includes(lowerSearch))
-			);
-		}
-		if (status !== 'ALL') {
-			const activeBool = status === 'ACTIVE';
-			result = result.filter((item) => item.is_active === activeBool);
-		}
-		setFilteredOwners(result);
-	};
-
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const val = e.target.value;
-		setSearchText(val);
-		applyFilters(owners, val, statusFilter);
-	};
-
-	const handleStatusFilterChange = (val: string) => {
-		setStatusFilter(val);
-		applyFilters(owners, searchText, val);
-	};
-
-	const handleResetFilters = () => {
-		setSearchText('');
-		setStatusFilter('ALL');
-		setFilteredOwners(owners);
-	};
-
-	const handleToggleStatus = async (userId: string, active: boolean) => {
-		try {
-			await toggleUserStatus(userId, active);
-			const updated = owners.map((o) => (o.id === userId ? { ...o, is_active: active } : o));
-			setOwners(updated);
-			applyFilters(updated, searchText, statusFilter);
-			if (selectedOwnerId === userId && ownerDetails) {
-				setOwnerDetails({
-					...ownerDetails,
-					user: ownerDetails.user ? { ...ownerDetails.user, is_active: active } : null,
-				});
-			}
-		} catch (error) {
-			console.error('Failed to update user status:', error);
-		}
-	};
-
-	const handleOpenDetails = async (ownerId: string) => {
-		setSelectedOwnerId(ownerId);
-		setDrawerVisible(true);
-		setDrawerLoading(true);
-		try {
-			const details = await getOwnerDetails(ownerId);
-			setOwnerDetails(details);
-		} catch (error) {
-			console.error('Failed to load owner details:', error);
-		} finally {
-			setDrawerLoading(false);
-		}
-	};
-
-	const handleCloseDrawer = () => {
-		setDrawerVisible(false);
-		setSelectedOwnerId(null);
-		setOwnerDetails(null);
-	};
-
-	const totalCount = owners.length;
-	const activeCount = owners.filter((o) => o.is_active).length;
-	const lockedCount = totalCount - activeCount;
-
-	const renderPetAge = (dobString?: string) => {
-		if (!dobString) return 'Không rõ tuổi';
-		const dob = moment(dobString);
-		const years = moment().diff(dob, 'years');
-		if (years > 0) {
-			const months = moment().diff(dob, 'months') % 12;
-			return months > 0 ? `${years} tuổi, ${months} tháng` : `${years} tuổi`;
-		}
-		const months = moment().diff(dob, 'months');
-		return months > 0 ? `${months} tháng` : 'Dưới 1 tháng';
-	};
+const UserManagement: React.FC = () => {
+	const [activeFilter, setActiveFilter] = useState('Tất cả');
 
 	const columns = [
 		{
-			title: 'Chủ thú cưng',
-			dataIndex: 'full_name',
-			key: 'full_name',
-			render: (text: string, record: User) => (
-				<div className='user-cell'>
-					<Avatar
-						src={record.avatar_url}
-						icon={<UserOutlined />}
-						className='user-avatar'
-						size={40}
-					/>
-					<div className='user-info'>
-						<div className='user-name'>{text}</div>
-						<div className='user-email'>{record.email}</div>
+			title: 'Hồ sơ người dùng',
+			dataIndex: 'name',
+			key: 'name',
+			render: (_: any, record: any) => (
+				<div className="cell-user-profile">
+					<div className="avatar">{record.avatar}</div>
+					<div className="info">
+						<span className="name">{record.name}</span>
+						<span className="id">Member ID: {record.id}</span>
 					</div>
 				</div>
-			),
+			)
 		},
 		{
-			title: 'Số điện thoại',
-			dataIndex: 'phone',
-			key: 'phone',
-			render: (text?: string) =>
-				text || <span style={{ color: '#bfbfbf', fontStyle: 'italic' }}>Chưa cập nhật</span>,
+			title: 'Loại tài khoản',
+			dataIndex: 'type',
+			key: 'type',
+			render: (type: string) => {
+				let typeClass = 'pet-owner';
+				if (type === 'Bác sĩ thú y') typeClass = 'veterinarian';
+				if (type === 'Nhân viên') typeClass = 'staff';
+				return <span className={`cell-user-type ${typeClass}`}>{type}</span>;
+			}
 		},
 		{
-			title: 'Ngày tham gia',
-			dataIndex: 'created_at',
-			key: 'created_at',
-			render: (date: string) => moment(date).format('DD/MM/YYYY'),
-		},
-		{
-			title: 'Hoạt động cuối',
-			dataIndex: 'last_login_at',
-			key: 'last_login_at',
-			render: (date?: string) =>
-				date ? moment(date).fromNow() : <span style={{ color: '#bfbfbf' }}>Chưa đăng nhập</span>,
+			title: 'Thông tin liên hệ',
+			key: 'contact',
+			render: (_: any, record: any) => (
+				<div className="cell-contact">
+					<span>{record.email}</span>
+					<span>{record.phone}</span>
+				</div>
+			)
 		},
 		{
 			title: 'Trạng thái',
-			dataIndex: 'is_active',
-			key: 'is_active',
-			width: 140,
-			render: (isActive: boolean) => (
-				<Tag color={isActive ? 'success' : 'error'} className='status-tag'>
-					{isActive ? '● Hoạt động' : '● Đã khóa'}
-				</Tag>
-			),
+			dataIndex: 'status',
+			key: 'status',
+			render: (status: string) => {
+				let statusClass = 'active';
+				if (status === 'Đình chỉ') statusClass = 'suspended';
+				if (status === 'Chờ duyệt') statusClass = 'pending';
+				return (
+					<div className="cell-status">
+						<div className={`dot ${statusClass}`} />
+						<span>{status}</span>
+					</div>
+				);
+			}
 		},
 		{
-			title: 'Khóa/Mở',
-			dataIndex: 'is_active',
-			key: 'toggle_active',
-			width: 90,
-			align: 'center' as const,
-			render: (isActive: boolean, record: User) => (
-				<Popconfirm
-					title={isActive ? 'Bạn có chắc muốn khóa tài khoản này?' : 'Mở khóa tài khoản này?'}
-					onConfirm={() => handleToggleStatus(record.id, !isActive)}
-					okText={isActive ? 'Khóa' : 'Mở khóa'}
-					cancelText='Hủy'
-					okButtonProps={{
-						danger: isActive,
-						style: !isActive ? { backgroundColor: '#52c41a', borderColor: '#52c41a' } : undefined,
-					}}
-				>
-					<Switch checked={isActive} size='small' />
-				</Popconfirm>
-			),
+			title: 'Ngày tham gia',
+			dataIndex: 'joined',
+			key: 'joined',
 		},
 		{
-			title: '',
-			key: 'action',
-			width: 60,
+			title: 'Thao tác',
+			key: 'actions',
+			width: 80,
 			align: 'center' as const,
-			render: (_: any, record: User) => (
-				<Tooltip title='Xem chi tiết hồ sơ'>
-					<Button
-						type='text'
-						icon={<EyeOutlined />}
-						onClick={() => handleOpenDetails(record.id)}
-						className='action-view-btn'
-						size='small'
-					/>
-				</Tooltip>
-			),
-		},
+			render: () => (
+				<div className="cell-actions">
+					<MoreVertical size={18} />
+				</div>
+			)
+		}
 	];
 
+	const displayedUsers = MOCK_USERS.filter(user => {
+		if (activeFilter === 'Tất cả') return true;
+		if (activeFilter === 'Chủ nuôi') return user.type === 'Chủ nuôi';
+		if (activeFilter === 'Bác sĩ thú y') return user.type === 'Bác sĩ thú y';
+		if (activeFilter === 'Nhân viên') return user.type === 'Nhân viên';
+		if (activeFilter === 'Chờ duyệt') return user.status === 'Chờ duyệt';
+		return true;
+	});
+
 	return (
-		<div className='user-mgmt-container'>
+		<div className="user-management-container">
+			{/* Top Bar */}
+			<div className="um-topbar">
+				<div className="um-topbar-left" style={{ minWidth: '200px' }}></div>
+				<div className="um-topbar-center" style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+					<div className="um-search">
+						<Search size={18} strokeWidth={2} />
+						<input type="text" placeholder="Tìm kiếm hệ thống..." />
+					</div>
+				</div>
+				<div className="um-topbar-right">
+					<Bell className="um-icon-btn" size={20} />
+					<Settings className="um-icon-btn" size={20} />
+					<div className="um-profile">
+						<img src="https://i.pravatar.cc/150?img=11" alt="Admin" className="um-avatar" />
+						<div className="um-profile-info">
+							<span className="um-profile-name">Alex Admin</span>
+							<span className="um-profile-role">Head Coordinator</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			{/* Page Header */}
-			<div className='page-header'>
-				<div>
-					<h1>
-						<UserOutlined className='header-icon' /> Quản Lý Người Dùng
-					</h1>
-					<p style={{ color: '#6b7280', margin: '6px 0 0 0', fontSize: '14px', maxWidth: 500 }}>
-						Quản lý tài khoản chủ nuôi, khóa/mở khóa và theo dõi hồ sơ y tế thú cưng.
-					</p>
+			<div className="um-header">
+				<div className="um-header-title">
+					<h1>Quản lý người dùng</h1>
+					<p>Quản lý cộng đồng chủ nuôi, bác sĩ thú y và nhân viên tại một trung tâm duy nhất.</p>
+				</div>
+				<button className="um-add-btn">
+					<Plus size={18} strokeWidth={2.5} /> Thêm người dùng mới
+				</button>
+			</div>
+
+			{/* Filter Pills */}
+			<div className="um-filters">
+				{FILTERS.map(filter => (
+					<div 
+						key={filter} 
+						className={`um-filter-pill ${activeFilter === filter ? 'active' : ''}`}
+						onClick={() => setActiveFilter(filter)}
+					>
+						{filter}
+					</div>
+				))}
+			</div>
+
+			{/* Data Table */}
+			<div className="um-table-container">
+				<Table 
+					columns={columns} 
+					dataSource={displayedUsers} 
+					pagination={false}
+					rowKey="id"
+				/>
+				
+				{/* Custom Pagination Footer */}
+				<div className="um-pagination">
+					<div className="um-pagination-info">
+						Hiển thị 1 đến {displayedUsers.length} trong số 128 người dùng
+					</div>
+					<div className="um-pagination-controls">
+						<button className="page-btn active">1</button>
+						<button className="page-btn">2</button>
+						<button className="page-btn">3</button>
+						<span style={{ color: '#9CA3AF', margin: '0 4px' }}>...</span>
+						<button className="page-btn">32</button>
+						<button className="page-btn">
+							<ChevronRight size={16} />
+						</button>
+					</div>
 				</div>
 			</div>
 
-			{/* ===== BENTO GRID ===== */}
-			<div className='bento-grid'>
-				{/* Stat: Total */}
-				<div className='bento-stat stat-total'>
-					<div className='stat-top'>
-						<div className='stat-icon-box icon-total'>
-							<UserOutlined />
+			{/* Dashboard Footer */}
+			<div className="um-dashboard-footer">
+				<div className="um-footer-card um-card-left">
+					<div className="um-card-radial">
+						<Progress 
+							type="circle" 
+							percent={75} 
+							strokeColor="#A16207" // Dark yellow/olive
+							trailColor="#FEF08A" 
+							format={percent => <span className="radial-text">{percent}%</span>}
+							size={100}
+							strokeWidth={8}
+						/>
+						<span className="radial-subtext">ĐÃ XÁC THỰC</span>
+					</div>
+					<div className="um-card-content">
+						<h3>Xu hướng Xác thực Người dùng</h3>
+						<p>
+							Kể từ khi áp dụng Huy hiệu Chuyên gia PetCare, tỷ lệ xác thực người dùng đã tăng 15.4% trong quý này. Xác thực cao giúp tăng lượng đặt lịch lên 2.4 lần.
+						</p>
+						<a href="#" className="um-card-link">
+							Xem chi tiết phân tích <ArrowRight size={16} />
+						</a>
+					</div>
+				</div>
+
+				<div className="um-footer-card um-card-right">
+					<div className="um-card-right-top">
+						<div className="shield-icon-wrapper">
+							<ShieldCheck size={20} className="shield-icon" strokeWidth={2.5} />
 						</div>
-						<span className='stat-badge badge-total'>Tổng cộng</span>
-					</div>
-					<div className='stat-number'>{loading ? <Spin size='small' /> : totalCount}</div>
-					<div className='stat-label'>Chủ nuôi đã đăng ký</div>
-				</div>
-
-				{/* Stat: Active */}
-				<div className='bento-stat stat-active'>
-					<div className='stat-top'>
-						<div className='stat-icon-box icon-active'>
-							<CheckCircleOutlined />
+						<div className="shield-title-wrapper">
+							<h3>Bảo mật Tài khoản</h3>
+							<span>Tỷ lệ Áp dụng 2FA</span>
 						</div>
-						<span className='stat-badge badge-active'>Đang hoạt động</span>
 					</div>
-					<div className='stat-number'>{loading ? <Spin size='small' /> : activeCount}</div>
-					<div className='stat-label'>Tài khoản mở</div>
-				</div>
-
-				{/* Stat: Locked */}
-				<div className='bento-stat stat-locked'>
-					<div className='stat-top'>
-						<div className='stat-icon-box icon-locked'>
-							<StopOutlined />
-						</div>
-						<span className='stat-badge badge-locked'>Tạm khóa</span>
+					<div className="um-card-right-middle">
+						<Progress 
+							percent={62} 
+							strokeColor="#047857" // Dark green
+							trailColor="#A7F3D0" // Light teal trail
+							showInfo={false}
+							strokeWidth={8}
+						/>
 					</div>
-					<div className='stat-number'>{loading ? <Spin size='small' /> : lockedCount}</div>
-					<div className='stat-label'>Tài khoản bị khóa</div>
-				</div>
-
-				{/* Filter Cell */}
-				<div className='bento-filter'>
-					<span className='filter-label'>
-						<FilterOutlined /> Bộ lọc
-					</span>
-					<Input
-						placeholder='Tìm theo tên, email hoặc SĐT...'
-						prefix={<SearchOutlined />}
-						value={searchText}
-						onChange={handleSearchChange}
-						className='search-input'
-						allowClear
-					/>
-					<Select
-						value={statusFilter}
-						onChange={handleStatusFilterChange}
-						className='status-select'
-					>
-						<Option value='ALL'>Tất cả trạng thái</Option>
-						<Option value='ACTIVE'>Đang hoạt động</Option>
-						<Option value='LOCKED'>Đã khóa</Option>
-					</Select>
-					<div className='filter-actions'>
-						<Button
-							icon={<ReloadOutlined />}
-							onClick={handleResetFilters}
-							className='reset-btn'
-						>
-							Làm mới
-						</Button>
+					<div className="um-card-right-bottom">
+						<i>62% người dùng của bạn đã bật bảo mật 2 lớp (2FA) để tăng cường an toàn.</i>
 					</div>
-				</div>
-
-				{/* Table Cell */}
-				<div className='bento-table'>
-					<Table
-						columns={columns}
-						dataSource={filteredOwners}
-						rowKey='id'
-						loading={loading}
-						pagination={{
-							pageSize: 5,
-							showSizeChanger: true,
-							pageSizeOptions: ['5', '10', '20'],
-							locale: { items_per_page: '/ trang' },
-						}}
-						locale={{
-							emptyText: <Empty description='Không tìm thấy khách hàng nào phù hợp' />,
-						}}
-					/>
 				</div>
 			</div>
-
-			{/* Detailed Owner Drawer */}
-			<Drawer
-				visible={drawerVisible}
-				onClose={handleCloseDrawer}
-				width={680}
-				destroyOnClose
-				className='owner-detail-drawer'
-				headerStyle={{ padding: 0 }}
-				title={
-					drawerLoading || !ownerDetails?.user ? (
-						<div style={{ padding: '20px 24px' }}>Đang tải thông tin...</div>
-					) : (
-						<div className='drawer-header-title'>
-							<Avatar
-								src={ownerDetails.user.avatar_url}
-								size={54}
-								icon={<UserOutlined />}
-								className='drawer-avatar'
-							/>
-							<div>
-								<h3 className='drawer-name'>{ownerDetails.user.full_name}</h3>
-								<span className='drawer-email'>{ownerDetails.user.email}</span>
-								<Tag
-									color={ownerDetails.user.is_active ? 'success' : 'error'}
-									style={{ marginLeft: '8px', borderRadius: '10px' }}
-								>
-									{ownerDetails.user.is_active ? 'Đang hoạt động' : 'Tài khoản khóa'}
-								</Tag>
-							</div>
-						</div>
-					)
-				}
-			>
-				{drawerLoading ? (
-					<div
-						style={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							height: '100%',
-							flexDirection: 'column',
-							gap: '12px',
-						}}
-					>
-						<Spin size='large' />
-						<span style={{ color: '#999' }}>Đang nạp hồ sơ chi tiết...</span>
-					</div>
-				) : ownerDetails && ownerDetails.user ? (
-					<Tabs defaultActiveKey='1'>
-						{/* Tab 1: Profile */}
-						<TabPane
-							tab={
-								<span>
-									<UserOutlined />
-									Hồ sơ cá nhân
-								</span>
-							}
-							key='1'
-						>
-							<div className='detail-info-block'>
-								<div className='info-row'>
-									<div className='info-label'>Mã khách hàng:</div>
-									<div className='info-value' style={{ fontFamily: 'monospace', fontSize: '12px' }}>
-										{ownerDetails.user.id}
-									</div>
-								</div>
-								<div className='info-row'>
-									<div className='info-label'>
-										<PhoneOutlined /> Số điện thoại:
-									</div>
-									<div className='info-value'>
-										{ownerDetails.user.phone || (
-											<span style={{ color: '#bfbfbf' }}>Chưa cập nhật</span>
-										)}
-									</div>
-								</div>
-								<div className='info-row'>
-									<div className='info-label'>
-										<MailOutlined /> Thư điện tử:
-									</div>
-									<div className='info-value'>{ownerDetails.user.email}</div>
-								</div>
-								<div className='info-row'>
-									<div className='info-label'>
-										<CalendarOutlined /> Ngày gia nhập:
-									</div>
-									<div className='info-value'>
-										{moment(ownerDetails.user.created_at).format('DD/MM/YYYY HH:mm')}
-									</div>
-								</div>
-								<div className='info-row'>
-									<div className='info-label'>Đăng nhập cuối:</div>
-									<div className='info-value'>
-										{ownerDetails.user.last_login_at
-											? moment(ownerDetails.user.last_login_at).format('DD/MM/YYYY HH:mm')
-											: 'Chưa từng đăng nhập'}
-									</div>
-								</div>
-							</div>
-						</TabPane>
-
-						{/* Tab 2: Pets */}
-						<TabPane
-							tab={
-								<span>
-									<GitlabOutlined />
-									Thú cưng ({ownerDetails.pets.length})
-								</span>
-							}
-							key='2'
-						>
-							{ownerDetails.pets.length === 0 ? (
-								<Empty description='Chủ nuôi này chưa đăng ký thú cưng nào.' />
-							) : (
-								<div className='pet-grid'>
-									{ownerDetails.pets.map((pet) => (
-										<div key={pet.id} className='pet-card'>
-											<div className='pet-header'>
-												<Avatar
-													src={pet.avatar_url}
-													icon={<GitlabOutlined />}
-													size={40}
-													className='pet-avatar'
-													style={{ backgroundColor: '#fff3cd', border: '1px solid #ffd43b' }}
-												/>
-												<div>
-													<h4 className='pet-name'>{pet.name}</h4>
-													<Tag
-														color={pet.species === 'Chó' ? 'blue' : 'purple'}
-														className='pet-species-badge'
-													>
-														{pet.species}
-													</Tag>
-												</div>
-											</div>
-											<div className='pet-body'>
-												<div className='pet-info-item'>
-													Giống: <span>{pet.breed || 'Chưa cập nhật'}</span>
-												</div>
-												<div className='pet-info-item'>
-													Tuổi: <span>{renderPetAge(pet.date_of_birth)}</span>
-												</div>
-												<div className='pet-info-item'>
-													Giới tính:{' '}
-													<span>
-														{pet.gender === 'male'
-															? 'Đực'
-															: pet.gender === 'female'
-															? 'Cái'
-															: 'Không rõ'}
-													</span>
-												</div>
-											</div>
-										</div>
-									))}
-								</div>
-							)}
-						</TabPane>
-
-						{/* Tab 3: Appointments */}
-						<TabPane
-							tab={
-								<span>
-									<MedicineBoxOutlined />
-									Lịch hẹn khám ({ownerDetails.appointments.length})
-								</span>
-							}
-							key='3'
-						>
-							{ownerDetails.appointments.length === 0 ? (
-								<Empty description='Khách hàng chưa đăng ký lịch khám nào.' />
-							) : (
-								<Table
-									dataSource={ownerDetails.appointments}
-									rowKey='id'
-									pagination={{ pageSize: 4 }}
-									size='small'
-									columns={[
-										{
-											title: 'Thời gian',
-											dataIndex: 'scheduled_at',
-											key: 'scheduled_at',
-											render: (date: string) => moment(date).format('DD/MM/YYYY HH:mm'),
-										},
-										{
-											title: 'Thú cưng',
-											dataIndex: 'pet_name',
-											key: 'pet_name',
-											render: (name: string) => <Tag color='orange'>{name}</Tag>,
-										},
-										{
-											title: 'Dịch vụ / Bác sĩ',
-											key: 'service_vet',
-											render: (_, record) => (
-												<div>
-													<b>{record.service_name}</b>
-													<div style={{ fontSize: '11px', color: '#8c8c8c' }}>
-														BS: {record.vet_name}
-													</div>
-												</div>
-											),
-										},
-										{
-											title: 'Trạng thái',
-											dataIndex: 'status',
-											key: 'status',
-											render: (status: string) => {
-												let color = 'default';
-												let text = 'Chờ duyệt';
-												if (status === 'confirmed') {
-													color = 'processing';
-													text = 'Đã duyệt';
-												} else if (status === 'completed') {
-													color = 'success';
-													text = 'Đã khám';
-												} else if (status === 'cancelled') {
-													color = 'error';
-													text = 'Đã hủy';
-												}
-												return <Badge status={color as any} text={text} />;
-											},
-										},
-									]}
-								/>
-							)}
-						</TabPane>
-
-						{/* Tab 4: Payments */}
-						<TabPane
-							tab={
-								<span>
-									<DollarCircleOutlined />
-									Lịch sử thanh toán ({ownerDetails.payments.length})
-								</span>
-							}
-							key='4'
-						>
-							{ownerDetails.payments.length === 0 ? (
-								<Empty description='Chưa có giao dịch thanh toán nào.' />
-							) : (
-								<Table
-									dataSource={ownerDetails.payments}
-									rowKey='id'
-									pagination={{ pageSize: 4 }}
-									size='small'
-									className='payment-table'
-									columns={[
-										{
-											title: 'Mã giao dịch / Ngày',
-											key: 'tx_date',
-											render: (_, record) => (
-												<div>
-													<b>
-														{record.transaction_id || (
-															<span style={{ color: '#bfbfbf', fontSize: '11px' }}>
-																Tiền mặt
-															</span>
-														)}
-													</b>
-													<div style={{ fontSize: '11px', color: '#8c8c8c' }}>
-														{record.paid_at
-															? moment(record.paid_at).format('DD/MM/YYYY HH:mm')
-															: 'Chưa thu'}
-													</div>
-												</div>
-											),
-										},
-										{
-											title: 'Dịch vụ',
-											dataIndex: 'service_name',
-											key: 'service_name',
-										},
-										{
-											title: 'Hình thức',
-											dataIndex: 'method',
-											key: 'method',
-											render: (method: string) => {
-												const map: Record<string, string> = {
-													cash: 'Tiền mặt',
-													card: 'Cà thẻ',
-													online: 'Chuyển khoản',
-												};
-												return map[method] || method;
-											},
-										},
-										{
-											title: 'Số tiền',
-											dataIndex: 'amount',
-											key: 'amount',
-											align: 'right' as const,
-											render: (amount: number) => (
-												<b style={{ color: '#1a1a2e' }}>{amount.toLocaleString('vi-VN')} đ</b>
-											),
-										},
-										{
-											title: 'Trạng thái',
-											dataIndex: 'status',
-											key: 'status',
-											render: (status: string) => (
-												<Tag
-													color={
-														status === 'paid'
-															? 'success'
-															: status === 'refunded'
-															? 'warning'
-															: 'default'
-													}
-													style={{ borderRadius: '10px' }}
-												>
-													{status === 'paid'
-														? 'Đã thu'
-														: status === 'refunded'
-														? 'Hoàn tiền'
-														: 'Chưa thu'}
-												</Tag>
-											),
-										},
-									]}
-								/>
-							)}
-						</TabPane>
-					</Tabs>
-				) : (
-					<Empty description='Không tìm thấy dữ liệu hồ sơ.' />
-				)}
-			</Drawer>
 		</div>
 	);
 };
 
-export default QuanLyNguoiDung;
+export default UserManagement;
