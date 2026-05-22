@@ -1,545 +1,397 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useModel } from 'umi';
 import {
-	SearchOutlined,
-	BellOutlined,
-	RiseOutlined,
-	FallOutlined,
-	TeamOutlined,
-	DollarOutlined,
+	UserOutlined,
+	MedicineBoxOutlined,
 	CalendarOutlined,
-	EyeOutlined,
-	MoreOutlined,
 	ArrowRightOutlined,
+	SearchOutlined,
+	SyncOutlined,
+	ExclamationCircleOutlined,
+	SettingOutlined,
 } from '@ant-design/icons';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
 import './components/style.less';
 
-// ─── Mock Data ────────────────────────────────
-const KPI_DATA = [
+// ─── Metric Cards Data ────────────────────────
+const METRICS = [
 	{
-		label: 'Tổng thú cưng',
-		value: 1284,
-		trend: '+12.5%',
-		trendDir: 'up',
-		icon: '🐾',
-		color: 'emerald',
+		label: 'Tổng người dùng',
+		value: 1248,
+		sub: '+12% tháng này',
+		icon: 'user',
+		color: 'warm',
 	},
 	{
-		label: 'Khách hàng',
-		value: 856,
-		trend: '+8.2%',
-		trendDir: 'up',
-		icon: '👥',
-		color: 'indigo',
+		label: 'Bác sĩ',
+		value: 56,
+		sub: '+2 nhân sự mới',
+		icon: 'doctor',
+		color: 'mint',
 	},
 	{
-		label: 'Doanh thu (triệu)',
-		value: 42.5,
-		trend: '+23.1%',
-		trendDir: 'up',
-		icon: '💰',
-		color: 'amber',
-		prefix: '',
-		suffix: 'M₫',
-		decimals: 1,
+		label: 'Thú cưng',
+		value: 3892,
+		sub: '+45 đăng ký',
+		icon: 'paw',
+		color: 'pink',
 	},
 	{
-		label: 'Lịch hẹn hôm nay',
-		value: 64,
-		trend: '+5.7%',
-		trendDir: 'up',
-		icon: '📅',
-		color: 'rose',
+		label: 'Lịch hẹn',
+		value: 156,
+		sub: 'Hôm nay',
+		icon: 'calendar',
+		color: 'peach',
 	},
 ];
 
-const ACTIVITIES = [
+// ─── Notifications Data ───────────────────────
+const NOTIFICATIONS = [
 	{
-		title: 'Khách hàng mới',
-		desc: 'Nguyễn Văn An đã đăng ký tài khoản',
-		time: '2 phút trước',
-		dot: 'emerald',
+		title: 'Cập nhật hệ thống thành công',
+		desc: 'Phiên bản 2.4.0 — Nâng cấp toàn bộ module',
+		time: '10 phút trước',
+		type: 'success',
 	},
 	{
-		title: 'Lịch hẹn mới',
-		desc: 'Khám sức khỏe cho Lucky (Golden Retriever)',
-		time: '15 phút trước',
-		dot: 'indigo',
-	},
-	{
-		title: 'Thú cưng mới',
-		desc: 'Thêm mèo Mimi - giống British Shorthair',
-		time: '32 phút trước',
-		dot: 'amber',
-	},
-	{
-		title: 'Thanh toán',
-		desc: 'Trần Thị Bình thanh toán 2.500.000₫',
+		title: 'Cảnh báo tồn kho thuốc',
+		desc: 'Thuốc Paracetamol cho chó dưới 10 đơn vị',
 		time: '1 giờ trước',
-		dot: 'emerald',
+		type: 'warning',
 	},
 	{
-		title: 'Tắm & Grooming',
-		desc: 'Hoàn thành grooming cho chó Bông',
-		time: '2 giờ trước',
-		dot: 'sky',
-	},
-	{
-		title: 'Cập nhật hồ sơ',
-		desc: 'BS. Lê Minh cập nhật bệnh án #1042',
+		title: 'Bác sĩ mới gia nhập',
+		desc: 'BS. Nguyễn Văn Minh đã tham gia đội ngũ',
 		time: '3 giờ trước',
-		dot: 'rose',
+		type: 'success',
+	},
+	{
+		title: 'Lịch hẹn quá hạn',
+		desc: 'Thú cưng "Buddy" bỏ lỡ lịch khám định kỳ',
+		time: '5 giờ trước',
+		type: 'warning',
 	},
 ];
 
-const TOP_USERS = [
-	{ name: 'Nguyễn Minh Anh', pets: 4, spending: '12.8M₫', avatar: 'https://i.pravatar.cc/150?img=1' },
-	{ name: 'Trần Thu Hà', pets: 3, spending: '9.5M₫', avatar: 'https://i.pravatar.cc/150?img=5' },
-	{ name: 'Lê Hoàng Nam', pets: 5, spending: '8.2M₫', avatar: 'https://i.pravatar.cc/150?img=3' },
-	{ name: 'Phạm Quỳnh Chi', pets: 2, spending: '7.1M₫', avatar: 'https://i.pravatar.cc/150?img=9' },
-	{ name: 'Đặng Văn Hùng', pets: 3, spending: '6.4M₫', avatar: 'https://i.pravatar.cc/150?img=7' },
-];
-
-const PET_STATS = [
-	{ emoji: '🐕', label: 'Chó', count: 524, total: 1284, color: 'emerald' },
-	{ emoji: '🐈', label: 'Mèo', count: 389, total: 1284, color: 'indigo' },
-	{ emoji: '🐦', label: 'Chim', count: 156, total: 1284, color: 'amber' },
-	{ emoji: '🐹', label: 'Hamster', count: 118, total: 1284, color: 'rose' },
-	{ emoji: '🐠', label: 'Cá', count: 97, total: 1284, color: 'sky' },
-];
-
-const TABLE_DATA = [
-	{
-		name: 'Lucky', breed: 'Golden Retriever', type: 'dog', emoji: '🐕',
-		owner: 'Nguyễn Minh Anh', ownerAvatar: 'https://i.pravatar.cc/150?img=1',
-		status: 'healthy', statusLabel: 'Khỏe mạnh',
-		nextVisit: '25/05/2026', weight: '28kg',
-	},
-	{
-		name: 'Mimi', breed: 'British Shorthair', type: 'cat', emoji: '🐈',
-		owner: 'Trần Thu Hà', ownerAvatar: 'https://i.pravatar.cc/150?img=5',
-		status: 'checkup', statusLabel: 'Cần khám',
-		nextVisit: '22/05/2026', weight: '4.2kg',
-	},
-	{
-		name: 'Bông', breed: 'Poodle', type: 'dog', emoji: '🐕',
-		owner: 'Lê Hoàng Nam', ownerAvatar: 'https://i.pravatar.cc/150?img=3',
-		status: 'healthy', statusLabel: 'Khỏe mạnh',
-		nextVisit: '28/05/2026', weight: '6.5kg',
-	},
-	{
-		name: 'Kiki', breed: 'Vẹt Cockatiel', type: 'bird', emoji: '🐦',
-		owner: 'Phạm Quỳnh Chi', ownerAvatar: 'https://i.pravatar.cc/150?img=9',
-		status: 'treatment', statusLabel: 'Đang điều trị',
-		nextVisit: '21/05/2026', weight: '0.09kg',
-	},
-	{
-		name: 'Nemo', breed: 'Cá vàng Oranda', type: 'fish', emoji: '🐠',
-		owner: 'Đặng Văn Hùng', ownerAvatar: 'https://i.pravatar.cc/150?img=7',
-		status: 'healthy', statusLabel: 'Khỏe mạnh',
-		nextVisit: '30/05/2026', weight: '0.15kg',
-	},
-	{
-		name: 'Chuột', breed: 'Syrian Hamster', type: 'hamster', emoji: '🐹',
-		owner: 'Nguyễn Minh Anh', ownerAvatar: 'https://i.pravatar.cc/150?img=1',
-		status: 'checkup', statusLabel: 'Cần khám',
-		nextVisit: '24/05/2026', weight: '0.12kg',
-	},
-];
-
-// ─── Chart Configs ────────────────────────────
-const revenueChartOptions: ApexCharts.ApexOptions = {
+// ─── Appointment Line Chart ───────────────────
+const appointmentChartOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'area',
 		toolbar: { show: false },
 		fontFamily: 'Inter, sans-serif',
-		sparkline: { enabled: false },
 		zoom: { enabled: false },
 	},
-	colors: ['#10B981', '#6366F1'],
+	colors: ['#4A5B3E'], // Dark olive green
 	fill: {
 		type: 'gradient',
 		gradient: {
 			shadeIntensity: 1,
-			opacityFrom: 0.3,
-			opacityTo: 0.05,
+			opacityFrom: 0.15,
+			opacityTo: 0.02,
 			stops: [0, 90, 100],
 		},
 	},
-	stroke: {
-		curve: 'smooth',
-		width: 2.5,
-	},
+	stroke: { curve: 'smooth', width: 3 },
 	grid: {
-		borderColor: '#F1F5F9',
-		strokeDashArray: 4,
-		xaxis: { lines: { show: false } },
-		padding: { left: 8, right: 8 },
+		show: false, // Remove harsh grid lines
 	},
 	xaxis: {
-		categories: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
-		axisBorder: { show: false },
+		categories: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+		axisBorder: { show: true, color: '#E5E0D8' },
 		axisTicks: { show: false },
 		labels: {
-			style: { colors: '#94A3B8', fontSize: '12px', fontWeight: 500 },
+			style: {
+				colors: ['#B5AFA5', '#B5AFA5', '#4A5B3E', '#B5AFA5', '#B5AFA5', '#B5AFA5', '#B5AFA5'], // Highlight T4
+				fontSize: '13px',
+				fontWeight: [500, 500, 800, 500, 500, 500, 500]
+			}
 		},
 	},
 	yaxis: {
-		labels: {
-			style: { colors: '#94A3B8', fontSize: '12px', fontWeight: 500 },
-			formatter: (val: number) => `${val}M`,
-		},
+		labels: { show: false },
 	},
 	tooltip: {
 		theme: 'light',
-		x: { format: 'Tháng ' },
-		y: { formatter: (val: number) => `${val}M₫` },
-	},
-	legend: {
-		position: 'top',
-		horizontalAlign: 'right',
-		fontSize: '12px',
-		fontWeight: 500,
-		markers: { width: 8, height: 8, radius: 4 },
-		itemMargin: { horizontal: 12 },
+		y: { formatter: (val: number) => `${val} lịch hẹn` },
 	},
 	dataLabels: { enabled: false },
+	markers: {
+		size: 0, // Clean line without dots unless hovered
+		hover: { size: 6, sizeOffset: 3 },
+	},
 };
 
-const revenueSeries = [
-	{
-		name: 'Doanh thu',
-		data: [18, 22, 19, 28, 25, 32, 30, 35, 38, 36, 40, 42.5],
-	},
-	{
-		name: 'Chi phí',
-		data: [12, 14, 13, 16, 15, 18, 17, 20, 22, 21, 23, 24],
-	},
+const appointmentSeries = [
+	{ name: 'Lịch hẹn', data: [18, 22, 15, 28, 20, 35, 24] },
 ];
 
-const donutChartOptions: ApexCharts.ApexOptions = {
+// ─── Status Donut Chart ───────────────────────
+const statusDonutOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'donut',
 		fontFamily: 'Inter, sans-serif',
 	},
-	labels: ['Chó', 'Mèo', 'Chim', 'Hamster', 'Cá'],
-	colors: ['#10B981', '#6366F1', '#F59E0B', '#F43F5E', '#0EA5E9'],
-	stroke: { width: 3, colors: ['#FFFFFF'] },
+	labels: ['Đã khám', 'Chờ khám', 'Hủy lịch', 'Khẩn cấp'],
+	colors: ['#4A5B3E', '#166E75', '#F5EEDC', '#943B42'],
+	stroke: { width: 6, colors: ['#FFFFFF'] },
 	plotOptions: {
 		pie: {
 			donut: {
-				size: '72%',
+				size: '80%',
 				labels: {
 					show: true,
-					name: { fontSize: '13px', fontWeight: 600, color: '#64748B' },
-					value: { fontSize: '24px', fontWeight: 700, color: '#0F172A' },
+					name: { fontSize: '12px', fontWeight: 700, color: '#8A8478', offsetY: 25 },
+					value: { fontSize: '42px', fontWeight: 800, color: '#2D2A26', offsetY: -10 },
 					total: {
 						show: true,
-						label: 'Tổng cộng',
+						label: 'HOÀN TẤT',
 						fontSize: '12px',
-						fontWeight: 500,
-						color: '#94A3B8',
-						formatter: (w: any) => {
-							return w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0).toString();
-						},
+						fontWeight: 700,
+						color: '#B5AFA5',
+						formatter: () => '75%',
 					},
 				},
 			},
 		},
 	},
-	legend: {
-		position: 'bottom',
-		fontSize: '12px',
-		fontWeight: 500,
-		markers: { width: 8, height: 8, radius: 4 },
-		itemMargin: { horizontal: 8, vertical: 4 },
+	legend: { show: false },
+	dataLabels: { enabled: false },
+	tooltip: {
+		y: { formatter: (val: number) => `${val} lịch hẹn` },
+	},
+};
+
+const statusDonutSeries = [117, 26, 8, 5];
+
+// ─── Growth Bar Chart ─────────────────────────
+const growthChartOptions: ApexCharts.ApexOptions = {
+	chart: {
+		type: 'bar',
+		toolbar: { show: false },
+		fontFamily: 'Inter, sans-serif',
+	},
+	colors: ['#C9A96E'],
+	plotOptions: {
+		bar: {
+			borderRadius: 8,
+			columnWidth: '45%',
+		},
+	},
+	grid: {
+		borderColor: '#F0EDE8',
+		strokeDashArray: 4,
+		xaxis: { lines: { show: false } },
+	},
+	xaxis: {
+		categories: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6'],
+		axisBorder: { show: false },
+		axisTicks: { show: false },
+		labels: { style: { colors: '#B5AFA5', fontSize: '12px', fontWeight: 500 } },
+	},
+	yaxis: {
+		labels: { style: { colors: '#B5AFA5', fontSize: '12px', fontWeight: 500 } },
 	},
 	dataLabels: { enabled: false },
 	tooltip: {
-		y: { formatter: (val: number) => `${val} thú cưng` },
+		theme: 'light',
+		y: { formatter: (val: number) => `${val} khách hàng` },
 	},
 };
 
-const donutSeries = [524, 389, 156, 118, 97];
+const growthSeries = [
+	{ name: 'Khách hàng', data: [180, 220, 260, 310, 380, 420] },
+];
 
 // ─── Sub Components ───────────────────────────
-const KPICard = ({ item }: { item: typeof KPI_DATA[0] }) => (
-	<div className={`kpi-card ${item.color}`}>
-		<div className="kpi-top">
-			<div className="kpi-icon">{item.icon}</div>
-			<div className={`kpi-trend ${item.trendDir}`}>
-				{item.trendDir === 'up' ? <RiseOutlined /> : <FallOutlined />}
-				{item.trend}
+const MetricCard = ({ item }: { item: typeof METRICS[0] }) => {
+	const iconMap: Record<string, React.ReactNode> = {
+		user: <UserOutlined />,
+		doctor: <MedicineBoxOutlined />,
+		paw: <span style={{ fontSize: 22 }}>🐾</span>,
+		calendar: <CalendarOutlined />,
+	};
+
+	return (
+		<div className={`pc-metric-card ${item.color}`}>
+			<div className="metric-icon-box">{iconMap[item.icon]}</div>
+			<div className="metric-content">
+				<div className="metric-label">{item.label}</div>
+				<div className="metric-value">
+					<CountUp end={item.value} duration={1.5} separator="," />
+				</div>
+				<div className="metric-sub">{item.sub}</div>
 			</div>
 		</div>
-		<div className="kpi-value">
-			<CountUp
-				end={item.value}
-				duration={1.5}
-				decimals={item.decimals || 0}
-				prefix={item.prefix || ''}
-				suffix={item.suffix || ''}
-				separator=","
-			/>
+	);
+};
+
+const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
+	<div className={`notif-item ${item.type}`}>
+		<div className="notif-icon-box">
+			{item.type === 'success' ? <SyncOutlined /> : <ExclamationCircleOutlined />}
 		</div>
-		<div className="kpi-label">{item.label}</div>
+		<div className="notif-content">
+			<div className="notif-title">{item.title}</div>
+			<div className="notif-desc">{item.desc}</div>
+		</div>
+		<div className="notif-time">{item.time}</div>
 	</div>
 );
 
-const ActivityItem = ({ item, isLast }: { item: typeof ACTIVITIES[0]; isLast: boolean }) => (
-	<li className="activity-item">
-		<div className="activity-dot-wrapper">
-			<div className={`activity-dot ${item.dot}`} />
-			{!isLast && <div className="activity-line" />}
-		</div>
-		<div className="activity-content">
-			<div className="activity-title">{item.title}</div>
-			<div className="activity-time">{item.desc} · {item.time}</div>
-		</div>
-	</li>
+// ─── Legend Item ──────────────────────────────
+const LegendItem = ({ color, label, count }: { color: string; label: string; count: number }) => (
+	<div className="legend-item">
+		<span className="legend-dot" style={{ background: color }} />
+		<span className="legend-label">{label}</span>
+		<span className="legend-count">{count}</span>
+	</div>
 );
-
-const UserItem = ({ user, rank }: { user: typeof TOP_USERS[0]; rank: number }) => {
-	const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : 'default';
-	return (
-		<li className="user-item">
-			<div className={`user-rank ${rankClass}`}>{rank + 1}</div>
-			<div className="user-avatar">
-				<img src={user.avatar} alt={user.name} />
-			</div>
-			<div className="user-info">
-				<div className="user-name">{user.name}</div>
-				<div className="user-pets">{user.pets} thú cưng</div>
-			</div>
-			<div className="user-spending">{user.spending}</div>
-		</li>
-	);
-};
-
-const PetStatBar = ({ stat }: { stat: typeof PET_STATS[0] }) => {
-	const [width, setWidth] = useState(0);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setWidth(Math.round((stat.count / stat.total) * 100));
-		}, 300);
-		return () => clearTimeout(timer);
-	}, [stat]);
-
-	return (
-		<li className="pet-stat-item">
-			<div className="pet-stat-top">
-				<div className="pet-stat-label">
-					<span className="pet-stat-emoji">{stat.emoji}</span>
-					{stat.label}
-				</div>
-				<div className="pet-stat-count">{stat.count}</div>
-			</div>
-			<div className="pet-stat-bar">
-				<div
-					className={`pet-stat-fill ${stat.color}`}
-					style={{ width: `${width}%` }}
-				/>
-			</div>
-		</li>
-	);
-};
 
 // ─── Main Dashboard ───────────────────────────
 const TrangChu = () => {
 	const { data } = useModel('randomuser');
-	const [activePeriod, setActivePeriod] = useState('12T');
+	const [filterPeriod, setFilterPeriod] = useState('7 days');
 
 	return (
-		<div className="saas-dashboard">
+		<div className="petcare-dashboard">
 			{/* ── Header ──────────────────────── */}
-			<div className="dash-header">
-				<div className="dash-greeting">
-					<h1>Xin chào! 👋</h1>
-					<p>Tổng quan hệ thống quản lý thú cưng MyPet</p>
+			<div className="pc-header">
+				<div className="pc-header-left">
+					{/* Empty spacer to balance the layout */}
+				</div>
+				<div className="pc-header-center">
+					<div className="pc-header-search">
+						<SearchOutlined className="search-icon" />
+						<input type="text" placeholder="Tìm kiếm thú cưng, khách hàng..." />
+					</div>
+				</div>
+				<div className="pc-header-actions">
+					<div className="pc-user-profile">
+						<div className="pc-user-info">
+							<span className="pc-user-name">Administrator</span>
+						</div>
+						<div className="pc-user-avatar">
+							<img src={data?.results?.[0]?.picture?.thumbnail || "https://i.pravatar.cc/150?img=12"} alt="User Avatar" />
+						</div>
+					</div>
 				</div>
 			</div>
 
-			{/* ── KPI Cards ───────────────────── */}
-			<div className="kpi-grid">
-				{KPI_DATA.map((item, idx) => (
-					<KPICard key={idx} item={item} />
+			{/* ── Metric Cards ─────────────────── */}
+			<div className="pc-metrics-grid">
+				{METRICS.map((item, idx) => (
+					<MetricCard key={idx} item={item} />
 				))}
 			</div>
 
-			{/* ── Charts Row (Bento) ──────────── */}
-			<div className="bento-charts">
-				{/* Revenue Chart */}
-				<div className="dash-card chart-revenue">
-					<div className="dash-card-header">
-						<h3>📊 Phân tích doanh thu</h3>
-						<div className="period-selector">
-							{['7N', '30N', '6T', '12T'].map((p) => (
-								<button
-									key={p}
-									type="button"
-									className={`period-btn ${activePeriod === p ? 'active' : ''}`}
-									onClick={() => setActivePeriod(p)}
-								>
-									{p}
-								</button>
-							))}
+			{/* ── Row 1: Appointment Stats + Status ── */}
+			<div className="pc-charts-row">
+				{/* Appointment Line Chart */}
+				<div className="pc-card pc-chart-line">
+					<div className="pc-card-header">
+						<div>
+							<h3>Thống kê lịch hẹn</h3>
+							<p className="pc-card-subtitle">Dữ liệu hàng tuần</p>
+						</div>
+						<select
+							className="pc-dropdown"
+							value={filterPeriod}
+							onChange={(e) => setFilterPeriod(e.target.value)}
+						>
+							<option value="7 days">7 ngày qua</option>
+							<option value="30 days">30 ngày qua</option>
+							<option value="3 months">3 tháng qua</option>
+						</select>
+					</div>
+					<div className="pc-card-body">
+						<Chart options={appointmentChartOptions} series={appointmentSeries} type="area" height={280} />
+					</div>
+				</div>
+
+				{/* Status Donut */}
+				<div className="pc-card pc-chart-donut">
+					<div className="pc-card-header">
+						<div>
+							<h3>Trạng thái</h3>
+							<p className="pc-card-subtitle">Phân bổ hôm nay</p>
 						</div>
 					</div>
-					<div className="dash-card-body">
-						<Chart options={revenueChartOptions} series={revenueSeries} type="area" height={310} />
-					</div>
-				</div>
-
-				{/* Donut Chart */}
-				<div className="dash-card chart-donut">
-					<div className="dash-card-header">
-						<h3>🐾 Phân loại thú cưng</h3>
-						<span className="dash-card-badge">Tổng: 1,284</span>
-					</div>
-					<div className="dash-card-body">
-						<Chart options={donutChartOptions} series={donutSeries} type="donut" height={310} />
-					</div>
-				</div>
-			</div>
-
-			{/* ── Activity Row (Bento) ────────── */}
-			<div className="bento-activity">
-				{/* Recent Activity */}
-				<div className="dash-card">
-					<div className="dash-card-header">
-						<h3>⚡ Hoạt động gần đây</h3>
-						<a className="view-all-link">
-							Xem tất cả <ArrowRightOutlined />
-						</a>
-					</div>
-					<div className="dash-card-body">
-						<ul className="activity-list">
-							{ACTIVITIES.map((item, idx) => (
-								<ActivityItem key={idx} item={item} isLast={idx === ACTIVITIES.length - 1} />
-							))}
-						</ul>
-					</div>
-				</div>
-
-				{/* Top Users */}
-				<div className="dash-card">
-					<div className="dash-card-header">
-						<h3>🏆 Top khách hàng</h3>
-						<a className="view-all-link">
-							Xem tất cả <ArrowRightOutlined />
-						</a>
-					</div>
-					<div className="dash-card-body">
-						<ul className="user-list">
-							{TOP_USERS.map((user, idx) => (
-								<UserItem key={idx} user={user} rank={idx} />
-							))}
-						</ul>
-					</div>
-				</div>
-
-				{/* Pet Statistics */}
-				<div className="dash-card">
-					<div className="dash-card-header">
-						<h3>📈 Thống kê thú cưng</h3>
-						<span className="dash-card-badge">Chi tiết</span>
-					</div>
-					<div className="dash-card-body">
-						<ul className="pet-stats-list">
-							{PET_STATS.map((stat, idx) => (
-								<PetStatBar key={idx} stat={stat} />
-							))}
-						</ul>
+					<div className="pc-card-body donut-body">
+						<Chart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={260} />
+						<div className="donut-legends">
+							<LegendItem color="#4A5B3E" label="Đã khám" count={117} />
+							<LegendItem color="#166E75" label="Chờ khám" count={26} />
+							<LegendItem color="#F5EEDC" label="Hủy lịch" count={8} />
+							<LegendItem color="#943B42" label="Khẩn cấp" count={5} />
+						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* ── Data Table ──────────────────── */}
-			<div className="dash-table-section">
-				<div className="dash-card dash-table">
-					<div className="dash-card-header">
-						<h3>🗂️ Danh sách thú cưng gần đây</h3>
-						<div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-							<button type="button" className="dash-btn secondary" style={{ padding: '6px 16px' }}>
-								<CalendarOutlined /> Lọc
-							</button>
-							<button type="button" className="dash-btn primary" style={{ padding: '6px 16px' }}>
-								+ Thêm mới
-							</button>
+			{/* ── Row 2: Growth + Notifications ── */}
+			<div className="pc-charts-row">
+				{/* Growth Chart */}
+				<div className="pc-card pc-chart-bar">
+					<div className="pc-card-header">
+						<div>
+							<h3>Tăng trưởng khách hàng</h3>
+							<p className="pc-card-subtitle">Th1 — Th6 2026</p>
 						</div>
 					</div>
-					<div className="dash-card-body">
-						<table className="modern-table">
-							<thead>
-								<tr>
-									<th>Thú cưng</th>
-									<th>Chủ nhân</th>
-									<th>Trạng thái</th>
-									<th>Cân nặng</th>
-									<th>Lịch khám tiếp</th>
-									<th style={{ width: 60 }}></th>
-								</tr>
-							</thead>
-							<tbody>
-								{TABLE_DATA.map((row, idx) => (
-									<tr key={idx}>
-										<td>
-											<div className="table-pet-info">
-												<div className={`table-pet-avatar ${row.type}`}>{row.emoji}</div>
-												<div>
-													<div className="table-pet-name">{row.name}</div>
-													<div className="table-pet-breed">{row.breed}</div>
-												</div>
-											</div>
-										</td>
-										<td>
-											<div className="table-owner">
-												<div className="table-owner-avatar">
-													<img src={row.ownerAvatar} alt={row.owner} />
-												</div>
-												{row.owner}
-											</div>
-										</td>
-										<td>
-											<span className={`table-status ${row.status}`}>{row.statusLabel}</span>
-										</td>
-										<td>{row.weight}</td>
-										<td>
-											<span className="date-badge">
-												<CalendarOutlined /> {row.nextVisit}
-											</span>
-										</td>
-										<td>
-											<button type="button" className="table-action-btn">
-												<MoreOutlined />
-											</button>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+					<div className="pc-card-body">
+						<Chart options={growthChartOptions} series={growthSeries} type="bar" height={280} />
 					</div>
-					{/* Summary Row */}
-					<div className="summary-row">
-						<div className="summary-item">
-							<span className="summary-label">Tổng thú cưng</span>
-							<span className="summary-value">1,284</span>
+				</div>
+
+				{/* System Notifications */}
+				<div className="pc-card pc-notifications">
+					<div className="pc-card-header">
+						<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+							<h3>Thông báo hệ thống</h3>
+							<span className="notif-badge-new">Mới</span>
 						</div>
-						<div className="summary-item">
-							<span className="summary-label">Khỏe mạnh</span>
-							<span className="summary-value" style={{ color: '#10B981' }}>1,142</span>
-						</div>
-						<div className="summary-item">
-							<span className="summary-label">Cần khám</span>
-							<span className="summary-value" style={{ color: '#F59E0B' }}>98</span>
-						</div>
-						<div className="summary-item">
-							<span className="summary-label">Đang điều trị</span>
-							<span className="summary-value" style={{ color: '#F43F5E' }}>44</span>
-						</div>
+						<a className="pc-view-all">
+							Xem tất cả <ArrowRightOutlined />
+						</a>
+					</div>
+					<div className="pc-card-body notif-body">
+						{NOTIFICATIONS.map((item, idx) => (
+							<NotificationItem key={idx} item={item} />
+						))}
+					</div>
+				</div>
+			</div>
+
+			{/* ── Banner Section ────────────────── */}
+			<div className="pc-banners-row">
+				<div className="pc-banner banner-spa">
+					<div className="banner-overlay" />
+					<img
+						src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=600"
+						alt="Dog spa"
+					/>
+					<div className="banner-content">
+						<h3>Chăm sóc tận tâm 🐕</h3>
+						<p>Dịch vụ spa cao cấp dành riêng cho thú cưng của bạn</p>
+						<button type="button" className="banner-btn">
+							Khám phá <ArrowRightOutlined />
+						</button>
+					</div>
+				</div>
+
+				<div className="pc-banner banner-health">
+					<div className="banner-overlay" />
+					<img
+						src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=600"
+						alt="Cat health"
+					/>
+					<div className="banner-content">
+						<h3>Sức khỏe là trên hết 🐈</h3>
+						<p>Đội ngũ bác sĩ giàu kinh nghiệm luôn sẵn sàng 24/7</p>
+						<button type="button" className="banner-btn">
+							Liên hệ ngay <ArrowRightOutlined />
+						</button>
 					</div>
 				</div>
 			</div>

@@ -107,14 +107,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 		menuHeaderRender: undefined,
 		menuFooterRender: (props: any) => {
 			if (props?.collapsed) return undefined;
+			const handleLogout = () => {
+				localStorage.removeItem('token');
+				localStorage.removeItem('currentUser');
+				history.replace('/user/login');
+			};
 			return (
-				<div className="sidebar-user-card" style={{ margin: '0 10px' }} onClick={() => history.push('/user/profile')}>
-					<div className="sidebar-user-avatar">
-						<img src={initialState?.currentUser?.picture || "https://i.pravatar.cc/150?img=12"} alt="User" />
-					</div>
-					<div className="sidebar-user-info">
-						<div className="sidebar-user-name">{initialState?.currentUser?.name || 'Admin'}</div>
-						<div className="sidebar-user-role">Premium Plan ✨</div>
+				<div style={{ padding: '0 12px 12px' }}>
+
+					<div className="sidebar-footer-menu">
+						<button type="button" className="sidebar-footer-item logout" onClick={handleLogout}>
+							<span>🚪</span> Đăng xuất
+						</button>
 					</div>
 				</div>
 			);

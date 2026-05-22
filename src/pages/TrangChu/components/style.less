@@ -1,1131 +1,591 @@
 @import '~antd/es/style/themes/default.less';
-@import '../../../styles/_variable.less';
 
 // ============================================
-// 🎨 SaaS Dashboard — Minimal Bento Grid
-// Inspired by Linear, Stripe, Notion, Supabase
+// 🐾 PetCare Admin Suite — Dashboard Styles
 // ============================================
 
 // ─── Design Tokens ────────────────────────────
-@dash-bg: #F8FAFC;
-@dash-card: #FFFFFF;
-@dash-text: #0F172A;
-@dash-text-secondary: #64748B;
-@dash-text-muted: #94A3B8;
-@dash-border: #E2E8F0;
-@dash-border-light: #F1F5F9;
+@pc-bg: #FAF8F5;
+@pc-card: #FFFFFF;
+@pc-text: #2D2A26;
+@pc-text-secondary: #8A8478;
+@pc-text-muted: #B5AFA5;
+@pc-border: #F0EDE8;
 
-// Accent
-@emerald: #10B981;
-@emerald-50: #ECFDF5;
-@emerald-100: #D1FAE5;
-@emerald-600: #059669;
-@indigo: #6366F1;
-@indigo-50: #EEF2FF;
-@indigo-100: #E0E7FF;
-@amber: #F59E0B;
-@amber-50: #FFFBEB;
-@amber-100: #FEF3C7;
-@rose: #F43F5E;
-@rose-50: #FFF1F2;
-@rose-100: #FFE4E6;
-@sky: #0EA5E9;
-@sky-50: #F0F9FF;
-@sky-100: #E0F2FE;
-@violet: #8B5CF6;
+// PetCare Brand Colors
+@pc-olive: #8B7355;
+@pc-olive-light: #A89070;
+@pc-gold: #C9A96E;
+@pc-gold-light: #FBF5E8;
 
-// Shadows
-@shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-@shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-@shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
-@shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-@shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.04);
-@shadow-card-hover: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.06);
+// Metric Card Colors
+@mc-warm-bg: #FFF9ED;
+@mc-warm-text: #B48434;
+@mc-mint-bg: #F0FAF7;
+@mc-mint-text: #459E87;
+@mc-pink-bg: #FFF0F2;
+@mc-pink-text: #C46473;
+@mc-peach-bg: #FEF3EE;
+@mc-peach-text: #CA714E;
 
-// Radius
+// Layout & Radius
+@radius-md: 12px;
 @radius-lg: 16px;
 @radius-xl: 20px;
 @radius-2xl: 24px;
 @radius-full: 9999px;
-
-// Transitions
-@ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-@transition-base: all 0.2s @ease-out-expo;
-@transition-slow: all 0.35s @ease-out-expo;
-
-// ─── Dashboard Wrapper ────────────────────────
-.saas-dashboard {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: @dash-bg;
-  min-height: calc(100vh - 60px);
-  padding: 28px 32px 48px;
-  margin: -24px;
-  color: @dash-text;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: @screen-md) {
-    padding: 20px 16px 40px;
-    margin: -12px;
-  }
-
-  * {
-    font-family: inherit;
-    box-sizing: border-box;
-  }
-
-  // Override antd card inside dashboard
-  .ant-card {
-    background: @dash-card;
-    border: none;
-    height: auto;
-  }
-}
-
-// ─── Header Section ───────────────────────────
-.dash-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 28px;
-  gap: 16px;
-
-  @media (max-width: @screen-sm) {
-    flex-direction: column;
-    gap: 16px;
-  }
-}
-
-.dash-greeting {
-  h1 {
-    font-size: 26px;
-    font-weight: 700;
-    color: @dash-text;
-    margin: 0 0 4px;
-    letter-spacing: -0.5px;
-    line-height: 1.2;
-  }
-
-  p {
-    font-size: 14px;
-    color: @dash-text-secondary;
-    margin: 0;
-    font-weight: 400;
-  }
-}
-
-
-
-
-
-// ─── KPI Cards Row ────────────────────────────
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-
-  @media (max-width: @screen-lg) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: @screen-sm) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.kpi-card {
-  background: @dash-card;
-  border-radius: @radius-xl;
-  padding: 22px 24px;
-  border: 1px solid @dash-border-light;
-  box-shadow: @shadow-card;
-  transition: @transition-base;
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    opacity: 0.04;
-    transform: translate(30%, -30%);
-    transition: @transition-slow;
-  }
-
-  &:hover {
-    box-shadow: @shadow-card-hover;
-    transform: translateY(-2px);
-
-    &::before {
-      opacity: 0.08;
-      transform: translate(25%, -25%) scale(1.1);
-    }
-
-    .kpi-icon {
-      transform: scale(1.1);
-    }
-  }
-
-  &.emerald {
-    &::before { background: @emerald; }
-    .kpi-icon { background: @emerald-50; color: @emerald; }
-    .kpi-trend.up { color: @emerald-600; background: @emerald-50; }
-  }
-
-  &.indigo {
-    &::before { background: @indigo; }
-    .kpi-icon { background: @indigo-50; color: @indigo; }
-    .kpi-trend.up { color: @indigo; background: @indigo-50; }
-  }
-
-  &.amber {
-    &::before { background: @amber; }
-    .kpi-icon { background: @amber-50; color: @amber; }
-    .kpi-trend.up { color: @amber; background: @amber-50; }
-  }
-
-  &.rose {
-    &::before { background: @rose; }
-    .kpi-icon { background: @rose-50; color: @rose; }
-    .kpi-trend.up { color: @rose; background: @rose-50; }
-  }
-}
-
-.kpi-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.kpi-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  transition: @transition-base;
-}
-
-.kpi-trend {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: @radius-full;
-  font-size: 12px;
-  font-weight: 600;
-
-  &.up {
-    color: @emerald-600;
-    background: @emerald-50;
-  }
-
-  &.down {
-    color: @rose;
-    background: @rose-50;
-  }
-}
-
-.kpi-value {
-  font-size: 30px;
-  font-weight: 700;
-  color: @dash-text;
-  line-height: 1.1;
-  margin-bottom: 4px;
-  letter-spacing: -1px;
-}
-
-.kpi-label {
-  font-size: 13px;
-  color: @dash-text-secondary;
-  font-weight: 500;
-}
-
-// ─── Bento Grid (Charts Row) ──────────────────
-.bento-charts {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-
-  @media (max-width: @screen-lg) {
-    grid-template-columns: 1fr;
-  }
-}
-
-// ─── Bento Grid (Activity Row) ────────────────
-.bento-activity {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-
-  @media (max-width: @screen-lg) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: @screen-sm) {
-    grid-template-columns: 1fr;
-  }
-}
-
-// ─── Dashboard Card (Shared) ──────────────────
-.dash-card {
-  background: @dash-card;
-  border-radius: @radius-xl;
-  border: 1px solid @dash-border-light;
-  box-shadow: @shadow-card;
-  transition: @transition-base;
-  overflow: hidden;
-
-  &:hover {
-    box-shadow: @shadow-card-hover;
-  }
-}
-
-.dash-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px 0;
-
-  h3 {
-    font-size: 15px;
-    font-weight: 600;
-    color: @dash-text;
-    margin: 0;
-  }
-}
-
-.dash-card-badge {
-  font-size: 12px;
-  font-weight: 500;
-  color: @dash-text-secondary;
-  background: @dash-border-light;
-  padding: 4px 12px;
-  border-radius: @radius-full;
-  cursor: pointer;
-  transition: @transition-base;
-
-  &:hover {
-    background: @dash-border;
-    color: @dash-text;
-  }
-}
-
-.dash-card-body {
-  padding: 16px 24px 24px;
-}
-
-// ─── Revenue Chart ────────────────────────────
-.chart-revenue {
-  .dash-card-body {
-    padding: 8px 16px 8px 8px;
-  }
-}
-
-// ─── Donut Chart ──────────────────────────────
-.chart-donut {
-  .dash-card-body {
-    padding: 0 16px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-// ─── Activity Feed ────────────────────────────
-.activity-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.activity-item {
-  display: flex;
-  gap: 14px;
-  padding: 12px 0;
-  border-bottom: 1px solid @dash-border-light;
-  transition: @transition-base;
-
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:hover {
-    .activity-dot {
-      transform: scale(1.3);
-    }
-  }
-}
-
-.activity-dot-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 4px;
-  flex-shrink: 0;
-}
-
-.activity-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: @radius-full;
-  transition: @transition-base;
-
-  &.emerald { background: @emerald; }
-  &.indigo { background: @indigo; }
-  &.amber { background: @amber; }
-  &.rose { background: @rose; }
-  &.sky { background: @sky; }
-}
-
-.activity-line {
-  width: 2px;
-  flex: 1;
-  background: @dash-border-light;
-  margin-top: 6px;
-}
-
-.activity-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.activity-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: @dash-text;
-  margin-bottom: 2px;
-  line-height: 1.4;
-
-  span {
-    font-weight: 600;
-    color: @emerald;
-  }
-}
-
-.activity-time {
-  font-size: 12px;
-  color: @dash-text-muted;
-}
-
-// ─── Top Users ────────────────────────────────
-.user-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid @dash-border-light;
-  transition: @transition-base;
-
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:hover {
-    .user-avatar {
-      transform: scale(1.08);
-      border-color: @emerald;
-    }
-  }
-}
-
-.user-rank {
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  flex-shrink: 0;
-
-  &.gold { background: #FEF3C7; color: #B45309; }
-  &.silver { background: #F1F5F9; color: #475569; }
-  &.bronze { background: #FED7AA; color: #C2410C; }
-  &.default { background: @dash-border-light; color: @dash-text-muted; }
-}
-
-.user-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 2px solid @dash-border-light;
-  transition: @transition-base;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.user-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: @dash-text;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.user-pets {
-  font-size: 12px;
-  color: @dash-text-muted;
-}
-
-.user-spending {
-  font-size: 13px;
-  font-weight: 600;
-  color: @emerald;
-  flex-shrink: 0;
-}
-
-// ─── Pet Statistics Bars ──────────────────────
-.pet-stats-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.pet-stat-item {
-  cursor: default;
-}
-
-.pet-stat-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.pet-stat-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: @dash-text;
-}
-
-.pet-stat-emoji {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.pet-stat-count {
-  font-size: 13px;
-  font-weight: 600;
-  color: @dash-text-secondary;
-}
-
-.pet-stat-bar {
-  height: 8px;
-  background: @dash-border-light;
-  border-radius: @radius-full;
-  overflow: hidden;
-}
-
-.pet-stat-fill {
-  height: 100%;
-  border-radius: @radius-full;
-  transition: width 1s @ease-out-expo;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
-  }
-
-  &.emerald { background: linear-gradient(90deg, @emerald, #34D399); }
-  &.indigo { background: linear-gradient(90deg, @indigo, #818CF8); }
-  &.amber { background: linear-gradient(90deg, @amber, #FBBF24); }
-  &.rose { background: linear-gradient(90deg, @rose, #FB7185); }
-  &.sky { background: linear-gradient(90deg, @sky, #38BDF8); }
-  &.violet { background: linear-gradient(90deg, @violet, #A78BFA); }
-}
-
-// ─── Data Table Section ───────────────────────
-.dash-table-section {
-  margin-top: 4px;
-}
-
-.dash-table {
-  .dash-card-body {
-    padding: 0;
-  }
-}
-
-.modern-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-
-  th {
-    padding: 13px 20px;
-    font-size: 12px;
-    font-weight: 600;
-    color: @dash-text-muted;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background: @dash-bg;
-    border-bottom: 1px solid @dash-border-light;
-    text-align: left;
-    white-space: nowrap;
-
-    &:first-child { border-radius: @radius-lg 0 0 0; }
-    &:last-child { border-radius: 0 @radius-lg 0 0; }
-  }
-
-  td {
-    padding: 14px 20px;
-    font-size: 13px;
-    color: @dash-text;
-    border-bottom: 1px solid @dash-border-light;
-    vertical-align: middle;
-  }
-
-  tr {
-    transition: @transition-base;
-
-    &:hover td {
-      background: fade(@emerald, 3%);
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
-  }
-}
-
-.table-pet-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.table-pet-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-
-  &.dog { background: @amber-50; }
-  &.cat { background: @indigo-50; }
-  &.bird { background: @sky-50; }
-  &.fish { background: @emerald-50; }
-  &.hamster { background: @rose-50; }
-}
-
-.table-pet-name {
-  font-weight: 600;
-  color: @dash-text;
-}
-
-.table-pet-breed {
-  font-size: 12px;
-  color: @dash-text-muted;
-}
-
-.table-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: @radius-full;
-  font-size: 12px;
-  font-weight: 500;
-
-  &::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: @radius-full;
-  }
-
-  &.healthy {
-    background: @emerald-50;
-    color: @emerald-600;
-    &::before { background: @emerald; }
-  }
-
-  &.checkup {
-    background: @amber-50;
-    color: #B45309;
-    &::before { background: @amber; }
-  }
-
-  &.treatment {
-    background: @rose-50;
-    color: @rose;
-    &::before { background: @rose; }
-  }
-}
-
-.table-owner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.table-owner-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-// ─── Toggle Switch ────────────────────────────
-.modern-toggle {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  display: inline-block;
-
-  input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background: @dash-border;
-    border-radius: @radius-full;
-    transition: @transition-base;
-
-    &::before {
-      content: '';
-      position: absolute;
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background: @dash-card;
-      border-radius: @radius-full;
-      transition: @transition-base;
-      box-shadow: @shadow-xs;
-    }
-  }
-
-  input:checked + .toggle-slider {
-    background: @emerald;
-
-    &::before {
-      transform: translateX(20px);
-    }
-  }
-}
-
-// ─── Buttons ──────────────────────────────────
-.dash-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 20px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: @transition-base;
-  font-family: inherit;
-  line-height: 1.5;
-
-  &.primary {
-    background: @emerald;
-    color: white;
-    box-shadow: 0 1px 2px rgba(16, 185, 129, 0.3);
-
-    &:hover {
-      background: @emerald-600;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      transform: translateY(-1px);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-  }
-
-  &.secondary {
-    background: @dash-card;
-    color: @dash-text;
-    border: 1px solid @dash-border;
-
-    &:hover {
-      border-color: @dash-text-muted;
-      box-shadow: @shadow-sm;
-    }
-  }
-
-  &.ghost {
-    background: transparent;
-    color: @dash-text-secondary;
-
-    &:hover {
-      background: @dash-border-light;
-      color: @dash-text;
-    }
-  }
-}
-
-// ─── Quick Stats Mini ─────────────────────────
-.quick-stats {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.quick-stat-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: @dash-card;
-  border: 1px solid @dash-border-light;
-  border-radius: @radius-full;
-  font-size: 12px;
-  font-weight: 500;
-  color: @dash-text-secondary;
-  transition: @transition-base;
-
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: @radius-full;
-
-    &.green { background: @emerald; }
-    &.blue { background: @sky; }
-    &.yellow { background: @amber; }
-  }
-
-  &:hover {
-    border-color: @dash-border;
-    box-shadow: @shadow-xs;
-  }
-}
-
-// ─── Sparkline Mini Chart ─────────────────────
-.sparkline {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 32px;
-}
-
-.sparkline-bar {
-  width: 4px;
-  border-radius: 2px;
-  background: @emerald-100;
-  transition: @transition-base;
-
-  &:nth-child(even) {
-    background: fade(@emerald, 40%);
-  }
-
-  &:last-child {
-    background: @emerald;
-  }
-}
-
-// ─── Animation Keyframes ──────────────────────
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes barGrow {
-  from { width: 0; }
-}
-
-// Apply animations
-.saas-dashboard {
-  .dash-header {
-    animation: fadeIn 0.5s ease;
-  }
-
-  .kpi-card {
-    animation: fadeInUp 0.5s @ease-out-expo both;
-
-    &:nth-child(1) { animation-delay: 0.05s; }
-    &:nth-child(2) { animation-delay: 0.1s; }
-    &:nth-child(3) { animation-delay: 0.15s; }
-    &:nth-child(4) { animation-delay: 0.2s; }
-  }
-
-  .bento-charts .dash-card {
-    animation: fadeInUp 0.5s @ease-out-expo both;
-    animation-delay: 0.25s;
-
-    &:nth-child(2) { animation-delay: 0.3s; }
-  }
-
-  .bento-activity .dash-card {
-    animation: fadeInUp 0.5s @ease-out-expo both;
-    animation-delay: 0.35s;
-
-    &:nth-child(2) { animation-delay: 0.4s; }
-    &:nth-child(3) { animation-delay: 0.45s; }
-  }
-
-  .dash-table-section {
-    animation: fadeInUp 0.5s @ease-out-expo both;
-    animation-delay: 0.5s;
-  }
-
-  .pet-stat-fill {
-    animation: barGrow 1.2s @ease-out-expo both;
-    animation-delay: 0.6s;
-  }
-}
-
-// ─── Responsive Overrides ─────────────────────
-@media (max-width: @screen-xs) {
-  .kpi-value {
-    font-size: 24px;
-  }
-
-  .dash-card-header {
-    padding: 16px 18px 0;
-  }
-
-  .dash-card-body {
-    padding: 12px 18px 18px;
-  }
-
-  .modern-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-}
-
-// ─── Scrollbar Override ───────────────────────
-.saas-dashboard {
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: @dash-border;
-    border-radius: 3px;
-
-    &:hover {
-      background: @dash-text-muted;
-    }
-  }
-}
-
-// ─── View All Link ────────────────────────────
-.view-all-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: @emerald;
-  cursor: pointer;
-  transition: @transition-base;
-  text-decoration: none;
-
-  &:hover {
-    color: @emerald-600;
-    gap: 6px;
-  }
-
-  &::after {
-    display: none !important;
-  }
-}
-
-// ─── Empty State / Loading ────────────────────
-.dash-skeleton {
-  background: linear-gradient(90deg, @dash-border-light, @dash-border, @dash-border-light);
-  background-size: 200% 100%;
-  animation: pulse 1.5s ease-in-out infinite;
-  border-radius: 8px;
-}
-
-// ─── Table Actions ────────────────────────────
-.table-action-btn {
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: @dash-text-muted;
-  cursor: pointer;
-  transition: @transition-base;
-  font-size: 14px;
-
-  &:hover {
-    background: @dash-border-light;
-    color: @dash-text;
-  }
-}
-
-// ─── Date Badge ───────────────────────────────
-.date-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background: @dash-border-light;
-  border-radius: @radius-full;
-  font-size: 12px;
-  color: @dash-text-secondary;
-  font-weight: 500;
-}
-
-// ─── Chart Period Selector ────────────────────
-.period-selector {
-  display: flex;
-  background: @dash-border-light;
-  border-radius: 10px;
-  padding: 3px;
-  gap: 2px;
-}
-
-.period-btn {
-  padding: 5px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: @dash-text-muted;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: @transition-base;
-  font-family: inherit;
-
-  &:hover {
-    color: @dash-text-secondary;
-  }
-
-  &.active {
-    background: @dash-card;
-    color: @dash-text;
-    box-shadow: @shadow-xs;
-  }
-}
-
-// ─── Summary Row ──────────────────────────────
-.summary-row {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 16px 24px;
-  border-top: 1px solid @dash-border-light;
-  background: @dash-bg;
-  border-radius: 0 0 @radius-xl @radius-xl;
-}
-
-.summary-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.summary-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: @dash-text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.summary-value {
-  font-size: 16px;
-  font-weight: 700;
-  color: @dash-text;
+@shadow-card: 0 4px 16px rgba(139, 115, 85, 0.04);
+@shadow-card-hover: 0 8px 24px rgba(139, 115, 85, 0.08);
+@transition-base: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+// ─── Base Dashboard ───────────────────────────
+.petcare-dashboard {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	color: @pc-text;
+	padding: 8px 0 32px;
+	
+	* {
+		box-sizing: border-box;
+	}
+}
+
+// ─── Animations ───────────────────────────────
+@keyframes gradientPan {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeUp {
+	from { opacity: 0; transform: translateY(10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+// ─── Header ───────────────────────────────────
+.pc-header {
+	margin-bottom: 32px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+
+	.pc-header-left {
+		display: flex;
+		justify-content: flex-start;
+	}
+
+	.pc-header-center {
+		display: flex;
+		justify-content: center;
+		flex: 1;
+		padding: 0 40px;
+	}
+
+	.pc-header-search {
+		display: flex;
+		align-items: center;
+		background: #FFFFFF;
+		border: 1px solid @pc-border;
+		border-radius: @radius-xl;
+		padding: 0 16px;
+		width: 100%;
+		max-width: 480px;
+		height: 44px;
+		transition: @transition-base;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+		&:focus-within {
+			border-color: @pc-olive;
+			box-shadow: 0 4px 16px rgba(139, 115, 85, 0.1);
+		}
+
+		.search-icon {
+			color: @pc-text-muted;
+			font-size: 16px;
+			margin-right: 12px;
+		}
+
+		input {
+			flex: 1;
+			border: none;
+			outline: none;
+			background: transparent;
+			font-size: 14px;
+			color: @pc-text;
+			font-family: inherit;
+
+			&::placeholder {
+				color: @pc-text-muted;
+			}
+		}
+	}
+
+	.pc-header-actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 16px;
+	}
+
+	.pc-icon-btn {
+		position: relative;
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: #FFFFFF;
+		border: 1px solid @pc-border;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 18px;
+		color: @pc-text-secondary;
+		cursor: pointer;
+		transition: @transition-base;
+
+		&:hover {
+			background: @pc-olive-light;
+			color: #FFFFFF;
+			border-color: @pc-olive-light;
+		}
+
+		.pc-badge {
+			position: absolute;
+			top: -2px;
+			right: -2px;
+			background: #F43F5E;
+			color: #FFFFFF;
+			font-size: 10px;
+			font-weight: 700;
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border: 2px solid @pc-bg;
+		}
+	}
+
+	.pc-user-profile {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		cursor: pointer;
+
+		.pc-user-info {
+			text-align: right;
+			
+			.pc-user-name {
+				font-size: 14px;
+				font-weight: 700;
+				color: @pc-text;
+			}
+		}
+
+		.pc-user-avatar {
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+			border: 2px solid #FFFFFF;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+			overflow: hidden;
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+	}
+}
+
+// ─── Metric Cards Grid ────────────────────────
+.pc-metrics-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 28px; // Increased from 20px
+	margin-bottom: 32px; // Increased from 24px
+
+	@media (max-width: 1200px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@media (max-width: 768px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.pc-metric-card {
+	background: #FFFFFF;
+	border-radius: @radius-lg;
+	padding: 24px;
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	border: 1px solid @pc-border;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+	transition: @transition-base;
+	
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	}
+
+	.metric-icon-box {
+		width: 52px;
+		height: 52px;
+		border-radius: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 22px;
+		flex-shrink: 0;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		transition: @transition-base;
+	}
+
+	.metric-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.metric-label {
+		font-size: 13px;
+		font-weight: 600;
+		color: @pc-text-secondary;
+		margin-bottom: 2px;
+	}
+
+	.metric-value {
+		font-size: 24px;
+		font-weight: 800;
+		color: @pc-text;
+		line-height: 1.1;
+		margin-bottom: 2px;
+	}
+
+	.metric-sub {
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	// Flat Color Layout with stronger icon styling
+	&.warm {
+		.metric-icon-box { background: linear-gradient(135deg, #FFF4E5, #FFE4B8); color: #D97706; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.18); }
+		.metric-sub { color: #D97706; }
+		&:hover .metric-icon-box { transform: scale(1.08); }
+	}
+	&.mint {
+		.metric-icon-box { background: linear-gradient(135deg, #E6F7F1, #B8F0DC); color: #059669; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.18); }
+		.metric-sub { color: #059669; }
+		&:hover .metric-icon-box { transform: scale(1.08); }
+	}
+	&.pink {
+		.metric-icon-box { background: linear-gradient(135deg, #FCE8EC, #F5C6CE); color: #E11D48; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.18); }
+		.metric-sub { color: #E11D48; }
+		&:hover .metric-icon-box { transform: scale(1.08); }
+	}
+	&.peach {
+		.metric-icon-box { background: linear-gradient(135deg, #FFEDD5, #FFD6AE); color: #C2410C; box-shadow: 0 4px 14px rgba(194, 65, 12, 0.18); }
+		.metric-sub { color: #C2410C; }
+		&:hover .metric-icon-box { transform: scale(1.08); }
+	}
+}
+
+// ─── Charts & Content Layout ──────────────────
+.pc-charts-row {
+	display: grid;
+	grid-template-columns: 2fr 1.2fr;
+	gap: 28px; // Increased from 20px
+	margin-bottom: 32px; // Increased from 24px
+
+	@media (max-width: 1024px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.pc-card {
+	background: @pc-card;
+	border-radius: @radius-2xl;
+	border: 1px solid @pc-border;
+	box-shadow: @shadow-card;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.pc-card-header {
+	padding: 24px 24px 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+
+	h3 {
+		font-size: 16px;
+		font-weight: 700;
+		color: @pc-text;
+		margin: 0 0 4px;
+	}
+
+	.pc-card-subtitle {
+		font-size: 13px;
+		color: @pc-text-muted;
+		margin: 0;
+		font-weight: 500;
+	}
+}
+
+.pc-card-body {
+	padding: 16px 24px 24px;
+	flex: 1;
+}
+
+// Controls
+.pc-dropdown {
+	border: 1px solid @pc-border;
+	background: #FFFFFF;
+	border-radius: @radius-lg;
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	color: @pc-text-secondary;
+	cursor: pointer;
+	outline: none;
+	transition: @transition-base;
+
+	&:hover {
+		border-color: @pc-gold;
+	}
+}
+
+.pc-view-all {
+	font-size: 13px;
+	font-weight: 600;
+	color: @pc-olive;
+	cursor: pointer;
+	
+	&:hover {
+		color: @pc-gold;
+		text-decoration: underline;
+	}
+}
+
+// ─── Donut Chart Specifics ────────────────────
+.donut-body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.donut-legends {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px 24px;
+	margin-top: 16px;
+	width: 100%;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	font-size: 13px;
+	font-weight: 500;
+
+	.legend-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		margin-right: 8px;
+	}
+	.legend-label {
+		color: @pc-text-secondary;
+		flex: 1;
+	}
+	.legend-count {
+		color: @pc-text;
+		font-weight: 600;
+	}
+}
+
+// ─── Notifications List ───────────────────────
+.pc-notifications {
+	.notif-badge-new {
+		background: @mc-peach-bg;
+		color: @mc-peach-text;
+		font-size: 10px;
+		font-weight: 700;
+		padding: 2px 8px;
+		border-radius: @radius-full;
+		text-transform: uppercase;
+	}
+
+	.notif-body {
+		padding: 16px 20px 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+}
+
+.notif-item {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 14px;
+	background: #FAFAFA;
+	border-radius: @radius-xl;
+	transition: @transition-base;
+	border: 1px solid transparent;
+
+	&:hover {
+		background: #FFFFFF;
+		border-color: @pc-border;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+		transform: translateX(4px);
+	}
+
+	.notif-icon-box {
+		width: 36px;
+		height: 36px;
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 16px;
+		flex-shrink: 0;
+	}
+
+	.notif-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.notif-title {
+		font-size: 14px;
+		font-weight: 600;
+		color: @pc-text;
+		margin-bottom: 2px;
+	}
+
+	.notif-desc {
+		font-size: 12px;
+		color: @pc-text-secondary;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.notif-time {
+		font-size: 11px;
+		font-weight: 600;
+		color: @pc-text-muted;
+		flex-shrink: 0;
+	}
+
+	// Types
+	&.success {
+		.notif-icon-box { background: @mc-mint-bg; color: @mc-mint-text; }
+	}
+	&.warning {
+		.notif-icon-box { background: @mc-pink-bg; color: @mc-pink-text; }
+	}
+}
+
+// ─── Promotion Banners ────────────────────────
+.pc-banners-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+
+	@media (max-width: 768px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.pc-banner {
+	position: relative;
+	border-radius: @radius-2xl;
+	overflow: hidden;
+	height: 180px;
+	display: flex;
+	align-items: center;
+	padding: 32px;
+	box-shadow: @shadow-card;
+	transition: @transition-base;
+
+	&:hover {
+		box-shadow: @shadow-card-hover;
+		transform: translateY(-4px);
+
+		img {
+			transform: scale(1.05);
+		}
+		
+		.banner-btn {
+			padding-right: 24px;
+		}
+	}
+
+	img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+		z-index: 1;
+	}
+
+	.banner-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 100%);
+		z-index: 2;
+	}
+
+	.banner-content {
+		position: relative;
+		z-index: 3;
+		max-width: 280px;
+		color: #FFFFFF;
+		
+		h3 {
+			font-size: 20px;
+			font-weight: 800;
+			color: #FFFFFF;
+			margin: 0 0 8px;
+			line-height: 1.2;
+		}
+		
+		p {
+			font-size: 13px;
+			color: rgba(255,255,255,0.8);
+			margin: 0 0 16px;
+			line-height: 1.4;
+		}
+	}
+
+	.banner-btn {
+		background: rgba(255,255,255,0.2);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255,255,255,0.3);
+		color: #FFFFFF;
+		padding: 8px 16px;
+		border-radius: @radius-full;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		transition: @transition-base;
+
+		&:hover {
+			background: #FFFFFF;
+			color: @pc-text;
+		}
+	}
 }
