@@ -133,14 +133,15 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				</ErrorBoundary>
 			</OIDCBounder>
 		),
-		menuHeaderRender: (logo, title) => (
+		menuHeaderRender: (logo, title, props: any) => (
 			<div 
 				style={{ 
 					display: 'flex', 
 					alignItems: 'center', 
+					justifyContent: props?.collapsed ? 'center' : 'flex-start',
 					height: '48px', 
-					marginTop: '32px', 
-					paddingLeft: '24px',
+					marginTop: '0px', 
+					paddingLeft: props?.collapsed ? '0' : '24px',
 					gap: '12px',
 					cursor: 'pointer',
 				}}
@@ -152,6 +153,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 						justifyContent: 'center',
 						background: 'linear-gradient(135deg, #D4AF37 0%, #F3D573 100%)',
 						borderRadius: '12px',
+						minWidth: '36px',
 						width: '36px',
 						height: '36px',
 						color: '#FFFFFF',
@@ -160,37 +162,38 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				>
 					<PawPrint size={20} strokeWidth={2.5} />
 				</div>
-				<h2 
-					style={{ 
-						fontSize: '26px', 
-						fontWeight: 900, 
-						margin: 0, 
-						letterSpacing: '-0.5px',
-						background: 'linear-gradient(90deg, #1A1A1A 0%, #4A4A4A 100%)',
-						WebkitBackgroundClip: 'text',
-						WebkitTextFillColor: 'transparent',
-					}}
-				>
-					Pet<span style={{ color: '#D4AF37', WebkitTextFillColor: '#D4AF37' }}>Care</span>
-				</h2>
+				{!props?.collapsed && (
+					<h2 
+						style={{ 
+							fontSize: '26px', 
+							fontWeight: 900, 
+							margin: 0, 
+							letterSpacing: '-0.5px',
+							background: 'linear-gradient(90deg, #1A1A1A 0%, #4A4A4A 100%)',
+							WebkitBackgroundClip: 'text',
+							WebkitTextFillColor: 'transparent',
+						}}
+					>
+						Pet<span style={{ color: '#D4AF37', WebkitTextFillColor: '#D4AF37' }}>Care</span>
+					</h2>
+				)}
 			</div>
 		),
 		menuFooterRender: (props: any) => {
-			if (props?.collapsed) return undefined;
 			const handleLogout = () => {
 				localStorage.removeItem('token');
 				localStorage.removeItem('currentUser');
 				history.replace('/user/login');
 			};
 			return (
-				<div style={{ padding: '0 16px 24px' }}>
-					<div className="sidebar-footer-menu" style={{ padding: '0 8px' }}>
+				<div style={{ padding: props?.collapsed ? '0 8px 24px' : '0 16px 24px' }}>
+					<div className="sidebar-footer-menu" style={{ padding: props?.collapsed ? '0' : '0 8px' }}>
 						<button 
 							type="button" 
 							className="sidebar-footer-item logout" 
 							onClick={handleLogout}
 							style={{ 
-								display: 'flex', alignItems: 'center', gap: '12px', 
+								display: 'flex', alignItems: 'center', justifyContent: props?.collapsed ? 'center' : 'flex-start', gap: '12px', 
 								width: '100%', background: 'transparent', border: 'none', 
 								color: '#1A1A1A', fontWeight: 500, fontSize: '14px', cursor: 'pointer',
 								padding: '8px 0', opacity: 0.7, transition: 'all 0.2s'
@@ -198,7 +201,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 							onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
 							onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
 						>
-							<LogOut size={18} strokeWidth={1.75} /> Đăng xuất
+							<LogOut size={18} strokeWidth={1.75} style={{ flexShrink: 0 }} /> {!props?.collapsed && <span>Đăng xuất</span>}
 						</button>
 					</div>
 				</div>
