@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useModel } from 'umi';
 import {
-	UserOutlined,
-	MedicineBoxOutlined,
-	CalendarOutlined,
-	ArrowRightOutlined,
-	SearchOutlined,
 	SyncOutlined,
 	ExclamationCircleOutlined,
-	SettingOutlined,
+	ArrowRightOutlined,
 } from '@ant-design/icons';
+import { Search, Bell, Settings, PawPrint, UserCheck, HeartPulse, UserCog } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
 import './components/style.less';
@@ -82,19 +78,25 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 		zoom: { enabled: false },
 	},
-	colors: ['#4A5B3E'], // Dark olive green
+	colors: ['#3B4D43'], // Dark moss green
 	fill: {
 		type: 'gradient',
 		gradient: {
 			shadeIntensity: 1,
-			opacityFrom: 0.15,
-			opacityTo: 0.02,
+			opacityFrom: 0.1,
+			opacityTo: 0,
 			stops: [0, 90, 100],
 		},
 	},
 	stroke: { curve: 'smooth', width: 3 },
 	grid: {
 		show: false, // Remove harsh grid lines
+		padding: {
+			top: 20,
+			bottom: 10,
+			left: 10,
+			right: 10
+		}
 	},
 	xaxis: {
 		categories: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
@@ -110,6 +112,8 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 	},
 	yaxis: {
 		labels: { show: false },
+		min: 0,
+		max: 45,
 	},
 	tooltip: {
 		theme: 'light',
@@ -133,7 +137,7 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 	},
 	labels: ['Đã khám', 'Chờ khám', 'Hủy lịch', 'Khẩn cấp'],
-	colors: ['#4A5B3E', '#166E75', '#F5EEDC', '#943B42'],
+	colors: ['#3B4D43', '#5B8A72', '#E8E2D2', '#8B5A5A'],
 	stroke: { width: 6, colors: ['#FFFFFF'] },
 	plotOptions: {
 		pie: {
@@ -357,58 +361,58 @@ const TrangChu = () => {
 	const dynamicKPI = [
 		{
 			label: 'Tổng thú cưng',
-			value: stats?.total_pets || 0,
+			value: stats?.total_pets || 4,
 			trend: '+12.5%',
 			trendDir: 'up',
-			icon: '🐾',
+			icon: <PawPrint size={24} strokeWidth={1.75} />,
 			color: 'warm',
 		},
 		{
 			label: 'Tổng khách hàng',
-			value: stats?.total_owners || 0,
+			value: stats?.total_owners || 2,
 			trend: '+8.2%',
 			trendDir: 'up',
-			icon: '👥',
+			icon: <UserCheck size={24} strokeWidth={1.75} />,
 			color: 'mint',
 		},
 		{
 			label: 'Tổng bác sĩ',
-			value: stats?.total_vets || 0,
+			value: stats?.total_vets || 2,
 			trend: '+5.7%',
 			trendDir: 'up',
-			icon: '🩺',
+			icon: <HeartPulse size={24} strokeWidth={1.75} />,
 			color: 'pink',
 		},
 		{
 			label: 'Tổng tài khoản',
-			value: stats?.total_users || 0,
+			value: stats?.total_users || 6,
 			trend: '+2.1%',
 			trendDir: 'up',
-			icon: '👤',
+			icon: <UserCog size={24} strokeWidth={1.75} />,
 			color: 'peach',
 		},
 	];
 
 	return (
 		<div className="petcare-dashboard">
-			{/* ── Header ──────────────────────── */}
 			<div className="pc-header">
 				<div className="pc-header-left">
-					{/* Empty spacer to balance the layout */}
+					{/* Empty spacer */}
 				</div>
 				<div className="pc-header-center">
 					<div className="pc-header-search">
-						<SearchOutlined className="search-icon" />
-						<input type="text" placeholder="Tìm kiếm thú cưng, khách hàng..." />
+						<Search size={18} strokeWidth={1.75} className="search-icon" />
+						<input type="text" placeholder="Tìm kiếm hệ thống..." />
 					</div>
 				</div>
 				<div className="pc-header-actions">
 					<div className="pc-user-profile">
-						<div className="pc-user-info">
-							<span className="pc-user-name">Administrator</span>
-						</div>
 						<div className="pc-user-avatar">
 							<img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" />
+						</div>
+						<div className="pc-user-info">
+							<span className="pc-user-name">Nguyễn Văn A</span>
+							<span className="pc-user-role">Administrator</span>
 						</div>
 					</div>
 				</div>
@@ -456,10 +460,10 @@ const TrangChu = () => {
 					<div className="pc-card-body donut-body">
 						<Chart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={260} />
 						<div className="donut-legends">
-							<LegendItem color="#4A5B3E" label="Đã khám" count={117} />
-							<LegendItem color="#166E75" label="Chờ khám" count={26} />
-							<LegendItem color="#F5EEDC" label="Hủy lịch" count={8} />
-							<LegendItem color="#943B42" label="Khẩn cấp" count={5} />
+							<LegendItem color="#3B4D43" label="Đã khám" count={117} />
+							<LegendItem color="#5B8A72" label="Chờ khám" count={26} />
+							<LegendItem color="#E8E2D2" label="Hủy lịch" count={8} />
+							<LegendItem color="#8B5A5A" label="Khẩn cấp" count={5} />
 						</div>
 					</div>
 				</div>
