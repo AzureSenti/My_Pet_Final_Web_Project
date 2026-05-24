@@ -247,7 +247,43 @@
 			}
 		}
 	}
+
+	.tabs {
+		margin-bottom: 24px;
+
+		:global {
+			.ant-tabs-nav::before {
+				border-bottom: 1px solid fade(@accent-yellow, 20%);
+			}
+
+			.ant-tabs-ink-bar {
+				background: @accent-yellow;
+				height: 3px;
+				border-radius: 3px;
+			}
+
+			.ant-tabs-tab {
+				padding: 12px 0;
+				font-weight: 600;
+				font-size: 16px;
+				color: #888;
+				transition: all 0.3s ease;
+
+				&:hover {
+					color: @hover-yellow;
+				}
+
+				&.ant-tabs-tab-active {
+					.ant-tabs-tab-btn {
+						color: @text-main;
+						font-weight: 800;
+					}
+				}
+			}
+		}
+	}
 }
+
 
 /* ===== Card Footer ===== */
 .cardFooter {

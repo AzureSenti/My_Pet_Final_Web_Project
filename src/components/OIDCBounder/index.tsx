@@ -23,10 +23,13 @@ const OIDCBounder: FC & { getActions: () => null } = ({ children }) => {
 
 		const token = localStorage.getItem('token');
 
-		if (!token) {
-			// Chưa đăng nhập → chuyển về trang login
-			history.replace('/user/login');
-			return;
+		// DÀNH CHO FRONTEND DEVELOPER: Comment đoạn này nếu muốn bypass login hoàn toàn
+		// Hoặc thêm ?bypass=true vào URL
+		const isBypass = window.location.search.includes('bypass=true');
+
+		if (!token && !isBypass) {
+			// history.replace('/user/login'); // Đã tạm thời tắt để anh em code front dễ dàng
+			// return;
 		}
 
 		// Nếu đã có token nhưng chưa có currentUser trong state → restore từ localStorage
