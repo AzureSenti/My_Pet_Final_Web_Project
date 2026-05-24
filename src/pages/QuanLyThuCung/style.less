@@ -1,699 +1,408 @@
 @import '~antd/es/style/themes/default.less';
 
-// ========== Design Tokens ==========
-@primary: #10B981; // Emerald
-@primary-dark: #059669;
-@primary-hover: #34D399;
-@primary-light: #ECFDF5;
-@primary-bg: #F0FDF4;
-@text-primary: #0F172A;
-@text-secondary: #64748B;
-@text-muted: #94A3B8;
-@surface: #FFFFFF;
-@surface-muted: #F8FAFC;
-@border-subtle: #F1F5F9;
-@border-default: #E2E8F0;
-@shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-@shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-@shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-@shadow-glow: 0 4px 14px rgba(16, 185, 129, 0.1);
-@radius-sm: 12px;
-@radius-md: 16px;
-@radius-lg: 20px;
-@radius-xl: 24px;
-@transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+// ═══════════════════════════════════════
+//  DESIGN TOKENS — PetCare Pet Management
+// ═══════════════════════════════════════
+@amber:          #D4A017;
+@amber-hover:    #C4910F;
+@amber-light:    #FEF3C7;
+@amber-glow:     rgba(212, 160, 23, 0.18);
 
-@keyframes bentoFadeIn {
-	from { opacity: 0; transform: translateY(16px); }
-	to { opacity: 1; transform: translateY(0); }
+@bg-cream:       #FAF7F0;
+@card-bg:        #FFFFFF;
+@text-primary:   #1A1A1A;
+@text-muted:     #888888;
+@text-sub:       #555555;
+
+@green-bg:       #F0FDF4;
+@green-text:     #15803D;
+@pink-bg:        #FFF1F2;
+@pink-text:      #BE123C;
+@red-bg:         #FEF2F2;
+@red-text:       #DC2626;
+@yellow-bg:      #FFFBEB;
+@yellow-text:    #B45309;
+
+@radius-card:    16px;
+@radius-pill:    999px;
+@shadow-card:    0 2px 12px rgba(0, 0, 0, 0.04);
+@shadow-hover:   0 12px 32px rgba(0, 0, 0, 0.1);
+@transition:     all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ═══════════════════════════════════════
+//  ANIMATIONS
+// ═══════════════════════════════════════
+@keyframes cardEnter {
+	from {
+		opacity: 0;
+		transform: translateY(20px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
 }
 
-@keyframes floatIn {
-	from { opacity: 0; transform: translateY(24px) scale(0.97); }
-	to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes fabPulse {
+	0%, 100% { box-shadow: 0 6px 24px @amber-glow; }
+	50%      { box-shadow: 0 6px 32px rgba(212, 160, 23, 0.35); }
 }
 
-.bento-cell() {
-	background: @surface;
-	border-radius: @radius-lg;
-	border: 1px solid @border-subtle;
-	box-shadow: @shadow-sm;
+// ═══════════════════════════════════════
+//  PAGE CONTENT WRAPPER
+// ═══════════════════════════════════════
+.pet-page-content {
+	padding: 0;
+}
+
+// ═══════════════════════════════════════
+//  PAGE TITLE ROW
+// ═══════════════════════════════════════
+.pet-title-row {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	margin-bottom: 32px;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+.pet-title-left {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+}
+
+.pet-title-icon {
+	width: 48px;
+	height: 48px;
+	border-radius: 14px;
+	background: linear-gradient(135deg, @amber-light, fade(@amber, 22%));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: @amber;
+	flex-shrink: 0;
+	box-shadow: 0 4px 14px @amber-glow;
+
+	svg {
+		display: block;
+	}
+}
+
+.pet-title-left h1 {
+	font-size: 26px;
+	font-weight: 800;
+	color: @text-primary;
+	margin: 0;
+	letter-spacing: -0.4px;
+	line-height: 1.2;
+}
+
+.pet-subtitle {
+	font-size: 14px;
+	color: @text-muted;
+	margin: 4px 0 0 0;
+	font-weight: 400;
+}
+
+// ═══════════════════════════════════════
+//  FILTER PILLS
+// ═══════════════════════════════════════
+.pet-filter-pills {
+	display: flex;
+	gap: 6px;
+	background: @card-bg;
+	padding: 5px;
+	border-radius: @radius-pill;
+	border: 1px solid #E8E5DE;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.filter-pill {
+	padding: 8px 22px;
+	border-radius: @radius-pill;
+	border: none;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
 	transition: @transition;
-	animation: bentoFadeIn 0.5s ease both;
+	color: @text-muted;
+	background: transparent;
+	white-space: nowrap;
+
+	&:hover:not(.active) {
+		background: #F5F2EB;
+		color: @text-primary;
+	}
+
+	&.active {
+		background: @amber;
+		color: #FFFFFF;
+		box-shadow: 0 2px 8px @amber-glow;
+	}
+}
+
+// ═══════════════════════════════════════
+//  PET CARD GRID
+// ═══════════════════════════════════════
+.pet-card-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 24px;
+	padding-bottom: 80px;
+
+	@media (max-width: 1200px) {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	@media (max-width: 900px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@media (max-width: 580px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+// ═══════════════════════════════════════
+//  PET CARD
+// ═══════════════════════════════════════
+.pet-card {
+	background: @card-bg;
+	border-radius: @radius-card;
+	box-shadow: @shadow-card;
 	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid rgba(0, 0, 0, 0.04);
+	transition: @transition;
+	animation: cardEnter 0.45s ease both;
 
 	&:hover {
-		box-shadow: @shadow-lg;
-		border-color: fade(@primary, 30%);
-	}
-}
+		transform: translateY(-4px);
+		box-shadow: @shadow-hover;
+		border-color: transparent;
 
-// ========== Container ==========
-.pet-mgmt-container {
-	padding: 24px 32px;
-	background: transparent;
-	min-height: 100vh;
-
-	// Page Header
-	.page-header {
-		margin-bottom: 28px;
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		animation: bentoFadeIn 0.4s ease both;
-
-		h1 {
-			font-size: 28px;
-			font-weight: 900;
-			color: @text-primary;
-			margin: 0;
-			display: flex;
-			align-items: center;
-			letter-spacing: -0.5px;
-
-			.header-icon {
-				margin-right: 14px;
-				font-size: 24px;
-				color: @primary-dark;
-				background: linear-gradient(135deg, @primary-bg, fade(@primary, 25%));
-				padding: 10px;
-				border-radius: @radius-sm;
-				box-shadow: 0 4px 12px rgba(246, 215, 118, 0.2);
-			}
-		}
-	}
-
-	// ========== Bento Grid ==========
-	.bento-grid {
-		display: grid;
-		grid-template-columns: repeat(12, 1fr);
-		gap: 20px;
-		margin-bottom: 28px;
-	}
-
-	// ========== Stats Chip Row ==========
-	.bento-stats-row {
-		.bento-cell();
-		grid-column: span 12;
-		padding: 20px 24px;
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		flex-wrap: wrap;
-		animation-delay: 0.05s;
-
-		&:hover { transform: none; }
-
-		.stat-chip {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			padding: 8px 20px;
-			border-radius: 30px;
-			font-size: 14px;
-			font-weight: 600;
-			transition: @transition;
-			cursor: default;
-
-			.stat-emoji {
-				font-size: 18px;
-			}
-
-			.stat-count {
-				font-weight: 900;
-				font-size: 18px;
-				margin-left: 4px;
-			}
-
-			&.chip-total {
-				background: @primary-light;
-				color: @primary-dark;
-				border: 1px solid fade(@primary, 20%);
-			}
-			&.chip-dog {
-				background: #EFF6FF;
-				color: #1D4ED8;
-				border: 1px solid #BFDBFE;
-			}
-			&.chip-cat {
-				background: #F5F3FF;
-				color: #6D28D9;
-				border: 1px solid #DDD6FE;
-			}
-		}
-	}
-
-	// ========== Filter Bento ==========
-	.bento-filter {
-		.bento-cell();
-		grid-column: span 12;
-		padding: 20px 24px;
-		animation-delay: 0.1s;
-
-		&:hover { transform: none; }
-
-		.filter-grid {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 20px;
-			align-items: end;
-
-			@media (max-width: 992px) {
-				grid-template-columns: repeat(2, 1fr);
-			}
-
-			@media (max-width: 768px) {
-				grid-template-columns: 1fr;
-			}
-		}
-
-		.filter-group {
-			.filter-label {
-				font-size: 11px;
-				font-weight: 700;
-				color: @text-secondary;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				margin-bottom: 6px;
-			}
-		}
-
-		.search-input {
-			border-radius: 10px;
-			height: 40px;
-			border: 1px solid @border-default;
-			transition: @transition;
-
-			&:hover, &:focus {
-				border-color: @primary;
-				box-shadow: 0 0 0 3px fade(@primary, 15%);
-			}
-		}
-
-		.species-radio {
-			.ant-radio-button-wrapper {
-				border-radius: 0;
-				border: 1px solid @border-default;
-				height: 40px;
-				line-height: 38px;
-				font-weight: 500;
-
-				&:first-child {
-					border-radius: 10px 0 0 10px;
-				}
-				&:last-child {
-					border-radius: 0 10px 10px 0;
-				}
-
-				&-checked:not(.ant-radio-button-wrapper-disabled) {
-					background: linear-gradient(135deg, @primary, @primary-hover);
-					border-color: @primary;
-					color: @text-primary;
-					font-weight: 700;
-
-					&::before {
-						background-color: transparent;
-					}
-				}
-			}
-		}
-
-		.filter-actions {
-			display: flex;
-			gap: 10px;
-			align-self: flex-end;
-
-			.reset-btn {
-				border-radius: 10px;
-				height: 40px;
-				border: 1px solid @border-default;
-				font-weight: 600;
-				color: @text-secondary;
-
-				&:hover {
-					border-color: @primary;
-					color: @primary-dark;
-					background: @primary-bg;
-				}
-			}
-
-			.search-btn {
-				border-radius: 10px;
-				height: 40px;
-				background: linear-gradient(135deg, @primary, @primary-hover);
-				border-color: @primary;
-				color: @text-primary;
-				font-weight: 700;
-				box-shadow: 0 4px 12px rgba(246, 215, 118, 0.3);
-
-				&:hover {
-					transform: translateY(-1px);
-					box-shadow: 0 6px 16px rgba(246, 215, 118, 0.4);
-					background: @primary-hover;
-					border-color: @primary-hover;
-					color: @text-primary;
-				}
-			}
-		}
-	}
-
-	// ========== Pet Bento Grid ==========
-	.pet-bento-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 20px;
-
-		.pet-bento-card {
-			.bento-cell();
-			display: flex;
-			flex-direction: column;
-			animation: floatIn 0.5s ease both;
-
-			&:nth-child(1) { animation-delay: 0.05s; }
-			&:nth-child(2) { animation-delay: 0.1s; }
-			&:nth-child(3) { animation-delay: 0.15s; }
-			&:nth-child(4) { animation-delay: 0.2s; }
-			&:nth-child(5) { animation-delay: 0.25s; }
-			&:nth-child(6) { animation-delay: 0.3s; }
-
-			&:hover {
-				transform: translateY(-4px);
-				box-shadow: @shadow-glow;
-
-				.pet-image-wrapper .pet-img {
-					transform: scale(1.06);
-				}
-			}
-
-			// Image Section
-			.pet-image-wrapper {
-				position: relative;
-				height: 190px;
-				overflow: hidden;
-				background: @surface-muted;
-
-				.pet-img {
-					width: 100%;
-					height: 100%;
-					object-fit: cover;
-					transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-				}
-
-				// Gradient overlay at bottom
-				&::after {
-					content: '';
-					position: absolute;
-					bottom: 0;
-					left: 0;
-					right: 0;
-					height: 50px;
-					background: linear-gradient(transparent, rgba(0, 0, 0, 0.03));
-					pointer-events: none;
-				}
-
-				.species-tag-overlay {
-					position: absolute;
-					top: 12px;
-					left: 12px;
-					z-index: 2;
-					border-radius: 8px;
-					padding: 3px 10px;
-					font-weight: 700;
-					font-size: 12px;
-					border: none;
-					backdrop-filter: blur(8px);
-				}
-
-				.gender-tag-overlay {
-					position: absolute;
-					top: 12px;
-					right: 12px;
-					z-index: 2;
-					border-radius: 50%;
-					width: 32px;
-					height: 32px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					font-size: 16px;
-					font-weight: 700;
-					border: none;
-					box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-					backdrop-filter: blur(8px);
-				}
-			}
-
-			// Details Section
-			.pet-details {
-				padding: 18px 20px 20px;
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-
-				.pet-name-row {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					margin-bottom: 6px;
-
-					h3 {
-						font-size: 18px;
-						font-weight: 800;
-						color: @text-primary;
-						margin: 0;
-						letter-spacing: -0.3px;
-					}
-
-					.pet-age {
-						font-size: 12px;
-						font-weight: 700;
-						color: @primary-dark;
-						background: @primary-bg;
-						padding: 4px 10px;
-						border-radius: 20px;
-					}
-				}
-
-				.breed-text {
-					font-size: 13px;
-					color: @text-muted;
-					margin-bottom: 14px;
-
-					b {
-						color: @text-secondary;
-					}
-				}
-
-				// Owner mini card
-				.owner-info-box {
-					background: @surface-muted;
-					border-radius: @radius-sm;
-					padding: 12px 14px;
-					margin-bottom: 16px;
-					border: 1px solid @border-subtle;
-					flex: 1;
-
-					.owner-title {
-						font-size: 10px;
-						color: @text-muted;
-						text-transform: uppercase;
-						letter-spacing: 0.8px;
-						margin-bottom: 6px;
-						font-weight: 700;
-					}
-
-					.owner-detail-row {
-						display: flex;
-						align-items: center;
-						gap: 6px;
-						font-size: 13px;
-						color: @text-primary;
-						font-weight: 600;
-					}
-
-					.owner-contact {
-						font-size: 11px;
-						color: @text-muted;
-						margin-top: 4px;
-						display: flex;
-						flex-direction: column;
-						gap: 1px;
-					}
-				}
-
-				.pet-action-btn {
-					width: 100%;
-					border-radius: 10px;
-					height: 38px;
-					background: @primary-bg;
-					border: 1px solid fade(@primary, 40%);
-					color: @primary-dark;
-					font-weight: 700;
-					font-size: 13px;
-					transition: @transition;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					gap: 6px;
-
-					&:hover {
-						background: linear-gradient(135deg, @primary, @primary-hover);
-						color: @text-primary;
-						border-color: @primary;
-						transform: translateY(-1px);
-						box-shadow: 0 4px 12px rgba(246, 215, 118, 0.3);
-					}
-				}
-			}
+		.pet-card-photo img {
+			transform: scale(1.06);
 		}
 	}
 }
 
-// ========== Drawer ==========
-.pet-medical-drawer {
-	.ant-drawer-content-wrapper {
-		box-shadow: -10px 0 40px rgba(0, 0, 0, 0.06) !important;
+// ── Photo Section ──
+.pet-card-photo {
+	position: relative;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	background: #F0EDE6;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 	}
+}
 
-	.ant-drawer-header {
-		background: linear-gradient(135deg, @surface-muted, #fdfdf9);
-		border-bottom: 1px solid @border-subtle;
-		padding: 20px 24px;
+// ── Health Badge ──
+.health-badge {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	padding: 4px 12px;
+	border-radius: @radius-pill;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+	backdrop-filter: blur(6px);
+	z-index: 2;
+
+	&.badge-healthy {
+		background: fade(@green-bg, 92%);
+		color: @green-text;
 	}
-
-	.drawer-header-pet {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-
-		.pet-avatar-border {
-			border: 3px solid fade(@primary, 50%);
-			box-shadow: 0 4px 14px rgba(246, 215, 118, 0.3);
-		}
-
-		h3 {
-			font-size: 20px;
-			font-weight: 900;
-			color: @text-primary;
-			margin: 0 0 4px 0;
-			letter-spacing: -0.3px;
-		}
+	&.badge-checkup {
+		background: fade(@pink-bg, 92%);
+		color: @pink-text;
 	}
-
-	// Pet Meta Grid (mini bento)
-	.pet-meta-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 12px;
-		margin-bottom: 24px;
-
-		.meta-box {
-			background: @surface-muted;
-			border-radius: @radius-sm;
-			padding: 14px 12px;
-			border: 1px solid @border-subtle;
-			text-align: center;
-			transition: @transition;
-
-			&:hover {
-				border-color: fade(@primary, 30%);
-				box-shadow: @shadow-md;
-			}
-
-			.meta-label {
-				font-size: 10px;
-				color: @text-muted;
-				margin-bottom: 4px;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				font-weight: 600;
-			}
-
-			.meta-value {
-				font-size: 14px;
-				font-weight: 700;
-				color: @text-primary;
-			}
-		}
+	&.badge-urgent {
+		background: fade(@red-bg, 92%);
+		color: @red-text;
 	}
-
-	// Owner Meta Block
-	.owner-meta-block {
-		background: @surface;
-		border-radius: @radius-md;
-		border: 1px solid @border-subtle;
-		padding: 16px;
-		margin-bottom: 24px;
-		box-shadow: @shadow-sm;
-
-		.owner-header {
-			font-size: 11px;
-			font-weight: 700;
-			color: @text-muted;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			margin-bottom: 12px;
-			border-bottom: 1px solid @border-subtle;
-			padding-bottom: 8px;
-		}
-
-		.owner-row {
-			display: flex;
-			font-size: 13px;
-			margin-bottom: 8px;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-
-			.owner-label {
-				width: 100px;
-				color: @text-muted;
-				font-weight: 500;
-			}
-
-			.owner-val {
-				font-weight: 600;
-				color: @text-primary;
-			}
-		}
+	&.badge-new {
+		background: fade(@yellow-bg, 92%);
+		color: @yellow-text;
 	}
+}
 
-	// Medical Timeline
-	.medical-timeline-title {
-		font-size: 16px;
-		font-weight: 900;
-		color: @text-primary;
-		margin-bottom: 16px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
+// ── Card Body ──
+.pet-card-body {
+	padding: 16px 18px 18px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
 
-		.title-icon {
-			color: @primary;
-			font-size: 18px;
-		}
+.pet-name-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 2px;
+}
+
+.pet-name {
+	font-size: 18px;
+	font-weight: 800;
+	color: @text-primary;
+	letter-spacing: -0.3px;
+}
+
+.gender-icon {
+	font-size: 18px;
+	font-weight: 700;
+
+	&.male {
+		color: #3B82F6;
 	}
+	&.female {
+		color: #EC4899;
+	}
+}
 
-	.timeline-content-card {
-		background: @surface-muted;
-		border-radius: @radius-md;
-		border: 1px solid @border-subtle;
-		padding: 18px;
-		box-shadow: @shadow-sm;
-		margin-bottom: 12px;
-		transition: @transition;
+.pet-breed {
+	font-size: 13px;
+	color: @text-muted;
+	font-weight: 500;
+	margin-bottom: auto;
+}
 
-		&:hover {
-			box-shadow: @shadow-md;
-			border-color: fade(@primary, 25%);
-		}
+// ── Owner Section ──
+.pet-owner-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 14px;
+	padding-top: 14px;
+	border-top: 1px solid #F0EDE6;
+}
 
-		.timeline-header-row {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 12px;
+.owner-avatar {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #F0EDE6;
+	flex-shrink: 0;
+}
 
-			.service-tag {
-				border-radius: 6px;
-				font-weight: 600;
-			}
+.owner-text {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
 
-			.vet-name {
-				font-size: 12px;
-				color: @text-muted;
-				font-weight: 500;
-			}
-		}
+.owner-label {
+	font-size: 10px;
+	color: @text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	font-weight: 700;
+	line-height: 1;
+	margin-bottom: 3px;
+}
 
-		.diagnosis-box {
-			background: @primary-light;
-			border-left: 3px solid @primary;
-			padding: 10px 14px;
-			border-radius: 0 10px 10px 0;
-			font-size: 13px;
-			color: #614d0a;
-			margin-bottom: 12px;
-			font-weight: 500;
-		}
+.owner-name {
+	font-size: 13px;
+	font-weight: 700;
+	color: @text-sub;
+	line-height: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
-		.treatment-text {
-			font-size: 13px;
-			color: @text-secondary;
-			margin-bottom: 12px;
-			line-height: 1.5;
-		}
+// ═══════════════════════════════════════
+//  ADD NEW PET CARD
+// ═══════════════════════════════════════
+.pet-card-add {
+	border: 2px dashed @amber;
+	border-radius: @radius-card;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 32px 24px;
+	text-align: center;
+	cursor: pointer;
+	transition: @transition;
+	animation: cardEnter 0.45s ease both;
+	min-height: 320px;
 
-		// Rx Card
-		.prescription-rx-card {
-			background: @surface;
-			border: 1.5px dashed fade(@primary, 60%);
-			border-radius: 10px;
-			padding: 12px 14px;
-			position: relative;
-			overflow: hidden;
-			margin-bottom: 10px;
+	&:hover {
+		background: fade(@amber, 6%);
+		border-color: @amber-hover;
 
-			&::before {
-				content: 'Rx';
-				position: absolute;
-				top: -8px;
-				right: 6px;
-				font-size: 32px;
-				font-family: Georgia, serif;
-				font-style: italic;
-				font-weight: 900;
-				color: fade(@primary, 20%);
-				z-index: 1;
-			}
-
-			.rx-title {
-				font-size: 10px;
-				color: @primary-dark;
-				font-weight: 700;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				margin-bottom: 4px;
-				position: relative;
-				z-index: 2;
-			}
-
-			.rx-content {
-				font-size: 12px;
-				font-weight: 700;
-				color: #4b3e1d;
-				font-family: 'Courier New', monospace;
-				position: relative;
-				z-index: 2;
-				line-height: 1.4;
-			}
-		}
-
-		.timeline-notes {
-			font-size: 12px;
-			color: @text-muted;
-			font-style: italic;
+		.add-circle {
+			background: @amber;
+			color: #FFFFFF;
+			transform: scale(1.1);
+			box-shadow: 0 6px 20px @amber-glow;
 		}
 	}
 }
 
-// ========== Responsive ==========
-@media (max-width: 768px) {
-	.pet-mgmt-container {
-		padding: 16px;
+.add-circle {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: @amber-light;
+	color: @amber;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 16px;
+	transition: @transition;
+}
 
-		.bento-grid {
-			grid-template-columns: 1fr;
-		}
+.add-title {
+	font-size: 16px;
+	font-weight: 800;
+	color: @text-primary;
+	margin-bottom: 6px;
+}
 
-		.bento-stats-row,
-		.bento-filter {
-			grid-column: span 1;
-		}
+.add-desc {
+	font-size: 13px;
+	color: @text-muted;
+	max-width: 200px;
+	line-height: 1.5;
+}
 
-		.pet-bento-grid {
-			grid-template-columns: 1fr;
-		}
+// ═══════════════════════════════════════
+//  FLOATING ACTION BUTTON
+// ═══════════════════════════════════════
+.pet-fab {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	z-index: 100;
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	border: none;
+	background: @amber;
+	color: #FFFFFF;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: 0 6px 24px @amber-glow;
+	transition: @transition;
+	animation: fabPulse 2.5s ease-in-out infinite;
+
+	&:hover {
+		background: @amber-hover;
+		transform: scale(1.12);
+		box-shadow: 0 10px 32px rgba(212, 160, 23, 0.4);
 	}
 }

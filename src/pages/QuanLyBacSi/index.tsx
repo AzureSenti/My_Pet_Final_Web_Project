@@ -1,407 +1,190 @@
-import React, { useState, useEffect } from 'react';
-import {
-	Card,
-	Row,
-	Col,
-	Button,
-	Switch,
-	Avatar,
-	Tag,
-	Popconfirm,
-	Spin,
-	Empty,
-	Tooltip,
-	Modal,
-	Form,
-	Input,
-} from 'antd';
+import React from 'react';
 import {
 	MedicineBoxOutlined,
 	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	PhoneOutlined,
-	MailOutlined,
-	FilePdfOutlined,
-	UserOutlined,
+	DeleteOutlined
 } from '@ant-design/icons';
-import {
-	getDoctors,
-	createDoctor,
-	updateDoctor,
-	deleteDoctor,
-	toggleDoctorStatus,
-} from '@/services/QuanLyPetStore';
+import { 
+	Search, 
+	ClipboardList, 
+	Clock, 
+	ShieldCheck, 
+	Asterisk, 
+	Filter, 
+	Calendar,
+	Award,
+	GraduationCap,
+	UserPlus
+} from 'lucide-react';
+import '../TrangChu/components/style.less'; // Import pc-header styles
 import './style.less';
 
-const { TextArea } = Input;
-
-interface DoctorType {
-	id: string;
-	vet_id: string;
-	full_name: string;
-	email: string;
-	phone?: string;
-	avatar_url?: string;
-	specialization: string;
-	bio: string;
-	certificate_url: string;
-	is_active: boolean;
-}
-
 const QuanLyBacSi: React.FC = () => {
-	const [doctors, setDoctors] = useState<DoctorType[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-
-	const [modalVisible, setModalVisible] = useState<boolean>(false);
-	const [editingDoctorId, setEditingDoctorId] = useState<string | null>(null);
-	const [formLoading, setFormLoading] = useState<boolean>(false);
-	const [expandedBios, setExpandedBios] = useState<Record<string, boolean>>({});
-
-	const [form] = Form.useForm();
-
-	const loadDoctorsList = async () => {
-		setLoading(true);
-		try {
-			const res = await getDoctors();
-			setDoctors(res);
-		} catch (error) {
-			console.error('Failed to load doctors list:', error);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		loadDoctorsList();
-	}, []);
-
-	const toggleBio = (id: string) => {
-		setExpandedBios((prev) => ({
-			...prev,
-			[id]: !prev[id],
-		}));
-	};
-
-	const handleOpenAddModal = () => {
-		setEditingDoctorId(null);
-		form.resetFields();
-		setModalVisible(true);
-	};
-
-	const handleOpenEditModal = (doctor: DoctorType) => {
-		setEditingDoctorId(doctor.vet_id); // Dùng vet_id để sửa
-		form.setFieldsValue({
-			full_name: doctor.full_name,
-			email: doctor.email,
-			phone: doctor.phone,
-			avatar_url: doctor.avatar_url,
-			specialization: doctor.specialization,
-			bio: doctor.bio,
-			certificate_url: doctor.certificate_url,
-		});
-		setModalVisible(true);
-	};
-
-	const handleCloseModal = () => {
-		setModalVisible(false);
-		setEditingDoctorId(null);
-		form.resetFields();
-	};
-
-	const handleSubmit = async () => {
-		try {
-			const values = await form.validateFields();
-			setFormLoading(true);
-
-			let success = false;
-			if (editingDoctorId) {
-				// Backend: PUT /admin/vets/{vet_id}
-				success = await updateDoctor(editingDoctorId, values);
-			} else {
-				// Backend: POST /admin/vets
-				success = await createDoctor(values);
-			}
-
-			if (success) {
-				handleCloseModal();
-				loadDoctorsList();
-			}
-		} catch (error) {
-			console.error('Form validation failed:', error);
-		} finally {
-			setFormLoading(false);
-		}
-	};
-
-	const handleDeleteDoctor = async (vetId: string) => {
-		try {
-			const success = await deleteDoctor(vetId);
-			if (success) {
-				loadDoctorsList();
-			}
-		} catch (error) {
-			console.error('Failed to delete doctor:', error);
-		}
-	};
-
-	const handleToggleStatus = async (vetId: string, active: boolean) => {
-		try {
-			const success = await toggleDoctorStatus(vetId);
-			if (success) {
-				setDoctors((prev) =>
-					prev.map((d) => (d.vet_id === vetId ? { ...d, is_active: active } : d))
-				);
-			}
-		} catch (error) {
-			console.error('Failed to toggle status:', error);
-		}
-	};
-
-	const getSpecializationColor = (spec: string) => {
-		const lower = spec.toLowerCase();
-		if (lower.includes('nội') || lower.includes('ngoại')) return 'gold';
-		if (lower.includes('da liễu')) return 'cyan';
-		if (lower.includes('dinh dưỡng')) return 'green';
-		if (lower.includes('nha khoa')) return 'blue';
-		return 'purple';
-	};
-
 	return (
-		<div className='vet-mgmt-container'>
-			{/* Page Header */}
-			<div className='page-header'>
-				<div>
-					<h1>
-						<MedicineBoxOutlined className='header-icon' /> Quản Lý Bác Sĩ
-					</h1>
-					<p style={{ color: '#6b7280', margin: '6px 0 0 0', fontSize: '14px', maxWidth: 600 }}>
-						Thêm mới, cập nhật hồ sơ chuyên môn, theo dõi trạng thái hoạt động và quản lý chứng chỉ hành nghề của đội ngũ bác sĩ.
-					</p>
+		<div className="petcare-dashboard">
+			{/* Header giống trang tổng quan */}
+			<div className="pc-header">
+				<div className="pc-header-left">
 				</div>
-				<Button
-					icon={<PlusOutlined />}
-					className='add-vet-btn'
-					onClick={handleOpenAddModal}
-				>
-					Thêm bác sĩ mới
-				</Button>
+				<div className="pc-header-center">
+					<div className="pc-header-search">
+						<Search size={18} strokeWidth={1.75} className="search-icon" />
+						<input type="text" placeholder="Tìm kiếm bác sĩ, hồ sơ..." />
+					</div>
+				</div>
+				<div className="pc-header-actions">
+					<div className="pc-user-profile">
+						<div className="pc-user-avatar">
+							<img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" />
+						</div>
+						<div className="pc-user-info">
+							<span className="pc-user-name">Nguyễn Văn A</span>
+							<span className="pc-user-role">Administrator</span>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			{/* Main Bento Grid */}
-			{loading ? (
-				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px', flexDirection: 'column', gap: '12px' }}>
-					<Spin size='large' />
-					<span style={{ color: '#999' }}>Đang nạp hồ sơ bác sĩ...</span>
+			<div>
+				{/* Page Header */}
+				<div className='page-header'>
+					<div>
+						<h1>
+							<MedicineBoxOutlined className='header-icon' /> Quản Lý Bác Sĩ
+						</h1>
+						<p style={{ color: '#6b7280', margin: '6px 0 0 0', fontSize: '14px', maxWidth: 600 }}>
+							Thêm mới, cập nhật hồ sơ chuyên môn, theo dõi trạng thái hoạt động và quản lý chứng chỉ hành nghề của đội ngũ bác sĩ.
+						</p>
+					</div>
 				</div>
-			) : doctors.length === 0 ? (
-				<Card style={{ borderRadius: '20px', textAlign: 'center', padding: '40px 20px', border: '1px solid rgba(0,0,0,0.04)' }}>
-					<Empty description='Chưa có bác sĩ thú y nào được tạo lập trong hệ thống.' />
-					<Button
-						type='primary'
-						icon={<PlusOutlined />}
-						onClick={handleOpenAddModal}
-						style={{ marginTop: '16px', backgroundColor: '#f6d776', borderColor: '#f6d776', color: '#1a1a2e', fontWeight: 'bold', borderRadius: '10px' }}
-					>
-						Thêm bác sĩ ngay
-					</Button>
-				</Card>
-			) : (
-				<div className='vet-grid'>
-					{doctors.map((doctor) => {
-						const isExpanded = expandedBios[doctor.vet_id] || false;
-						return (
-							<div key={doctor.vet_id} className='vet-bento-card'>
-								{/* Header */}
-								<div className='vet-card-header'>
-									<Avatar
-										src={doctor.avatar_url}
-										size={64}
-										icon={<UserOutlined />}
-										className='vet-avatar'
-									/>
-									<div className='vet-header-text'>
-										<h3>{doctor.full_name}</h3>
-										<Tag color={getSpecializationColor(doctor.specialization)} className='specialization-tag'>
-											{doctor.specialization}
-										</Tag>
-									</div>
-									<div className='status-switch-wrapper'>
-										<Tooltip title={doctor.is_active ? 'Đang hoạt động - Nhấp để khóa' : 'Tạm ngưng - Nhấp để mở khóa'}>
-											<Switch
-												checked={doctor.is_active}
-												onChange={(checked) => handleToggleStatus(doctor.vet_id, checked)}
-												size='small'
-											/>
-										</Tooltip>
-									</div>
-								</div>
 
-								{/* Body */}
-								<div className='vet-card-body'>
-									{/* Bio */}
-									<p className={`bio-box ${isExpanded ? 'expanded' : ''}`}>
-										{doctor.bio || 'Bác sĩ chưa cập nhật thông tin tiểu sử cá nhân.'}
-									</p>
-									{doctor.bio && doctor.bio.length > 100 && (
-										<span className='bio-toggle' onClick={() => toggleBio(doctor.vet_id)}>
-											{isExpanded ? ' Thu gọn' : ' Xem thêm'}
-										</span>
-									)}
+				{/* Toolbar Row */}
+				<div className="toolbar-row">
+					<button className="toolbar-btn filter">
+						<Filter size={18} /> Bộ lọc bác sĩ
+					</button>
+					<button className="toolbar-btn schedule">
+						<Calendar size={18} /> Lịch trình tổng quát
+					</button>
+				</div>
 
-									{/* Contact Bento Box */}
-									<div className='contact-bento-box'>
-										<a href={`tel:${doctor.phone}`} onClick={(e) => !doctor.phone && e.preventDefault()}>
-											<PhoneOutlined className='contact-icon' />
-											<span>{doctor.phone || <i style={{ color: '#bfbfbf', fontWeight: 'normal' }}>Chưa cập nhật SĐT</i>}</span>
-										</a>
-										<a href={`mailto:${doctor.email}`}>
-											<MailOutlined className='contact-icon' />
-											<span>{doctor.email}</span>
-										</a>
-									</div>
+				{/* 1. Khu vực Thống kê (Metrics Row) */}
+				<div className="metrics-row">
+					<div className="metric-card applications">
+						<div className="content-left">
+							<h2>Hồ Sơ Ứng Tuyển Mới</h2>
+							<p>4 bác sĩ thú y đang chờ duyệt hồ sơ</p>
+							<button className="btn-olive">Duyệt Ngay</button>
+						</div>
+						<div className="icon-right" style={{ position: 'relative' }}>
+							<ClipboardList size={48} strokeWidth={1.5} color="#F59E0B" />
+							<Clock size={24} color="#D97706" style={{ position: 'absolute', bottom: -5, right: -5, background: '#FFF', borderRadius: '50%' }} />
+						</div>
+					</div>
+					
+					<div className="metric-card active-doctors">
+						<div className="icon-top" style={{ color: '#10B981', background: '#D1FAE5', padding: '8px', borderRadius: '50%', display: 'inline-flex' }}>
+							<ShieldCheck size={24} />
+						</div>
+						<h1>42</h1>
+						<p>Bác Sĩ Đang Hoạt Động</p>
+					</div>
 
-									{/* Certificate */}
-									{doctor.certificate_url ? (
-										<Button
-											className='certificate-btn'
-											icon={<FilePdfOutlined />}
-											onClick={() => window.open(doctor.certificate_url, '_blank')}
-										>
-											Xem chứng chỉ hành nghề (PDF)
-										</Button>
-									) : (
-										<span className='no-certificate'>
-											⚠️ Chưa đính kèm chứng chỉ hành nghề
-										</span>
-									)}
-								</div>
+					<div className="metric-card on-duty">
+						<div className="icon-top" style={{ color: '#EF4444', background: '#FEE2E2', padding: '8px', borderRadius: '50%', display: 'inline-flex' }}>
+							<Asterisk size={24} />
+						</div>
+						<h1>12</h1>
+						<p>Đang Trực Hôm Nay</p>
+					</div>
+				</div>
 
-								{/* Footer Actions */}
-								<div className='vet-card-footer'>
-									<Button
-										icon={<EditOutlined />}
-										className='edit-btn'
-										onClick={() => handleOpenEditModal(doctor)}
-									>
-										Sửa hồ sơ
-									</Button>
-									<Popconfirm
-										title='Bạn chắc chắn muốn xóa bác sĩ này?'
-										okText='Xóa'
-										cancelText='Hủy'
-										okButtonProps={{ danger: true }}
-										onConfirm={() => handleDeleteDoctor(doctor.vet_id)}
-									>
-										<Button
-											type='primary'
-											danger
-											icon={<DeleteOutlined />}
-											className='delete-btn'
-										>
-											Xóa
-										</Button>
-									</Popconfirm>
-								</div>
+				{/* 2. Lưới danh sách Bác sĩ (Doctor Cards Grid) */}
+				<div className="doctor-grid">
+					{/* THẺ 1: Bác sĩ đã kích hoạt */}
+					<div className="doctor-card">
+						<div className="card-header">
+							<div className="avatar-wrapper">
+								<img src="https://i.pravatar.cc/150?img=47" alt="Avatar" className="avatar-img" />
 							</div>
-						);
-					})}
+							<div className="info">
+								<h3>Dr. Elena Rodriguez</h3>
+								<p className="specialty" style={{ color: '#E11D48' }}>Feline Specialist</p>
+							</div>
+							<div style={{ position: 'absolute', top: 0, right: 0 }}>
+								<span className="badge" style={{ background: '#D1FAE5', color: '#065F46', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>
+									Active
+								</span>
+							</div>
+						</div>
+
+						<div className="card-body">
+							<div className="info-row">
+								<Award size={18} className="icon" />
+								<span>8 năm kinh nghiệm</span>
+							</div>
+							<div className="info-row">
+								<Calendar size={18} className="icon" />
+								<span>Thứ 2, 4, 6 (9am - 5pm)</span>
+							</div>
+							<div className="badges" style={{ marginTop: '8px' }}>
+								<span className="badge">Phẫu thuật</span>
+								<span className="badge">Dinh dưỡng</span>
+							</div>
+						</div>
+
+						<div className="card-footer" style={{ gap: '12px' }}>
+							<button className="btn-schedule" style={{ flex: '0 0 85%' }}>
+								Quản lý lịch trình
+							</button>
+							<button className="btn-icon danger" style={{ flex: '1' }}>
+								<DeleteOutlined />
+							</button>
+						</div>
+					</div>
+
+					{/* THẺ 2: Hồ sơ đang chờ duyệt */}
+					<div className="doctor-card pending">
+						<div className="card-header">
+							<div className="avatar-wrapper">
+								<img src="https://i.pravatar.cc/150?img=11" alt="Avatar" className="avatar-img" />
+							</div>
+							<div className="info">
+								<h3>Dr. Julian Moore</h3>
+								<p className="specialty" style={{ color: '#6B7280' }}>Exotic Pets Expert</p>
+							</div>
+						</div>
+
+						<div className="card-body">
+							<div className="info-row">
+								<Award size={18} className="icon" />
+								<span>3 năm kinh nghiệm</span>
+							</div>
+							<div className="info-row">
+								<GraduationCap size={18} className="icon" />
+								<span>Đại học Thú y UC Davis</span>
+							</div>
+						</div>
+
+						<div className="card-footer" style={{ flexDirection: 'column', gap: '0' }}>
+							<button className="btn-approve">
+								Duyệt hồ sơ
+							</button>
+							<span className="pending-link">
+								Xem toàn bộ hồ sơ
+							</span>
+						</div>
+					</div>
+
+					{/* THẺ 3: Thẻ mời bác sĩ mới */}
+					<div className="doctor-card invite-card">
+						<div className="invite-icon">
+							<UserPlus size={32} />
+						</div>
+						<h3>Mời bác sĩ thú y</h3>
+					</div>
 				</div>
-			)}
-
-			{/* Modal */}
-			<Modal
-				title={editingDoctorId ? 'Cập Nhật Hồ Sơ Bác Sĩ' : 'Thêm Bác Sĩ Thú Y Mới'}
-				visible={modalVisible}
-				onCancel={handleCloseModal}
-				footer={[
-					<Button key='cancel' onClick={handleCloseModal} className='cancel-btn'>
-						Hủy bỏ
-					</Button>,
-					<Button
-						key='submit'
-						onClick={handleSubmit}
-						loading={formLoading}
-						className='submit-btn'
-					>
-						Lưu thông tin
-					</Button>,
-				]}
-				className='vet-modal'
-				width={600}
-				destroyOnClose
-			>
-				<Form form={form} layout='vertical' requiredMark>
-					<Row gutter={16}>
-						<Col span={12}>
-							<Form.Item
-								name='full_name'
-								label='Họ và tên bác sĩ'
-								rules={[{ required: true, message: 'Vui lòng nhập họ tên bác sĩ!' }]}
-							>
-								<Input placeholder='VD: BS. Phạm Thị Hoa' className='form-input' />
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item
-								name='email'
-								label='Địa chỉ Email'
-								rules={[
-									{ required: true, message: 'Vui lòng nhập địa chỉ email!' },
-									{ type: 'email', message: 'Email nhập vào không hợp lệ!' },
-								]}
-							>
-								<Input placeholder='VD: hoa.vet@mypet.dev' className='form-input' />
-							</Form.Item>
-						</Col>
-					</Row>
-
-					<Row gutter={16}>
-						<Col span={12}>
-							<Form.Item
-								name='phone'
-								label='Số điện thoại liên lạc'
-								rules={[{ pattern: /^[0-9+ ]{10,15}$/, message: 'Số điện thoại không đúng định dạng!' }]}
-							>
-								<Input placeholder='VD: 0934567890' className='form-input' />
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item
-								name='specialization'
-								label='Chuyên khoa phụ trách'
-								rules={[{ required: true, message: 'Vui lòng nhập chuyên khoa bác sĩ!' }]}
-							>
-								<Input placeholder='VD: Nội khoa & Ngoại khoa thú y' className='form-input' />
-							</Form.Item>
-						</Col>
-					</Row>
-
-					<Form.Item
-						name='avatar_url'
-						label='Đường dẫn ảnh đại diện (URL)'
-						extra='Nên nhập link ảnh từ Unsplash. Để trống sẽ tự động áp dụng ảnh mặc định.'
-					>
-						<Input placeholder='VD: https://images.unsplash.com/...' className='form-input' />
-					</Form.Item>
-
-					<Form.Item
-						name='certificate_url'
-						label='Đường dẫn Chứng chỉ hành nghề (PDF / URL)'
-						extra='VD: https://cdn.mypet.dev/certs/hoa_cert.pdf'
-					>
-						<Input placeholder='VD: https://...' className='form-input' />
-					</Form.Item>
-
-					<Form.Item name='bio' label='Giới thiệu tóm tắt (Tiểu sử)'>
-						<TextArea
-							rows={4}
-							placeholder='Giới thiệu ngắn gọn về kinh nghiệm, bằng cấp và thế mạnh chuyên môn...'
-							className='form-input'
-						/>
-					</Form.Item>
-				</Form>
-			</Modal>
+			</div>
 		</div>
 	);
 };
