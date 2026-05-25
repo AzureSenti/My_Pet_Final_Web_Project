@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Progress } from 'antd';
-import { Search, Bell, Settings, Plus, MoreVertical, ChevronRight, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Search, Bell, Settings, Plus, MoreVertical, ChevronRight, ArrowRight, ShieldCheck, Users } from 'lucide-react';
+import '../TrangChu/components/style.less';
 import './style.less';
 
 const MOCK_USERS = [
@@ -135,39 +136,49 @@ const UserManagement: React.FC = () => {
 	});
 
 	return (
-		<div className="user-management-container">
+		<div className="user-management-container petcare-dashboard">
 			{/* Top Bar */}
-			<div className="um-topbar">
-				<div className="um-topbar-left" style={{ minWidth: '200px' }}></div>
-				<div className="um-topbar-center" style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
-					<div className="um-search">
-						<Search size={18} strokeWidth={2} />
-						<input type="text" placeholder="Tìm kiếm hệ thống..." />
+			<div className="pc-header">
+				<div className="pc-header-left" />
+				<div className="pc-header-center">
+					<div className="pc-header-search">
+						<Search size={18} strokeWidth={1.75} className="search-icon" />
+						<input type="text" placeholder="Tìm kiếm người dùng..." />
 					</div>
 				</div>
-				<div className="um-topbar-right">
-					<Bell className="um-icon-btn" size={20} />
-					<Settings className="um-icon-btn" size={20} />
-					<div className="um-profile">
-						<img src="https://i.pravatar.cc/150?img=11" alt="Admin" className="um-avatar" />
-						<div className="um-profile-info">
-							<span className="um-profile-name">Alex Admin</span>
-							<span className="um-profile-role">Head Coordinator</span>
+				<div className="pc-header-actions">
+					<div className="pc-user-profile">
+						<div className="pc-user-avatar">
+							<img src="https://i.pravatar.cc/150?img=11" alt="Admin" />
+						</div>
+						<div className="pc-user-info">
+							<span className="pc-user-name">Alex Admin</span>
+							<span className="pc-user-role">Head Coordinator</span>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* Page Header */}
-			<div className="um-header">
-				<div className="um-header-title">
-					<h1>Quản lý người dùng</h1>
-					<p>Quản lý cộng đồng chủ nuôi, bác sĩ thú y và nhân viên tại một trung tâm duy nhất.</p>
+			<div className="um-page-content">
+				{/* Page Header */}
+				<div className="um-header-row">
+					<div className="um-title-left">
+						<div className="um-title-icon">
+							<Users size={22} strokeWidth={2.5} />
+						</div>
+						<div>
+							<h1>Quản lý người dùng</h1>
+							<p className="um-subtitle">
+								Quản lý cộng đồng chủ nuôi, bác sĩ thú y và nhân viên tại một trung tâm duy nhất.
+							</p>
+						</div>
+					</div>
+					<div className="um-header-actions">
+						<button className="um-add-btn">
+							<Plus size={18} strokeWidth={2.5} /> Thêm người dùng mới
+						</button>
+					</div>
 				</div>
-				<button className="um-add-btn">
-					<Plus size={18} strokeWidth={2.5} /> Thêm người dùng mới
-				</button>
-			</div>
 
 			{/* Filter Pills */}
 			<div className="um-filters">
@@ -258,6 +269,7 @@ const UserManagement: React.FC = () => {
 						<i>62% người dùng của bạn đã bật bảo mật 2 lớp (2FA) để tăng cường an toàn.</i>
 					</div>
 				</div>
+			</div>
 			</div>
 		</div>
 	);

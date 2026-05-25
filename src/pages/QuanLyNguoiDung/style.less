@@ -1,15 +1,15 @@
 @import '~antd/es/style/themes/default.less';
 
 // ─── Variables ──────────────────────────────────────────────
-@bg-color: #F8F9FA; // Off-white modern background
-@card-bg: #FFFFFF;
-@text-primary: #1A1A1A;
-@text-secondary: #6B7280;
-@border-color: #E5E7EB;
-@olive-green: #4A5B3E; // Olive green for buttons
-@olive-green-hover: #3A4731;
-@mustard-yellow: #F3D573;
-@mustard-yellow-light: #FEF3C7;
+@bg-color: #F5F2EC; // Premium warm neutral background
+@card-bg: #FEFDFB; // Premium warm off-white card background
+@text-primary: #1C1917; // Rich warm charcoal
+@text-secondary: #78716C; // Warm stone secondary
+@border-color: rgba(0, 0, 0, 0.06); // Subtle border with low opacity
+@olive-green: #6B635B; // Muted brand olive/charcoal
+@olive-green-hover: #575049;
+@mustard-yellow: #A3865A; // Muted gold/earthy gold
+@mustard-yellow-light: #F5F0E8;
 
 // ─── Layout Container ──────────────────────────────────────
 .user-management-container {
@@ -18,121 +18,57 @@
 	color: @text-primary;
 }
 
-// ─── Top Bar ───────────────────────────────────────────────
-.um-topbar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 16px 32px;
-	background: @card-bg;
-	border-bottom: 1px solid @border-color;
-	margin-bottom: 32px;
-
-	.um-search {
-		display: flex;
-		align-items: center;
-		background: #FFFBF0;
-		border-radius: 9999px;
-		padding: 0 20px;
-		width: 100%;
-		max-width: 480px;
-		height: 48px;
-		border: 1px solid @border-color;
-		transition: all 0.2s;
-
-		&:focus-within {
-			background: #FFFFFF;
-			border-color: @mustard-yellow;
-			box-shadow: 0 0 0 2px rgba(243, 213, 115, 0.2);
-		}
-
-		input {
-			border: none;
-			background: transparent;
-			outline: none;
-			width: 100%;
-			margin-left: 8px;
-			font-size: 14px;
-			color: @text-primary;
-
-			&::placeholder {
-				color: #9CA3AF;
-			}
-		}
-
-		svg {
-			color: #6B7280;
-		}
-	}
-
-	.um-topbar-right {
-		display: flex;
-		align-items: center;
-		gap: 24px;
-
-		.um-icon-btn {
-			cursor: pointer;
-			color: #4B5563;
-			transition: color 0.2s;
-
-			&:hover {
-				color: @text-primary;
-			}
-		}
-
-		.um-profile {
-			display: flex;
-			align-items: center;
-			gap: 12px;
-			padding-left: 24px;
-			border-left: 1px solid @border-color;
-
-			.um-avatar {
-				width: 40px;
-				height: 40px;
-				border-radius: 50%;
-				object-fit: cover;
-			}
-
-			.um-profile-info {
-				display: flex;
-				flex-direction: column;
-
-				.um-profile-name {
-					font-weight: 700;
-					font-size: 14px;
-					color: @text-primary;
-				}
-
-				.um-profile-role {
-					font-size: 12px;
-					color: @text-secondary;
-				}
-			}
-		}
-	}
+// ─── Page Header ───────────────────────────────────────────
+.um-page-content {
+	padding: 0;
 }
 
-// ─── Page Header ───────────────────────────────────────────
-.um-header {
+.um-header-row {
 	display: flex;
-	justify-content: space-between;
 	align-items: flex-end;
-	margin: 0 32px 24px;
+	justify-content: space-between;
+	margin: 0 0 32px;
+	flex-wrap: wrap;
+	gap: 20px;
 
-	.um-header-title {
+	.um-title-left {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+
+		.um-title-icon {
+			width: 48px;
+			height: 48px;
+			border-radius: 14px;
+			background: linear-gradient(135deg, #FEF3C7, rgba(201, 168, 76, 0.22));
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #C9A84C;
+			flex-shrink: 0;
+			box-shadow: 0 4px 14px rgba(212, 160, 23, 0.18);
+		}
+
 		h1 {
-			font-size: 28px;
+			font-size: 26px;
 			font-weight: 800;
-			margin: 0 0 8px;
 			color: @text-primary;
-			letter-spacing: -0.5px;
-		}
-		p {
 			margin: 0;
-			color: @text-secondary;
-			font-size: 14px;
+			letter-spacing: -0.4px;
+			line-height: 1.2;
 		}
+
+		.um-subtitle {
+			font-size: 14px;
+			color: @text-secondary;
+			margin: 4px 0 0 0;
+			font-weight: 400;
+		}
+	}
+
+	.um-header-actions {
+		display: flex;
+		gap: 6px;
 	}
 
 	.um-add-btn {
@@ -159,7 +95,7 @@
 .um-filters {
 	display: flex;
 	gap: 12px;
-	margin: 0 32px 24px;
+	margin: 0 0 24px;
 
 	.um-filter-pill {
 		background: @card-bg;
@@ -188,7 +124,7 @@
 
 // ─── Table Area ────────────────────────────────────────────
 .um-table-container {
-	margin: 0 32px 32px;
+	margin: 0 0 32px;
 	background: @card-bg;
 	border-radius: 16px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -200,7 +136,7 @@
 		}
 
 		.ant-table-thead > tr > th {
-			background: #F9FAFB;
+			background: #F9F6F0;
 			color: @text-secondary;
 			font-weight: 600;
 			font-size: 13px;
@@ -229,12 +165,12 @@
 			width: 40px;
 			height: 40px;
 			border-radius: 50%;
-			background: #E5E7EB;
+			background: @mustard-yellow-light;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			font-weight: 600;
-			color: #4B5563;
+			color: @mustard-yellow;
 		}
 
 		.info {
@@ -260,16 +196,16 @@
 		font-weight: 600;
 
 		&.pet-owner {
-			background: #E0F2FE;
-			color: #0369A1;
+			background: #EEF6F3;
+			color: #5B8A72;
 		}
 		&.veterinarian {
-			background: #FCE7F3;
-			color: #BE185D;
+			background: #F8F0F1;
+			color: #9E6B73;
 		}
 		&.staff {
-			background: #FEF3C7;
-			color: #92400E;
+			background: #FBF6EE;
+			color: #A3865A;
 		}
 	}
 
@@ -277,7 +213,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
-		color: #4B5563;
+		color: @text-secondary;
 		font-size: 13px;
 	}
 
@@ -292,9 +228,9 @@
 			height: 8px;
 			border-radius: 50%;
 
-			&.active { background: #10B981; }
-			&.suspended { background: #EF4444; }
-			&.pending { background: #F59E0B; }
+			&.active { background: #5B8A72; }
+			&.suspended { background: #A56060; }
+			&.pending { background: #A3865A; }
 		}
 	}
 
@@ -317,7 +253,7 @@
 	align-items: center;
 	padding: 16px 24px;
 	border-top: 1px solid @border-color;
-	background: #FFFFFF;
+	background: @card-bg;
 
 	.um-pagination-info {
 		color: @text-secondary;
@@ -345,7 +281,7 @@
 			transition: all 0.2s;
 
 			&:hover {
-				background: #F3F4F6;
+				background: rgba(0, 0, 0, 0.04);
 			}
 
 			&.active {
@@ -359,7 +295,7 @@
 
 // ─── Dashboard Footer ──────────────────────────────────────
 .um-dashboard-footer {
-	margin: 0 32px 32px;
+	margin: 0 0 32px;
 	display: flex;
 	gap: 24px;
 	align-items: stretch;
@@ -372,7 +308,7 @@
 
 	.um-card-left {
 		flex: 2;
-		background: #FEF9C3;
+		background: #FBF6EE;
 		align-items: center;
 		gap: 32px;
 
@@ -385,12 +321,12 @@
 			.radial-text {
 				font-size: 24px;
 				font-weight: 800;
-				color: #854D0E;
+				color: #A3865A;
 			}
 			.radial-subtext {
 				font-size: 13px;
 				font-weight: 700;
-				color: #854D0E;
+				color: #A3865A;
 				letter-spacing: 1px;
 			}
 		}
@@ -402,19 +338,19 @@
 			h3 {
 				font-size: 18px;
 				font-weight: 700;
-				color: #3F6212;
+				color: #5B8A72;
 				margin: 0 0 12px;
 			}
 
 			p {
-				color: #4B5563;
+				color: @text-secondary;
 				line-height: 1.6;
 				margin: 0 0 16px;
 				font-size: 14px;
 			}
 
 			.um-card-link {
-				color: #A16207;
+				color: #A3865A;
 				font-weight: 600;
 				font-size: 14px;
 				display: flex;
@@ -431,7 +367,7 @@
 
 	.um-card-right {
 		flex: 1;
-		background: #D1FAE5;
+		background: #EEF6F3;
 		flex-direction: column;
 		justify-content: space-between;
 
@@ -451,7 +387,7 @@
 				justify-content: center;
 				
 				.shield-icon {
-					color: #059669;
+					color: #5B8A72;
 				}
 			}
 
@@ -463,12 +399,12 @@
 					margin: 0;
 					font-size: 16px;
 					font-weight: 700;
-					color: #064E3B;
+					color: #3D6451;
 				}
 
 				span {
 					font-size: 13px;
-					color: #047857;
+					color: #5B8A72;
 					font-weight: 500;
 				}
 			}
@@ -479,12 +415,12 @@
 		}
 
 		.um-card-right-bottom {
-			background: #047857;
+			background: #5B8A72;
 			padding: 12px 16px;
 			border-radius: 12px;
 			
 			i {
-				color: #D1FAE5;
+				color: #EEF6F3;
 				font-size: 13px;
 				line-height: 1.4;
 				display: block;
