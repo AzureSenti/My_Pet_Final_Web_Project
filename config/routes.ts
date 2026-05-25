@@ -45,7 +45,7 @@ export default [
 	{
 		path: '/appointments',
 		name: 'Quản lý lịch hẹn',
-		component: './TrangChu',
+		component: './QuanLyLichHen',
 		icon: 'CalendarOutlined',
 	},
 
