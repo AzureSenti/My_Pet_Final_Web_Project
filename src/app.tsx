@@ -134,48 +134,15 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 			</OIDCBounder>
 		),
 		menuHeaderRender: (logo, title, props: any) => (
-			<div 
-				style={{ 
-					display: 'flex', 
-					alignItems: 'center', 
-					justifyContent: props?.collapsed ? 'center' : 'flex-start',
-					height: '48px', 
-					marginTop: '0px', 
-					paddingLeft: props?.collapsed ? '0' : '24px',
-					gap: '12px',
-					cursor: 'pointer',
-				}}
-			>
-				<div 
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						background: 'linear-gradient(135deg, #D4AF37 0%, #F3D573 100%)',
-						borderRadius: '12px',
-						minWidth: '36px',
-						width: '36px',
-						height: '36px',
-						color: '#FFFFFF',
-						boxShadow: '0 4px 12px rgba(212, 175, 55, 0.3)'
-					}}
-				>
-					<PawPrint size={20} strokeWidth={2.5} />
+			<div className={`pc-sidebar-brand ${props?.collapsed ? 'collapsed' : ''}`}>
+				<div className="brand-icon-wrapper">
+					<PawPrint size={props?.collapsed ? 24 : 36} strokeWidth={2.5} />
 				</div>
 				{!props?.collapsed && (
-					<h2 
-						style={{ 
-							fontSize: '26px', 
-							fontWeight: 900, 
-							margin: 0, 
-							letterSpacing: '-0.5px',
-							background: 'linear-gradient(90deg, #1A1A1A 0%, #4A4A4A 100%)',
-							WebkitBackgroundClip: 'text',
-							WebkitTextFillColor: 'transparent',
-						}}
-					>
-						Pet<span style={{ color: '#D4AF37', WebkitTextFillColor: '#D4AF37' }}>Care</span>
-					</h2>
+					<div className="brand-text-wrapper">
+						<h1>PetCare</h1>
+						<span>Admin Suite</span>
+					</div>
 				)}
 			</div>
 		),
