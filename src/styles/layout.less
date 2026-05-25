@@ -5,19 +5,19 @@
 // ============================================
 
 // ─── Design Tokens ────────────────────────────
-@pc-bg: #F7F5EE; // Main background (bright, soft warm cream)
-@pc-sidebar-bg: #EBE5D3; // Sidebar background (brighter warm cream)
-@pc-sidebar-border: transparent;
-@pc-text: #1A1A1A; // Charcoal grey for primary text
-@pc-text-secondary: #2C3E35; // Dark moss green for secondary text
-@pc-text-muted: #8A8478;
+@pc-bg: #F5F2EC; // Premium warm ivory — main content
+@pc-sidebar-bg: #F0EDE6; // Sidebar — slightly deeper warm neutral
+@pc-sidebar-border: rgba(0, 0, 0, 0.06);
+@pc-text: #1C1917; // Rich warm charcoal
+@pc-text-secondary: #44403C; // Warm stone secondary
+@pc-text-muted: #A8A29E;
 @pc-olive: #3B4D43; // Dark moss green for elements
-@pc-olive-light: #A89070;
-@pc-olive-bg: rgba(74, 91, 62, 0.08);
-@pc-olive-active: #F5EEDC;
-@pc-gold: #C9A96E;
-@pc-gold-bg: #FBF5E8;
-@pc-card: #FFFFFF;
+@pc-olive-light: #78716C;
+@pc-olive-bg: rgba(120, 113, 108, 0.06);
+@pc-olive-active: #F5F0E8;
+@pc-gold: #A3865A; // Muted earthy gold
+@pc-gold-bg: #F5F0E8;
+@pc-card: #FEFDFB; // Warm off-white cards
 @pc-radius: 16px;
 @pc-radius-lg: 20px;
 @pc-radius-xl: 24px;
@@ -44,17 +44,18 @@
 
 // ─── Sidebar Container ────────────────────────
 .ant-pro-sider.ant-layout-sider:not(.ant-layout-sider-collapsed) {
-	// Enforce 18% width
-	flex: 0 0 18% !important;
-	max-width: 18% !important;
-	min-width: 18% !important;
-	width: 18% !important;
+	// Enforce 250px width
+	flex: 0 0 250px !important;
+	max-width: 250px !important;
+	min-width: 250px !important;
+	width: 250px !important;
 }
 
 .ant-pro-sider.ant-layout-sider {
 	background: @pc-sidebar-bg !important;
 	border-right: 1px solid @pc-sidebar-border;
-	box-shadow: none;
+	box-shadow: 1px 0 24px rgba(0, 0, 0, 0.03);
+	backdrop-filter: blur(8px);
 
 	.ant-layout-sider-children {
 		display: flex;
@@ -68,42 +69,80 @@
 // ─── Logo Area ────────────────────────────────
 .ant-pro-sider-logo {
 	background: transparent !important;
-	padding: 12px 20px 12px !important;
+	padding: 0 !important;
 	height: auto !important;
 	border-bottom: none;
 
 	> a {
+		padding: 0 !important;
+		display: block !important;
+	}
+}
+
+.pc-sidebar-brand {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 32px 16px 24px;
+	width: 100%;
+	text-decoration: none;
+	gap: 12px;
+	
+	&:hover {
+		.brand-icon-wrapper {
+			transform: scale(1.06) translateY(-2px);
+			box-shadow: 0 12px 28px rgba(133, 109, 51, 0.15);
+		}
+	}
+
+	&.collapsed {
+		padding: 24px 0;
+		.brand-icon-wrapper {
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+		}
+		.brand-text-wrapper {
+			display: none;
+		}
+	}
+
+	.brand-icon-wrapper {
+		width: 72px;
+		height: 72px;
+		border-radius: 50%;
+		background: #FEF9E7;
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		justify-content: center;
+		color: #856D33;
+		box-shadow: 0 4px 12px rgba(133, 109, 51, 0.1);
+		transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	}
 
-		img {
-			height: 36px !important;
-			width: 36px !important;
-			object-fit: contain;
-			background: @pc-gold-bg;
-			border-radius: 50%;
-			padding: 4px;
-		}
+	.brand-text-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
 
 		h1 {
-			color: @pc-text !important;
-			font-weight: 800 !important;
-			font-size: 20px !important;
+			font-family: 'Inter', sans-serif;
+			font-size: 22px !important;
+			font-weight: 700 !important;
+			color: #856D33 !important;
+			margin: 0 !important;
 			letter-spacing: -0.5px;
-			margin-bottom: 0 !important;
-			line-height: 1.1;
-			
-			&::after {
-				content: 'Admin Suite';
-				display: block;
-				font-size: 10px;
-				font-weight: 500;
-				color: @pc-text-muted;
-				letter-spacing: 1.5px;
-				text-transform: uppercase;
-				margin-top: 2px;
-			}
+			line-height: 1;
+		}
+
+		span {
+			font-family: 'Inter', sans-serif;
+			font-size: 13px;
+			font-weight: 500;
+			color: #6B7280;
+			letter-spacing: 0.2px;
 		}
 	}
 }
@@ -117,14 +156,9 @@
 
 	// Section Labels
 	&::before {
-		content: 'MAIN MENU';
+		content: '';
 		display: block;
-		font-size: 10px;
-		font-weight: 700;
-		color: @pc-text-muted;
-		letter-spacing: 1.5px;
-		padding: 4px 14px 8px;
-		text-transform: uppercase;
+		height: 24px;
 	}
 
 	.ant-menu-item,
@@ -134,8 +168,8 @@
 		margin-bottom: 8px !important;
 		margin-top: 0 !important;
 		padding: 0 16px !important;
-		border-radius: 12px !important;
-		color: @pc-text-secondary;
+		border-radius: 999px !important;
+		color: #6B7280;
 		font-weight: 500;
 		font-size: 15px;
 		transition: @pc-transition;
@@ -147,8 +181,8 @@
 		}
 
 		&:hover {
-			color: @pc-text;
-			background: rgba(0,0,0,0.03);
+			color: @pc-text-secondary;
+			background: rgba(0, 0, 0, 0.04);
 		}
 
 		.pc-menu-item {
@@ -167,13 +201,14 @@
 
 	// ─── Active / Selected Item ──────────────
 	li.ant-menu-item-selected {
-		background: #D4AF37 !important; // Mustard yellow
-		color: #FFFFFF !important; // White text
+		background: @pc-gold !important;
+		color: #FFFFFF !important;
 		font-weight: 700;
+		box-shadow: 0 4px 16px rgba(163, 134, 90, 0.2);
 
 		&:hover {
-			background: #D4AF37 !important;
-			opacity: 0.95;
+			background: darken(@pc-gold, 5%) !important;
+			color: #FFFFFF !important;
 		}
 
 		.pc-menu-item {
@@ -203,18 +238,17 @@
 }
 
 .sidebar-user-card {
-	background: linear-gradient(135deg, @pc-gold-bg, #FFF8EC);
+	background: linear-gradient(135deg, #F5F0E8, #FAF7F2);
 	border-radius: @pc-radius;
 	padding: 12px 16px;
 	margin-bottom: 12px;
 	cursor: pointer;
 	transition: @pc-transition;
-	border: 1px solid rgba(201, 169, 110, 0.15);
+	border: 1px solid rgba(0, 0, 0, 0.05);
 	text-align: center;
 	
-	// This will act as "Add New Appointment" button
 	&:hover {
-		box-shadow: 0 4px 12px rgba(201, 169, 110, 0.2);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 		transform: translateY(-1px);
 	}
 
@@ -281,8 +315,8 @@
 .ant-card {
 	background: @pc-card;
 	border-radius: @pc-radius-lg;
-	border: 1px solid @pc-sidebar-border;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+	border: 1px solid rgba(0, 0, 0, 0.04);
+	box-shadow: 0 2px 16px rgba(0, 0, 0, 0.03);
 }
 
 // ─── IE11 compat ──────────────────────────────
