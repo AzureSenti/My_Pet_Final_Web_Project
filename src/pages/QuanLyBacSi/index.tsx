@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-	MedicineBoxOutlined,
-	PlusOutlined,
 	DeleteOutlined
 } from '@ant-design/icons';
 import { 
@@ -14,7 +12,9 @@ import {
 	Calendar,
 	Award,
 	GraduationCap,
-	UserPlus
+	UserPlus,
+	Stethoscope,
+	Plus
 } from 'lucide-react';
 import '../TrangChu/components/style.less'; // Import pc-header styles
 import './style.less';
@@ -45,16 +45,24 @@ const QuanLyBacSi: React.FC = () => {
 				</div>
 			</div>
 
-			<div>
+			<div className="doc-page-content">
 				{/* Page Header */}
-				<div className='page-header'>
-					<div>
-						<h1>
-							<MedicineBoxOutlined className='header-icon' /> Quản Lý Bác Sĩ
-						</h1>
-						<p style={{ color: '#6b7280', margin: '6px 0 0 0', fontSize: '14px', maxWidth: 600 }}>
-							Thêm mới, cập nhật hồ sơ chuyên môn, theo dõi trạng thái hoạt động và quản lý chứng chỉ hành nghề của đội ngũ bác sĩ.
-						</p>
+				<div className="pet-title-row">
+					<div className="pet-title-left">
+						<div className="pet-title-icon">
+							<Stethoscope size={22} strokeWidth={2.5} />
+						</div>
+						<div>
+							<h1>Quản lý bác sĩ</h1>
+							<p className="pet-subtitle">
+								Thêm mới, cập nhật hồ sơ chuyên môn, theo dõi trạng thái hoạt động và quản lý chứng chỉ hành nghề của đội ngũ bác sĩ.
+							</p>
+						</div>
+					</div>
+					<div className="pet-filter-pills">
+						<button className="um-add-btn">
+							<Plus size={18} strokeWidth={2.5} /> Thêm bác sĩ mới
+						</button>
 					</div>
 				</div>
 
