@@ -5,18 +5,18 @@
 // ============================================
 
 // ─── Design Tokens ────────────────────────────
-@pc-bg: #FDFBF7; // System Background - Milk cream light
-@pc-sidebar-bg: #FDFBF7; // Sidebar — matching system
-@pc-sidebar-border: rgba(0, 0, 0, 0.08);
-@pc-text: #0D0B0A; // Near-absolute black
-@pc-text-secondary: #2A2520; // Very dark warm stone
-@pc-text-muted: #6B6560;
-@pc-olive: #2A3D33; // Deep dark moss green
-@pc-olive-light: #57524E;
-@pc-olive-bg: rgba(87, 82, 78, 0.08);
-@pc-olive-active: #F0EBE0;
-@pc-gold: #D4AF37; // Warm Mustard Gold (Primary Accent)
-@pc-gold-bg: #FFF8E7;
+@pc-bg: #FFF8F2; // Creamy Honey background
+@pc-sidebar-bg: #FFF8F2; // Sidebar
+@pc-sidebar-border: #E3D9CB; // Surface Dim
+@pc-text: #4A3F35; // Headings dark brown
+@pc-text-secondary: #7D6E5D; // Body text warm gray
+@pc-text-muted: #9E9385; // Muted text
+@pc-olive: #D4A017; // Primary Honey
+@pc-olive-light: #FCE38A; // Light Honey
+@pc-olive-bg: #FFF3CD; // Active background
+@pc-olive-active: #FCE38A;
+@pc-gold: #D4A017; // Mustard Gold
+@pc-gold-bg: #FFF3CD;
 @pc-card: #FFFFFF; // Pure white cards
 @pc-radius: 16px;
 @pc-radius-lg: 20px;
@@ -26,7 +26,7 @@
 .ant-layout {
 	min-height: 100vh;
 	background: @pc-bg !important;
-	font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: 'Quicksand', sans-serif;
 }
 
 .ant-layout-content {
@@ -128,20 +128,20 @@
 		gap: 2px;
 
 		h1 {
-			font-family: 'Inter', sans-serif;
+			font-family: 'Quicksand', sans-serif;
 			font-size: 22px !important;
 			font-weight: 700 !important;
-			color: #5C4A1E !important;
+			color: #4A3F35 !important;
 			margin: 0 !important;
 			letter-spacing: -0.5px;
 			line-height: 1;
 		}
 
 		span {
-			font-family: 'Inter', sans-serif;
+			font-family: 'Quicksand', sans-serif;
 			font-size: 13px;
-			font-weight: 500;
-			color: #4A4540;
+			font-weight: 600;
+			color: #7D6E5D;
 			letter-spacing: 0.2px;
 		}
 	}
@@ -169,8 +169,8 @@
 		margin-top: 0 !important;
 		padding: 0 16px !important;
 		border-radius: 999px !important;
-		color: #4A4540;
-		font-weight: 500;
+		color: #7D6E5D;
+		font-weight: 600;
 		font-size: 15px;
 		transition: @pc-transition;
 		position: relative;
@@ -201,18 +201,18 @@
 
 	// ─── Active / Selected Item ──────────────
 	li.ant-menu-item-selected {
-		background: @pc-gold !important;
-		color: #0D0B0A !important;
+		background: @pc-olive-light !important;
+		color: #4A3F35 !important;
 		font-weight: 700;
-		box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+		box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2);
 
 		&:hover {
-			background: darken(@pc-gold, 5%) !important;
-			color: #0D0B0A !important;
+			background: darken(@pc-olive-light, 5%) !important;
+			color: #4A3F35 !important;
 		}
 
 		.pc-menu-item {
-			color: #0D0B0A !important;
+			color: #4A3F35 !important;
 		}
 	}
 
@@ -267,8 +267,8 @@
 }
 
 .add-appointment-btn {
-	background: #D4AF37;
-	color: #0D0B0A;
+	background: #D4A017;
+	color: #FFFFFF;
 	font-weight: 700;
 	font-size: 14px;
 	padding: 12px 16px;
@@ -279,15 +279,15 @@
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
-	box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+	box-shadow: 0 4px 12px rgba(212, 160, 23, 0.3);
 	transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 	margin-top: auto;
 	margin-bottom: 16px;
 
 	&:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
-		background: darken(#D4AF37, 5%);
+		box-shadow: 0 6px 16px rgba(212, 160, 23, 0.4);
+		background: darken(#D4A017, 5%);
 	}
 }
 
@@ -298,8 +298,8 @@
 	padding: 10px 14px;
 	border-radius: 12px;
 	color: @pc-text-secondary;
-	font-size: 13px;
-	font-weight: 500;
+	font-size: 14px;
+	font-weight: 600;
 	cursor: pointer;
 	transition: @pc-transition;
 	border: none;
