@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 
+from typing import Optional
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.user import UserRole
@@ -29,6 +30,7 @@ class RegisterResponse(BaseModel):
     id: uuid.UUID
     full_name: str
     email: str
+    phone: str | None = None
     role: UserRole
     is_active: bool
     created_at: datetime
@@ -80,3 +82,9 @@ class UserOut(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    password: Optional[str] = None
