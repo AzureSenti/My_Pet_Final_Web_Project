@@ -5,8 +5,8 @@
 // ============================================
 
 // ─── Design Tokens ────────────────────────────
-@pc-bg: #F5F2EC; // Premium warm ivory — main content
-@pc-sidebar-bg: #F0EDE6; // Sidebar — slightly deeper warm neutral
+@pc-bg: #FDFBF7; // System Background - Milk cream light
+@pc-sidebar-bg: #FDFBF7; // Sidebar — matching system
 @pc-sidebar-border: rgba(0, 0, 0, 0.08);
 @pc-text: #0D0B0A; // Near-absolute black
 @pc-text-secondary: #2A2520; // Very dark warm stone
@@ -15,9 +15,9 @@
 @pc-olive-light: #57524E;
 @pc-olive-bg: rgba(87, 82, 78, 0.08);
 @pc-olive-active: #F0EBE0;
-@pc-gold: #6B4E28; // Deep rich gold
-@pc-gold-bg: #F0EBE0;
-@pc-card: #FEFDFB; // Warm off-white cards
+@pc-gold: #D4AF37; // Warm Mustard Gold (Primary Accent)
+@pc-gold-bg: #FFF8E7;
+@pc-card: #FFFFFF; // Pure white cards
 @pc-radius: 16px;
 @pc-radius-lg: 20px;
 @pc-radius-xl: 24px;
@@ -54,7 +54,7 @@
 .ant-pro-sider.ant-layout-sider {
 	background: @pc-sidebar-bg !important;
 	border-right: 1px solid @pc-sidebar-border;
-	box-shadow: 1px 0 24px rgba(0, 0, 0, 0.03);
+	box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
 	backdrop-filter: blur(8px);
 
 	.ant-layout-sider-children {
@@ -202,17 +202,17 @@
 	// ─── Active / Selected Item ──────────────
 	li.ant-menu-item-selected {
 		background: @pc-gold !important;
-		color: #FFFFFF !important;
+		color: #0D0B0A !important;
 		font-weight: 700;
-		box-shadow: 0 4px 16px rgba(107, 78, 40, 0.25);
+		box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 
 		&:hover {
 			background: darken(@pc-gold, 5%) !important;
-			color: #FFFFFF !important;
+			color: #0D0B0A !important;
 		}
 
 		.pc-menu-item {
-			color: #FFFFFF !important;
+			color: #0D0B0A !important;
 		}
 	}
 
@@ -264,6 +264,31 @@
 	flex-direction: column;
 	gap: 4px;
 	margin-top: 8px;
+}
+
+.add-appointment-btn {
+	background: #D4AF37;
+	color: #0D0B0A;
+	font-weight: 700;
+	font-size: 14px;
+	padding: 12px 16px;
+	border-radius: 999px;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+	transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+	margin-top: auto;
+	margin-bottom: 16px;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+		background: darken(#D4AF37, 5%);
+	}
 }
 
 .sidebar-footer-item {
