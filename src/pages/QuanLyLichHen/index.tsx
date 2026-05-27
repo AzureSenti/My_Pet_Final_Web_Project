@@ -80,7 +80,21 @@ const QuanLyLichHen: React.FC = () => {
 	};
 
 	const handleConfirmAppointment = (id: string) => {
-		updateAppointmentStatus(id, 'confirmed').then(fetchData);
+		updateAppointmentStatus(id, 'confirmed').then(() => {
+			message.success('Xác nhận lịch hẹn thành công!');
+			fetchData();
+		});
+	};
+
+	const handleCancelAppointment = (id: string) => {
+		updateAppointmentStatus(id, 'cancelled').then(() => {
+			message.success('Đã hủy lịch hẹn!');
+			fetchData();
+		});
+	};
+
+	const handlePlaceholder = (featureName: string) => {
+		message.info(`Chức năng "${featureName}" đang được phát triển.`);
 	};
 
 	const handleApplyFilters = (values: any) => {
@@ -289,30 +303,22 @@ const QuanLyLichHen: React.FC = () => {
 								<div className="cal-day-header">T7</div>
 								<div className="cal-day-header">CN</div>
 
-								{/* Placeholder days */}
-								<div className="cal-day empty"></div>
-								<div className="cal-day empty"></div>
-								<div className="cal-day empty"></div>
-								<div className="cal-day">1</div>
-								<div className="cal-day">2</div>
-								<div className="cal-day">3</div>
-								<div className="cal-day">4</div>
-
-								<div className="cal-day">5</div>
-								<div className="cal-day">6</div>
-								<div className="cal-day">7</div>
-								<div className="cal-day">8</div>
-								<div className="cal-day">9</div>
-								<div className="cal-day">10</div>
-								<div className="cal-day active">11</div>
-
-								<div className="cal-day">12</div>
-								<div className="cal-day">13</div>
-								<div className="cal-day">14</div>
-								<div className="cal-day">15</div>
-								<div className="cal-day">16</div>
-								<div className="cal-day">17</div>
-								<div className="cal-day">18</div>
+								{/* Dynamic days */}
+								{Array(3).fill(null).map((_, i) => (
+									<div key={`empty-${i}`} className="cal-day empty"></div>
+								))}
+								{Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+									<div 
+										key={day} 
+										className={`cal-day ${selectedDay === day ? 'active' : ''}`}
+										onClick={() => { 
+											setSelectedDay(day); 
+											message.info(`Đã chọn ngày ${day} tháng ${currentMonth}`); 
+										}}
+									>
+										{day}
+									</div>
+								))}
 							</div>
 						</div>
 
