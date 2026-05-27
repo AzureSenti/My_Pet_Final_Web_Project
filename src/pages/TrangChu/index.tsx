@@ -136,9 +136,35 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 	},
 };
 
-const statusDonutSeries = [117, 26, 8, 5];
+const statusDonutSeriesData = (stats: any) => [
+	stats?.appointments_completed || 0,
+	stats?.appointments_pending || 0,
+	stats?.appointments_cancelled || 0,
+	stats?.appointments_confirmed || 0,
+];
 
-// ─── Growth Bar Chart ─────────────────────────
+const getDynamicDonutOptions = (stats: any): ApexCharts.ApexOptions => ({
+	...statusDonutOptions,
+	plotOptions: {
+		pie: {
+			donut: {
+				...statusDonutOptions.plotOptions?.pie?.donut,
+				labels: {
+					...statusDonutOptions.plotOptions?.pie?.donut?.labels,
+					total: {
+						...statusDonutOptions.plotOptions?.pie?.donut?.labels?.total,
+						formatter: (w) => {
+							const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+							if (total === 0) return '0%';
+							const percent = Math.round((w.globals.seriesTotals[0] / total) * 100);
+							return `${percent}%`;
+						}
+					}
+				}
+			}
+		}
+	}
+});
 const growthChartOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'bar',
@@ -321,12 +347,12 @@ const TrangChu = () => {
 						</div>
 					</div>
 					<div className="pc-card-body donut-body">
-						<Chart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={260} />
+						<Chart options={getDynamicDonutOptions(stats)} series={statusDonutSeriesData(stats)} type="donut" height={260} />
 						<div className="donut-legends">
-							<LegendItem color="#2A3D33" label="Đã khám" count={117} />
-							<LegendItem color="#1F5A3E" label="Chờ khám" count={26} />
-							<LegendItem color="#D6D0C4" label="Hủy lịch" count={8} />
-							<LegendItem color="#6E3542" label="Khẩn cấp" count={5} />
+							<LegendItem color="#2A3D33" label="Đã khám" count={stats?.appointments_completed || 0} />
+							<LegendItem color="#1F5A3E" label="Chờ khám" count={stats?.appointments_pending || 0} />
+							<LegendItem color="#D6D0C4" label="Hủy lịch" count={stats?.appointments_cancelled || 0} />
+							<LegendItem color="#6E3542" label="Khẩn cấp" count={stats?.appointments_confirmed || 0} />
 						</div>
 					</div>
 				</div>

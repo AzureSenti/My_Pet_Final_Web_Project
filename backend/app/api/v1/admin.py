@@ -7,7 +7,8 @@ from app.db.session import get_db
 from app.core.dependencies import admin_only
 from app.models.user import User, UserRole
 from app.schemas.admin import UserAdminResponse, UserListResponse
-from app.services import admin_service
+from app.schemas.auth import RegisterRequest
+from app.services import admin_service, auth_service
 
 router = APIRouter(prefix="/admin/users", tags=["Admin - User Management"])
 
@@ -29,6 +30,14 @@ async def get_user_detail(
 ):
     """Xem chi tiết một người dùng"""
     return await admin_service.get_user_by_id(db, user_id)
+
+@router.post("", response_model=UserAdminResponse, status_code=201, dependencies=[Depends(admin_only)])
+async def create_user(
+    body: RegisterRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """Tạo người dùng mới (Admin only)"""
+    return await auth_service.register_user(body, db)
 
 @router.patch("/{user_id}/lock", response_model=UserAdminResponse)
 async def lock_user(
