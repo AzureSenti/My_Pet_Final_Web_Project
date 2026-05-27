@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Progress } from 'antd';
-import { Search, Bell, Settings, Plus, MoreVertical, ChevronRight, ArrowRight, ShieldCheck, Users } from 'lucide-react';
+import { Table, Progress, Modal, Form, Input, Select, message } from 'antd';
+import { Search, Plus, MoreVertical, ChevronRight, ArrowRight, ShieldCheck, Users } from 'lucide-react';
 import '../TrangChu/components/style.less';
+import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
 const MOCK_USERS = [
@@ -55,6 +56,27 @@ const FILTERS = ['Tất cả', 'Chủ nuôi', 'Bác sĩ thú y', 'Nhân viên', 
 
 const UserManagement: React.FC = () => {
 	const [activeFilter, setActiveFilter] = useState('Tất cả');
+	const [users, setUsers] = useState(MOCK_USERS);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [form] = Form.useForm();
+
+	const handleAddUser = (values: any) => {
+		const newUser = {
+			key: String(users.length + 1),
+			id: `#PC-${Math.floor(1000 + Math.random() * 9000)}`,
+			name: values.name,
+			type: values.type,
+			email: values.email,
+			phone: values.phone || 'N/A',
+			status: values.status || 'Hoạt động',
+			joined: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+			avatar: values.name.trim().split(/\s+/).map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+		};
+		setUsers([newUser, ...users]);
+		setIsModalOpen(false);
+		form.resetFields();
+		message.success('Thêm người dùng mới thành công!');
+	};
 
 	const columns = [
 		{
@@ -126,7 +148,7 @@ const UserManagement: React.FC = () => {
 		}
 	];
 
-	const displayedUsers = MOCK_USERS.filter(user => {
+	const displayedUsers = users.filter(user => {
 		if (activeFilter === 'Tất cả') return true;
 		if (activeFilter === 'Chủ nuôi') return user.type === 'Chủ nuôi';
 		if (activeFilter === 'Bác sĩ thú y') return user.type === 'Bác sĩ thú y';
@@ -147,15 +169,7 @@ const UserManagement: React.FC = () => {
 					</div>
 				</div>
 				<div className="pc-header-actions">
-					<div className="pc-user-profile">
-						<div className="pc-user-avatar">
-							<img src="https://i.pravatar.cc/150?img=11" alt="Admin" />
-						</div>
-						<div className="pc-user-info">
-							<span className="pc-user-name">Alex Admin</span>
-							<span className="pc-user-role">Head Coordinator</span>
-						</div>
-					</div>
+					<HeaderProfile />
 				</div>
 			</div>
 
@@ -174,7 +188,7 @@ const UserManagement: React.FC = () => {
 						</div>
 					</div>
 					<div className="um-header-actions">
-						<button className="um-add-btn">
+						<button className="um-add-btn" onClick={() => setIsModalOpen(true)}>
 							<Plus size={18} strokeWidth={2.5} /> Thêm người dùng mới
 						</button>
 					</div>
@@ -205,13 +219,13 @@ const UserManagement: React.FC = () => {
 				{/* Custom Pagination Footer */}
 				<div className="um-pagination">
 					<div className="um-pagination-info">
-						Hiển thị 1 đến {displayedUsers.length} trong số 128 người dùng
+						Hiển thị 1 đến {displayedUsers.length} trong số {users.length} người dùng
 					</div>
 					<div className="um-pagination-controls">
 						<button className="page-btn active">1</button>
 						<button className="page-btn">2</button>
 						<button className="page-btn">3</button>
-						<span style={{ color: '#9CA3AF', margin: '0 4px' }}>...</span>
+						<span style={{ color: '#5A5550', margin: '0 4px' }}>...</span>
 						<button className="page-btn">32</button>
 						<button className="page-btn">
 							<ChevronRight size={16} />
@@ -230,7 +244,7 @@ const UserManagement: React.FC = () => {
 							strokeColor="#A16207" // Dark yellow/olive
 							trailColor="#FEF08A" 
 							format={percent => <span className="radial-text">{percent}%</span>}
-							size={100}
+							width={100}
 							strokeWidth={8}
 						/>
 						<span className="radial-subtext">ĐÃ XÁC THỰC</span>
@@ -271,6 +285,70 @@ const UserManagement: React.FC = () => {
 				</div>
 			</div>
 			</div>
+
+			{/* Modal Thêm người dùng mới */}
+			<Modal
+				title={<h3>Thêm người dùng mới 👤</h3>}
+				visible={isModalOpen}
+				onCancel={() => {
+					setIsModalOpen(false);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				okText="Lưu lại"
+				cancelText="Hủy"
+				destroyOnClose
+			>
+				<Form form={form} layout="vertical" onFinish={handleAddUser}>
+					<Form.Item
+						name="name"
+						label="Họ và tên"
+						rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
+					>
+						<Input placeholder="Ví dụ: Nguyễn Văn A" />
+					</Form.Item>
+					<Form.Item
+						name="type"
+						label="Loại tài khoản"
+						rules={[{ required: true, message: 'Vui lòng chọn loại tài khoản!' }]}
+						initialValue="Chủ nuôi"
+					>
+						<Select>
+							<Select.Option value="Chủ nuôi">Chủ nuôi</Select.Option>
+							<Select.Option value="Bác sĩ thú y">Bác sĩ thú y</Select.Option>
+							<Select.Option value="Nhân viên">Nhân viên</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="email"
+						label="Địa chỉ Email"
+						rules={[
+							{ required: true, message: 'Vui lòng nhập email!' },
+							{ type: 'email', message: 'Email không hợp lệ!' }
+						]}
+					>
+						<Input placeholder="email@example.com" />
+					</Form.Item>
+					<Form.Item
+						name="phone"
+						label="Số điện thoại"
+						rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+					>
+						<Input placeholder="Ví dụ: +84 987 654 321" />
+					</Form.Item>
+					<Form.Item
+						name="status"
+						label="Trạng thái"
+						initialValue="Hoạt động"
+					>
+						<Select>
+							<Select.Option value="Hoạt động">Hoạt động</Select.Option>
+							<Select.Option value="Chờ duyệt">Chờ duyệt</Select.Option>
+							<Select.Option value="Đình chỉ">Đình chỉ</Select.Option>
+						</Select>
+					</Form.Item>
+				</Form>
+			</Modal>
 		</div>
 	);
 };

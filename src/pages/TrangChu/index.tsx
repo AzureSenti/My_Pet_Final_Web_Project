@@ -1,46 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useModel } from 'umi';
 import {
 	SyncOutlined,
 	ExclamationCircleOutlined,
 	ArrowRightOutlined,
 } from '@ant-design/icons';
-import { Search, Bell, Settings, PawPrint, UserCheck, HeartPulse, UserCog } from 'lucide-react';
+import { Search, PawPrint, UserCheck, HeartPulse, UserCog } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
+import HeaderProfile from '@/components/HeaderProfile';
 import './components/style.less';
 
 // ─── Metric Cards Data ────────────────────────
-const METRICS = [
-	{
-		label: 'Tổng người dùng',
-		value: 1248,
-		sub: '+12% tháng này',
-		icon: 'user',
-		color: 'warm',
-	},
-	{
-		label: 'Bác sĩ',
-		value: 56,
-		sub: '+2 nhân sự mới',
-		icon: 'doctor',
-		color: 'mint',
-	},
-	{
-		label: 'Thú cưng',
-		value: 3892,
-		sub: '+45 đăng ký',
-		icon: 'paw',
-		color: 'pink',
-	},
-	{
-		label: 'Lịch hẹn',
-		value: 156,
-		sub: 'Hôm nay',
-		icon: 'calendar',
-		color: 'peach',
-	},
-];
 
 // ─── Notifications Data ───────────────────────
 const NOTIFICATIONS = [
@@ -104,7 +74,7 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 		axisTicks: { show: false },
 		labels: {
 			style: {
-				colors: ['#B5AFA5', '#B5AFA5', '#4A5B3E', '#B5AFA5', '#B5AFA5', '#B5AFA5', '#B5AFA5'], // Highlight T4
+				colors: ['#7A756E', '#7A756E', '#2A3D2E', '#7A756E', '#7A756E', '#7A756E', '#7A756E'], // Highlight T4
 				fontSize: '13px',
 				fontWeight: 500
 			}
@@ -137,7 +107,7 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 	},
 	labels: ['Đã khám', 'Chờ khám', 'Hủy lịch', 'Khẩn cấp'],
-	colors: ['#3B4D43', '#5B8A72', '#E8E2D2', '#8B5A5A'],
+	colors: ['#2A3D33', '#1F5A3E', '#D6D0C4', '#6E3542'],
 	stroke: { width: 6, colors: ['#FFFFFF'] },
 	plotOptions: {
 		pie: {
@@ -145,14 +115,14 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 				size: '80%',
 				labels: {
 					show: true,
-					name: { fontSize: '12px', fontWeight: 700, color: '#8A8478', offsetY: 25 },
+					name: { fontSize: '12px', fontWeight: 700, color: '#5A554E', offsetY: 25 },
 					value: { fontSize: '42px', fontWeight: 800, color: '#2D2A26', offsetY: -10 },
 					total: {
 						show: true,
 						label: 'HOÀN TẤT',
 						fontSize: '12px',
 						fontWeight: 700,
-						color: '#B5AFA5',
+						color: '#7A756E',
 						formatter: () => '75%',
 					},
 				},
@@ -208,28 +178,6 @@ const growthSeries = [
 ];
 
 // ─── Sub Components ───────────────────────────
-const MetricCard = ({ item }: { item: typeof METRICS[0] }) => {
-	const iconMap: Record<string, React.ReactNode> = {
-		user: <UserOutlined />,
-		doctor: <MedicineBoxOutlined />,
-		paw: <span style={{ fontSize: 22 }}>🐾</span>,
-		calendar: <CalendarOutlined />,
-	};
-
-	return (
-		<div className={`pc-metric-card ${item.color}`}>
-			<div className="metric-icon-box">{iconMap[item.icon]}</div>
-			<div className="metric-content">
-				<div className="metric-label">{item.label}</div>
-				<div className="metric-value">
-					<CountUp end={item.value} duration={1.5} separator="," />
-				</div>
-				<div className="metric-sub">{item.sub}</div>
-			</div>
-		</div>
-	);
-};
-
 const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
 	<div className={`notif-item ${item.type}`}>
 		<div className="notif-icon-box">
@@ -242,82 +190,6 @@ const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
 		<div className="notif-time">{item.time}</div>
 	</div>
 );
-
-const ACTIVITIES = [
-	{ title: 'Lịch hẹn mới', desc: 'BS. Hoa, Chó "Bông"', time: 'Vừa xong', dot: 'blue' },
-	{ title: 'Thanh toán', desc: '500,000đ - Max', time: '2 giờ trước', dot: 'green' },
-	{ title: 'Hủy lịch', desc: 'Mèo "Luna"', time: '5 giờ trước', dot: 'red' },
-];
-
-const ActivityItem = ({ item, isLast }: { item: typeof ACTIVITIES[0]; isLast: boolean }) => (
-	<li className="activity-item">
-		<div className="activity-dot-wrapper">
-			<div className={`activity-dot ${item.dot}`} />
-			{!isLast && <div className="activity-line" />}
-		</div>
-		<div className="activity-content">
-			<div className="activity-title">{item.title}</div>
-			<div className="activity-time">{item.desc} · {item.time}</div>
-		</div>
-	</li>
-);
-
-const TOP_USERS = [
-	{ name: 'Trần Thị Lan', pets: 3, spending: '4,200k', avatar: 'https://i.pravatar.cc/150?u=lan' },
-	{ name: 'Lê Văn Minh', pets: 2, spending: '3,800k', avatar: 'https://i.pravatar.cc/150?u=minh' },
-	{ name: 'Phạm Hồng Anh', pets: 4, spending: '2,900k', avatar: 'https://i.pravatar.cc/150?u=anh' },
-];
-
-const UserItem = ({ user, rank }: { user: typeof TOP_USERS[0]; rank: number }) => {
-	const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : 'default';
-	return (
-		<li className="user-item">
-			<div className={`user-rank ${rankClass}`}>{rank + 1}</div>
-			<div className="user-avatar">
-				<img src={user.avatar} alt={user.name} />
-			</div>
-			<div className="user-info">
-				<div className="user-name">{user.name}</div>
-				<div className="user-pets">{user.pets} thú cưng</div>
-			</div>
-			<div className="user-spending">{user.spending}</div>
-		</li>
-	);
-};
-
-const PET_STATS = [
-	{ label: 'Chó', count: 124, total: 200, emoji: '🐶', color: 'blue' },
-	{ label: 'Mèo', count: 86, total: 200, emoji: '🐱', color: 'orange' },
-];
-
-const PetStatBar = ({ stat }: { stat: typeof PET_STATS[0] }) => {
-	const [width, setWidth] = useState(0);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setWidth(Math.round((stat.count / stat.total) * 100));
-		}, 300);
-		return () => clearTimeout(timer);
-	}, [stat]);
-
-	return (
-		<li className="pet-stat-item">
-			<div className="pet-stat-top">
-				<div className="pet-stat-label">
-					<span className="pet-stat-emoji">{stat.emoji}</span>
-					{stat.label}
-				</div>
-				<div className="pet-stat-count">{stat.count}</div>
-			</div>
-			<div className="pet-stat-bar">
-				<div
-					className={`pet-stat-fill ${stat.color}`}
-					style={{ width: `${width}%` }}
-				/>
-			</div>
-		</li>
-	);
-};
 
 const KPICard = ({ item }: { item: any }) => (
 	<div className={`pc-metric-card ${item.color}`}>
@@ -345,7 +217,6 @@ const LegendItem = ({ color, label, count }: { color: string; label: string; cou
 import { getDashboardStats } from '@/services/QuanLyPetStore';
 
 const TrangChu = () => {
-	const [activePeriod, setActivePeriod] = useState('12T');
 	const [filterPeriod, setFilterPeriod] = useState('7 days');
 	const [stats, setStats] = useState<any>(null);
 
@@ -406,15 +277,7 @@ const TrangChu = () => {
 					</div>
 				</div>
 				<div className="pc-header-actions">
-					<div className="pc-user-profile">
-						<div className="pc-user-avatar">
-							<img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" />
-						</div>
-						<div className="pc-user-info">
-							<span className="pc-user-name">Nguyễn Văn A</span>
-							<span className="pc-user-role">Administrator</span>
-						</div>
-					</div>
+					<HeaderProfile />
 				</div>
 			</div>
 
@@ -460,10 +323,10 @@ const TrangChu = () => {
 					<div className="pc-card-body donut-body">
 						<Chart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={260} />
 						<div className="donut-legends">
-							<LegendItem color="#3B4D43" label="Đã khám" count={117} />
-							<LegendItem color="#5B8A72" label="Chờ khám" count={26} />
-							<LegendItem color="#E8E2D2" label="Hủy lịch" count={8} />
-							<LegendItem color="#8B5A5A" label="Khẩn cấp" count={5} />
+							<LegendItem color="#2A3D33" label="Đã khám" count={117} />
+							<LegendItem color="#1F5A3E" label="Chờ khám" count={26} />
+							<LegendItem color="#D6D0C4" label="Hủy lịch" count={8} />
+							<LegendItem color="#6E3542" label="Khẩn cấp" count={5} />
 						</div>
 					</div>
 				</div>

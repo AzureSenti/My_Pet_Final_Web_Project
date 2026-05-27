@@ -1,14 +1,14 @@
 @import '~antd/es/style/themes/default.less';
 
 // ========== Design Tokens - Organic Theme ==========
-@primary-olive: #3B4D43; // Muted brand olive
-@primary-olive-hover: #2D3D34;
+@primary-olive: #0F1A13; // Near-black deep olive
+@primary-olive-hover: #060D09;
 @bg-cream: #F5F2EC; // Premium warm neutral background
-@bg-teal-light: #EEF6F3;
-@bg-red-light: #F8F0F1;
-@text-dark: #1C1917; // Rich warm charcoal
-@text-gray: #78716C; // Warm stone secondary
-@text-light: #A8A29E;
+@bg-teal-light: #E0EDE8;
+@bg-red-light: #F0E2E5;
+@text-dark: #000000; // Rich absolute black for maximum prominence
+@text-gray: #1A1715; // Nearly black for secondary texts
+@text-light: #3D3835; // Higher contrast dark grey for helper text/icons
 @radius-3xl: 24px;
 @radius-full: 9999px;
 @shadow-soft: 0 2px 16px rgba(0, 0, 0, 0.03);
@@ -37,13 +37,13 @@
 			width: 48px;
 			height: 48px;
 			border-radius: 14px;
-			background: linear-gradient(135deg, #F5F0E8, rgba(163, 134, 90, 0.22));
+			background: linear-gradient(135deg, #EDE5D9, rgba(107, 78, 40, 0.28));
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			color: #A3865A;
+			color: #6B4E28;
 			flex-shrink: 0;
-			box-shadow: 0 4px 14px rgba(163, 134, 90, 0.15);
+			box-shadow: 0 4px 14px rgba(107, 78, 40, 0.2);
 		}
 
 		h1 {
@@ -104,17 +104,17 @@
 		transition: @transition-fast;
 
 		&.filter {
-			background-color: #EEF6F3; // Xanh mint nhạt
-			color: #5B8A72;
+			background-color: #E0EDE8; // Xanh mint nhạt đậm hơn
+			color: #0F2E1E; // Very deep prominent green
 
 			&:hover {
-				background-color: #E2EDE8;
+				background-color: #D0E0D8;
 			}
 		}
 
 		&.schedule {
-			background-color: #FBF6EE; // Vàng nhạt
-			color: #A3865A;
+			background-color: #F5ECD8; // Vàng nhạt đậm hơn
+			color: #4A3518; // Very rich prominent gold
 
 			&:hover {
 				background-color: #F5EBD9;
@@ -187,7 +187,7 @@
 
 			.icon-right {
 				font-size: 48px;
-				color: #A3865A;
+				color: #6B4E28;
 				opacity: 0.9;
 			}
 		}
@@ -201,9 +201,9 @@
 			gap: 8px;
 
 			.icon-top {
-				color: #5B8A72;
+				color: #0F2E1E;
 				font-size: 24px;
-				background: #EEF6F3;
+				background: #E0EDE8;
 				padding: 8px;
 				border-radius: 50%;
 			}
@@ -211,14 +211,14 @@
 			h1 {
 				font-size: 42px;
 				font-weight: 900;
-				color: #5B8A72;
+				color: #0F2E1E;
 				margin: 0;
 				line-height: 1;
 			}
 
 			p {
-				color: #5B8A72;
-				font-weight: 600;
+				color: #0F2E1E;
+				font-weight: 700;
 				margin: 0;
 				font-size: 14px;
 			}
@@ -233,9 +233,9 @@
 			gap: 8px;
 
 			.icon-top {
-				color: #A56060;
+				color: #4D2530;
 				font-size: 24px;
-				background: #F8F0F1;
+				background: #F0E2E5;
 				padding: 8px;
 				border-radius: 50%;
 			}
@@ -243,14 +243,14 @@
 			h1 {
 				font-size: 42px;
 				font-weight: 900;
-				color: #A56060;
+				color: #4D2530;
 				margin: 0;
 				line-height: 1;
 			}
 
 			p {
-				color: #A56060;
-				font-weight: 600;
+				color: #4D2530;
+				font-weight: 700;
 				margin: 0;
 				font-size: 14px;
 			}
@@ -356,7 +356,7 @@
 					right: 4px;
 					width: 14px;
 					height: 14px;
-					background-color: #5B8A72;
+					background-color: #1A5A38;
 					border: 2px solid #FFF;
 					border-radius: 50%;
 				}
@@ -374,8 +374,8 @@
 
 				.specialty {
 					font-size: 14px;
-					color: #A56060; // Muted red
-					font-weight: 600;
+					color: #5A1F2B; // Very dark Crimson specialty
+					font-weight: 700;
 					margin: 0;
 				}
 			}
@@ -426,8 +426,8 @@
 
 			.btn-schedule {
 				flex: 1;
-				background-color: #FBF6EE;
-				color: #A3865A;
+				background-color: #F5ECD8;
+				color: #4A3518;
 				border: none;
 				border-radius: 12px;
 				padding: 10px;
@@ -436,7 +436,7 @@
 				transition: @transition-fast;
 
 				&:hover {
-					background-color: #F5EBD9;
+					background-color: #EBE0C8;
 				}
 			}
 
@@ -471,8 +471,8 @@
 				transition: @transition-fast;
 
 				&.danger {
-					background-color: #F8F0F1;
-					color: #9E6B73;
+					background-color: #F0E2E5;
+					color: #4D2530;
 
 					&:hover {
 						background-color: #EADADE;
