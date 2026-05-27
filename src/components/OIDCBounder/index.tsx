@@ -28,8 +28,8 @@ const OIDCBounder: FC & { getActions: () => null } = ({ children }) => {
 		const isBypass = window.location.search.includes('bypass=true');
 
 		if (!token && !isBypass) {
-			history.replace('/user/login');
-			return;
+			// history.replace('/user/login'); // Đã tạm thời tắt để anh em code front dễ dàng
+			// return;
 		}
 
 		// Nếu đã có token nhưng chưa có currentUser trong state → restore từ localStorage
