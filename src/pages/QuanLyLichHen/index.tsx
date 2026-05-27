@@ -20,6 +20,9 @@ const QuanLyLichHen: React.FC = () => {
 	const [form] = Form.useForm();
 	const [filterForm] = Form.useForm();
 
+	const [currentMonth, setCurrentMonth] = useState(10);
+	const [selectedDay, setSelectedDay] = useState(11);
+
 	// Các filter state
 	const [searchText, setSearchText] = useState('');
 	const [statusFilter, setStatusFilter] = useState('Tất cả');
@@ -245,10 +248,16 @@ const QuanLyLichHen: React.FC = () => {
 														{item.status === 'pending' ? (
 															<>
 																<button className="btn-action btn-confirm" onClick={() => handleConfirmAppointment(item.id)}>Xác nhận</button>
-																<button className="btn-action btn-text">Sửa</button>
+																<button className="btn-action btn-text" onClick={() => handlePlaceholder('Sửa lịch hẹn')}>Sửa</button>
+																<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
 															</>
 														) : (
-															<button className="btn-action btn-text">Chi tiết</button>
+															<>
+																<button className="btn-action btn-text" onClick={() => handlePlaceholder('Chi tiết lịch hẹn')}>Chi tiết</button>
+																{item.status === 'confirmed' && (
+																	<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
+																)}
+															</>
 														)}
 													</div>
 												</td>
@@ -265,10 +274,10 @@ const QuanLyLichHen: React.FC = () => {
 						{/* Widget 1: Mini Calendar */}
 						<div className="widget-card">
 							<div className="calendar-header">
-								<h3>Tháng 10, 2023</h3>
+								<h3>Tháng {currentMonth}, 2023</h3>
 								<div className="calendar-nav">
-									<button>&lt;</button>
-									<button>&gt;</button>
+									<button onClick={() => setCurrentMonth(prev => prev === 1 ? 12 : prev - 1)}>&lt;</button>
+									<button onClick={() => setCurrentMonth(prev => prev === 12 ? 1 : prev + 1)}>&gt;</button>
 								</div>
 							</div>
 							<div className="calendar-grid">

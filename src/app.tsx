@@ -150,7 +150,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				)}
 			</div>
 		),
-		menuFooterRender: undefined,
+		menuFooterRender: (props) => {
+			if (props?.collapsed) return undefined;
+			return (
+				<div style={{ padding: '0 16px 16px' }}>
+
+				</div>
+			);
+		},
 		...initialState?.settings,
 	};
 };

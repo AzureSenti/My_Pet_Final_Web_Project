@@ -66,6 +66,15 @@ const QuanLyBacSi: React.FC = () => {
 	const handleApproveDoctor = (id: string) => {
 		toggleDoctorStatus(id).then(fetchData);
 	};
+
+	const handleApproveAll = () => {
+		setDoctors(doctors.map(d => ({ ...d, status: 'Active' })));
+		message.success('Đã duyệt tất cả hồ sơ bác sĩ đang chờ!');
+	};
+
+	const handlePlaceholder = (featureName: string) => {
+		message.info(`Chức năng "${featureName}" đang được phát triển.`);
+	};
 	return (
 		<div className="petcare-dashboard">
 			{/* Header giống trang tổng quan */}
@@ -106,10 +115,10 @@ const QuanLyBacSi: React.FC = () => {
 
 				{/* Toolbar Row */}
 				<div className="toolbar-row">
-					<button className="toolbar-btn filter">
+					<button className="toolbar-btn filter" onClick={() => handlePlaceholder('Bộ lọc bác sĩ')}>
 						<Filter size={18} /> Bộ lọc bác sĩ
 					</button>
-					<button className="toolbar-btn schedule">
+					<button className="toolbar-btn schedule" onClick={() => handlePlaceholder('Lịch trình tổng quát')}>
 						<Calendar size={18} /> Lịch trình tổng quát
 					</button>
 				</div>
@@ -119,8 +128,8 @@ const QuanLyBacSi: React.FC = () => {
 					<div className="metric-card applications">
 						<div className="content-left">
 							<h2>Hồ Sơ Ứng Tuyển Mới</h2>
-							<p>4 bác sĩ thú y đang chờ duyệt hồ sơ</p>
-							<button className="btn-olive">Duyệt Ngay</button>
+							<p>{doctors.filter(d => d.status === 'Pending').length} bác sĩ thú y đang chờ duyệt hồ sơ</p>
+							<button className="btn-olive" onClick={handleApproveAll}>Duyệt Ngay</button>
 						</div>
 						<div className="icon-right" style={{ position: 'relative' }}>
 							<ClipboardList size={48} strokeWidth={1.5} color="#F59E0B" />
@@ -182,7 +191,7 @@ const QuanLyBacSi: React.FC = () => {
 									</div>
 
 									<div className="card-footer" style={{ gap: '12px' }}>
-										<button className="btn-schedule" style={{ flex: '0 0 85%' }}>
+										<button className="btn-schedule" style={{ flex: '0 0 85%' }} onClick={() => handlePlaceholder('Quản lý lịch trình')}>
 											Quản lý lịch trình
 										</button>
 										<button className="btn-icon danger" style={{ flex: '1' }} onClick={() => handleDeleteDoctor(doc.vet_id)}>
@@ -217,7 +226,7 @@ const QuanLyBacSi: React.FC = () => {
 										<button className="btn-approve" onClick={() => handleApproveDoctor(doc.vet_id)}>
 											Duyệt hồ sơ
 										</button>
-										<span className="pending-link">
+										<span className="pending-link" onClick={() => handlePlaceholder('Xem toàn bộ hồ sơ')}>
 											Xem toàn bộ hồ sơ
 										</span>
 									</div>
