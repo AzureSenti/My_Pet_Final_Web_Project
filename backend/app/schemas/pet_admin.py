@@ -12,6 +12,16 @@ class OwnerBasicInfo(BaseModel):
     class Config:
         from_attributes = True
 
+# Schema tạo thú cưng
+class PetCreateRequest(BaseModel):
+    name: str
+    species: str
+    breed: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    gender: str
+    avatar_url: Optional[str] = None
+    owner_id: uuid.UUID
+
 # Schema chi tiết thú cưng
 class PetAdminResponse(BaseModel):
     id: uuid.UUID

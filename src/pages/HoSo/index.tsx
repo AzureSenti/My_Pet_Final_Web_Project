@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Card, Tabs, Checkbox } from 'antd';
-import { 
-	User, 
-	Mail, 
-	Phone, 
-	Shield, 
-	Save, 
-	Lock, 
-	Camera, 
-	CheckCircle, 
+import {
+	User,
+	Mail,
+	Phone,
+	Shield,
+	Save,
+	Lock,
+	Camera,
+	CheckCircle,
 	ArrowLeft,
 	Search
 } from 'lucide-react';
@@ -16,6 +16,8 @@ import { history, useModel } from 'umi';
 import HeaderProfile from '@/components/HeaderProfile';
 import '../TrangChu/components/style.less';
 import './style.less';
+
+import { updateProfile, getCurrentProfile } from '@/services/QuanLyPetStore';
 
 const HoSo: React.FC = () => {
 	const { initialState, setInitialState } = useModel('@@initialState');
@@ -25,16 +27,26 @@ const HoSo: React.FC = () => {
 
 	const currentUser = initialState?.currentUser as any;
 
+	const fetchLatestProfile = async () => {
+		const updatedProfile = await getCurrentProfile();
+		if (updatedProfile) {
+			setInitialState({
+				...initialState,
+				currentUser: {
+					...currentUser,
+					...updatedProfile
+				},
+			});
+		}
+	};
+
 	// Populate form with current user info
 	useEffect(() => {
 		if (currentUser) {
 			form.setFieldsValue({
-				family_name: currentUser.family_name || '',
-				given_name: currentUser.given_name || '',
-				name: currentUser.name || '',
-				preferred_username: currentUser.preferred_username || '',
+				full_name: currentUser.full_name || '',
 				email: currentUser.email || '',
-				phone: currentUser.phone || '+84 987 654 321',
+				phone: currentUser.phone || '',
 				picture: currentUser.picture || 'https://i.pravatar.cc/150?img=12'
 			});
 		}
@@ -43,37 +55,16 @@ const HoSo: React.FC = () => {
 	const handleSaveProfile = async (values: any) => {
 		setSubmitting(true);
 		try {
-			// Giả lập lưu API
-			await new Promise((resolve) => setTimeout(resolve, 800));
-
-			const updatedUser: any = {
-				...currentUser,
-				family_name: values.family_name,
-				given_name: values.given_name,
-				name: values.name || `${values.family_name} ${values.given_name}`.trim(),
-				preferred_username: values.preferred_username,
-				email: values.email,
-				phone: values.phone,
-				picture: values.picture,
-				sub: currentUser?.sub || 'mock-id-123',
-				ssoId: currentUser?.ssoId || 'mock-id-123',
-				email_verified: currentUser?.email_verified ?? true,
-				realm_access: currentUser?.realm_access || { roles: ['admin'] },
-			};
-
-			// Lưu vào localStorage
-			localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-
-			// Cập nhật initial state để hiển thị ngay lập tức
-			setInitialState({
-				...initialState,
-				currentUser: updatedUser,
+			const success = await updateProfile({
+				full_name: values.full_name,
+				phone: values.phone
 			});
 
-			message.success('Cập nhật thông tin hồ sơ thành công!');
+			if (success) {
+				await fetchLatestProfile();
+			}
 		} catch (error) {
 			console.error(error);
-			message.error('Lỗi khi lưu thông tin. Vui lòng thử lại!');
 		} finally {
 			setSubmitting(false);
 		}
@@ -82,9 +73,12 @@ const HoSo: React.FC = () => {
 	const handleSaveSecurity = async (values: any) => {
 		try {
 			setSubmitting(true);
-			await new Promise((resolve) => setTimeout(resolve, 800));
-			message.success('Cập nhật mật khẩu và bảo mật thành công!');
-			securityForm.resetFields();
+			const success = await updateProfile({
+				password: values.newPassword
+			});
+			if (success) {
+				securityForm.resetFields();
+			}
 		} catch (err) {
 			message.error('Lỗi cập nhật bảo mật.');
 		} finally {
@@ -92,23 +86,22 @@ const HoSo: React.FC = () => {
 		}
 	};
 
-	const role = currentUser?.realm_access?.roles?.[0] || 'Administrator';
-	const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
-	const name = currentUser?.name || 'Admin';
+	const roleLabel = currentUser?.role === 'admin' ? 'Quản trị viên' : currentUser?.role === 'vet' ? 'Bác sĩ thú y' : 'Chủ nuôi';
+	const name = currentUser?.full_name || 'Người dùng';
 
 	return (
 		<div className="petcare-dashboard profile-page-wrapper">
 			{/* Top Header Bar */}
 			<div className="pc-header">
 				<div className="pc-header-left">
-					<button 
-						type="button" 
-						className="back-btn" 
+					<button
+						type="button"
+						className="back-btn"
 						onClick={() => history.push('/dashboard')}
-						style={{ 
-							display: 'flex', alignItems: 'center', gap: '8px', 
+						style={{
+							display: 'flex', alignItems: 'center', gap: '8px',
 							background: 'transparent', border: 'none', cursor: 'pointer',
-							color: '#6B635B', fontWeight: 600, fontSize: '14px' 
+							color: '#6B635B', fontWeight: 600, fontSize: '14px'
 						}}
 					>
 						<ArrowLeft size={18} /> Quay lại
@@ -131,16 +124,16 @@ const HoSo: React.FC = () => {
 					<Card className="profile-card-overview" bordered={false}>
 						<div className="profile-avatar-section">
 							<div className="profile-avatar-container">
-								<img 
-									src={currentUser?.picture || 'https://i.pravatar.cc/150?img=12'} 
-									alt="Profile" 
+								<img
+									src={currentUser?.picture || 'https://i.pravatar.cc/150?img=12'}
+									alt="Profile"
 								/>
 								<div className="avatar-overlay">
 									<Camera size={18} />
 								</div>
 							</div>
 							<h2>{name}</h2>
-							<span className="role-badge">{capitalizedRole}</span>
+							<span className="role-badge">{roleLabel}</span>
 						</div>
 
 						<hr className="divider" />
@@ -157,8 +150,8 @@ const HoSo: React.FC = () => {
 								<span className="stat-val text-muted">{currentUser?.email || 'N/A'}</span>
 							</div>
 							<div className="stat-row">
-								<span className="stat-label">Username:</span>
-								<span className="stat-val text-muted">@{currentUser?.preferred_username || 'admin'}</span>
+								<span className="stat-label">Role:</span>
+								<span className="stat-val text-muted">{currentUser?.role}</span>
 							</div>
 						</div>
 					</Card>
@@ -179,39 +172,13 @@ const HoSo: React.FC = () => {
 									onFinish={handleSaveProfile}
 									className="profile-form-inner"
 								>
-									<div className="form-grid-2">
-										<Form.Item
-											name="family_name"
-											label="Họ và tên đệm"
-											rules={[{ required: true, message: 'Vui lòng nhập họ!' }]}
-										>
-											<Input placeholder="Nhập họ" prefix={<User size={16} className="input-icon" />} />
-										</Form.Item>
-										<Form.Item
-											name="given_name"
-											label="Tên"
-											rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
-										>
-											<Input placeholder="Nhập tên" prefix={<User size={16} className="input-icon" />} />
-										</Form.Item>
-									</div>
-
-									<div className="form-grid-2">
-										<Form.Item
-											name="name"
-											label="Tên hiển thị đầy đủ"
-											rules={[{ required: true, message: 'Vui lòng nhập tên hiển thị!' }]}
-										>
-											<Input placeholder="Tên hiển thị" prefix={<User size={16} className="input-icon" />} />
-										</Form.Item>
-										<Form.Item
-											name="preferred_username"
-											label="Tên đăng nhập"
-											rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
-										>
-											<Input placeholder="Username" prefix={<User size={16} className="input-icon" />} />
-										</Form.Item>
-									</div>
+									<Form.Item
+										name="full_name"
+										label="Họ và tên"
+										rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
+									>
+										<Input placeholder="Nhập họ và tên" prefix={<User size={16} className="input-icon" />} />
+									</Form.Item>
 
 									<div className="form-grid-2">
 										<Form.Item
@@ -240,9 +207,9 @@ const HoSo: React.FC = () => {
 									</Form.Item>
 
 									<div className="form-actions">
-										<Button 
-											type="primary" 
-											htmlType="submit" 
+										<Button
+											type="primary"
+											htmlType="submit"
 											loading={submitting}
 											icon={<Save size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />}
 											size="large"
@@ -311,9 +278,9 @@ const HoSo: React.FC = () => {
 									</Form.Item>
 
 									<div className="form-actions">
-										<Button 
-											type="primary" 
-											htmlType="submit" 
+										<Button
+											type="primary"
+											htmlType="submit"
 											loading={submitting}
 											icon={<Shield size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />}
 											size="large"
