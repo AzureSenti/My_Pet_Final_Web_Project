@@ -23,7 +23,35 @@ export default [
 	},
 
 	///////////////////////////////////
-	// DEFAULT MENU
+	// BÁC SĨ THÚ Y — CMS RIÊNG
+	{
+		path: '/bac-si',
+		layout: false,
+		routes: [
+			{
+				path: '/bac-si/dashboard',
+				layout: false,
+				component: './BacSi/Dashboard',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/lich-hen',
+				layout: false,
+				component: './BacSi/LichHen',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/tu-van',
+				layout: false,
+				component: './BacSi/TuVan',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si',
+				redirect: '/bac-si/dashboard',
+			},
+		],
+	},
 	{
 		path: '/dashboard',
 		name: 'Tổng quan',
