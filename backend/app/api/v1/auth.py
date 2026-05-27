@@ -22,6 +22,7 @@ from app.schemas.auth import (
     RegisterResponse,
     TokenResponse,
     UserOut,
+    UserUpdate,
 )
 from app.services import auth_service
 from app.models.user import User
@@ -87,3 +88,16 @@ async def me(
     current_user: User = Depends(get_current_user),
 ) -> UserOut:
     return UserOut.model_validate(current_user)
+
+
+@router.patch(
+    "/me",
+    response_model=UserOut,
+    summary="Cập nhật thông tin cá nhân",
+)
+async def update_me(
+    body: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> UserOut:
+    return await auth_service.update_user_profile(db, current_user, body)

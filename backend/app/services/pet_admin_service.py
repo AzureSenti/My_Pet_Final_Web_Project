@@ -73,3 +73,34 @@ async def list_pets_by_owner(db: AsyncSession, user_id: uuid.UUID) -> list[Pet]:
         .order_by(Pet.created_at.desc())
     )
     return result.scalars().all()
+
+async def create_pet(db: AsyncSession, data: any) -> Pet:
+    # Check if owner exists
+    owner = await db.get(User, data.owner_id)
+    if not owner:
+        raise HTTPException(status_code=404, detail="Chủ nuôi không tồn tại")
+    
+    pet = Pet(
+        name=data.name,
+        species=data.species,
+        breed=data.breed,
+        date_of_birth=data.date_of_birth,
+        gender=data.gender,
+        avatar_url=data.avatar_url,
+        owner_id=data.owner_id
+    )
+    db.add(pet)
+    await db.commit()
+    await db.refresh(pet)
+    
+    # Refresh to load owner relationship
+    return await get_pet_detail(db, pet.id)
+
+async def delete_pet(db: AsyncSession, pet_id: uuid.UUID) -> bool:
+    pet = await db.get(Pet, pet_id)
+    if not pet:
+        raise HTTPException(status_code=404, detail="Thú cưng không tồn tại")
+    
+    await db.delete(pet)
+    await db.commit()
+    return True
