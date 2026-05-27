@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { message } from 'antd';
+import { history } from 'umi';
 import {
 	SyncOutlined,
 	ExclamationCircleOutlined,
 	ArrowRightOutlined,
 } from '@ant-design/icons';
-import { Search, PawPrint, UserCheck, HeartPulse, UserCog } from 'lucide-react';
+import { Search, PawPrint, UserCheck, HeartPulse, UserCog, CalendarDays } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
 import HeaderProfile from '@/components/HeaderProfile';
@@ -48,17 +50,17 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 		zoom: { enabled: false },
 	},
-	colors: ['#3B4D43'], // Dark moss green
+	colors: ['#8A9A5B'], // Soft moss green / Earthy yellow
 	fill: {
 		type: 'gradient',
 		gradient: {
 			shadeIntensity: 1,
-			opacityFrom: 0.1,
+			opacityFrom: 0.25,
 			opacityTo: 0,
 			stops: [0, 90, 100],
 		},
 	},
-	stroke: { curve: 'smooth', width: 3 },
+	stroke: { curve: 'smooth', width: 4 },
 	grid: {
 		show: false, // Remove harsh grid lines
 		padding: {
@@ -96,9 +98,7 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 	},
 };
 
-const appointmentSeries = [
-	{ name: 'Lịch hẹn', data: [18, 22, 15, 28, 20, 35, 24] },
-];
+// Dynamic Chart options and series will be handled inside the component
 
 // ─── Status Donut Chart ───────────────────────
 const statusDonutOptions: ApexCharts.ApexOptions = {
@@ -107,7 +107,7 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 	},
 	labels: ['Đã khám', 'Chờ khám', 'Hủy lịch', 'Khẩn cấp'],
-	colors: ['#2A3D33', '#1F5A3E', '#D6D0C4', '#6E3542'],
+	colors: ['#2A3D33', '#1F5A3E', '#E0E0E0', '#6E3542'], // Dark moss green, dark turquoise, light gray, dark red
 	stroke: { width: 6, colors: ['#FFFFFF'] },
 	plotOptions: {
 		pie: {
@@ -120,9 +120,9 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 					total: {
 						show: true,
 						label: 'HOÀN TẤT',
-						fontSize: '12px',
-						fontWeight: 700,
-						color: '#7A756E',
+						fontSize: '14px',
+						fontWeight: 800,
+						color: '#0D0B0A',
 						formatter: () => '75%',
 					},
 				},
@@ -218,6 +218,7 @@ import { getDashboardStats } from '@/services/QuanLyPetStore';
 
 const TrangChu = () => {
 	const [filterPeriod, setFilterPeriod] = useState('7 days');
+	const [searchQuery, setSearchQuery] = useState('');
 	const [stats, setStats] = useState<any>(null);
 
 	useEffect(() => {
@@ -228,6 +229,48 @@ const TrangChu = () => {
 		fetchStats();
 	}, []);
 
+	// Handle button clicks
+	const handleViewAllNotifs = () => {
+		message.info('Chức năng "Xem tất cả thông báo" đang được phát triển.');
+	};
+
+	const handleBannerClick = (type: string) => {
+		if (type === 'spa') {
+			message.success('Đang chuyển đến trang Đặt lịch...');
+			history.push('/appointments');
+		} else {
+			message.success('Đang chuyển đến danh sách Bác sĩ...');
+			history.push('/quan-ly-bac-si');
+		}
+	};
+
+	const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFilterPeriod(e.target.value);
+		message.success(`Đã cập nhật dữ liệu biểu đồ theo: ${e.target.options[e.target.selectedIndex].text}`);
+	};
+
+	// Dynamic data derivations
+	const displayedNotifs = NOTIFICATIONS.filter(item => 
+		item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		item.desc.toLowerCase().includes(searchQuery.toLowerCase())
+	);
+
+	const getAppointmentSeries = () => {
+		if (filterPeriod === '30 days') return [{ name: 'Lịch hẹn', data: [45, 52, 38, 60, 48, 72, 65] }];
+		if (filterPeriod === '3 months') return [{ name: 'Lịch hẹn', data: [120, 145, 110, 180, 135, 210, 190] }];
+		return [{ name: 'Lịch hẹn', data: [18, 22, 15, 28, 20, 35, 24] }];
+	};
+
+	const dynamicChartOptions: ApexCharts.ApexOptions = {
+		...appointmentChartOptions,
+		xaxis: {
+			...appointmentChartOptions.xaxis,
+			categories: filterPeriod === '7 days' ? ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'] :
+						filterPeriod === '30 days' ? ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7'] :
+						['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7']
+		}
+	};
+
 	// Mapping dữ liệu từ API vào UI
 	const dynamicKPI = [
 		{
@@ -236,7 +279,7 @@ const TrangChu = () => {
 			trend: '+12.5%',
 			trendDir: 'up',
 			icon: <PawPrint size={24} strokeWidth={1.75} />,
-			color: 'warm',
+			color: 'pink',
 		},
 		{
 			label: 'Tổng khách hàng',
@@ -244,7 +287,7 @@ const TrangChu = () => {
 			trend: '+8.2%',
 			trendDir: 'up',
 			icon: <UserCheck size={24} strokeWidth={1.75} />,
-			color: 'mint',
+			color: 'warm',
 		},
 		{
 			label: 'Tổng bác sĩ',
@@ -252,14 +295,14 @@ const TrangChu = () => {
 			trend: '+5.7%',
 			trendDir: 'up',
 			icon: <HeartPulse size={24} strokeWidth={1.75} />,
-			color: 'pink',
+			color: 'mint',
 		},
 		{
-			label: 'Tổng tài khoản',
+			label: 'Tổng lịch hẹn',
 			value: stats?.total_users || 6,
 			trend: '+2.1%',
 			trendDir: 'up',
-			icon: <UserCog size={24} strokeWidth={1.75} />,
+			icon: <CalendarDays size={24} strokeWidth={1.75} />,
 			color: 'peach',
 		},
 	];
@@ -273,7 +316,12 @@ const TrangChu = () => {
 				<div className="pc-header-center">
 					<div className="pc-header-search">
 						<Search size={18} strokeWidth={1.75} className="search-icon" />
-						<input type="text" placeholder="Tìm kiếm hệ thống..." />
+						<input 
+							type="text" 
+							placeholder="Tìm kiếm thông báo..." 
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
 					</div>
 				</div>
 				<div className="pc-header-actions">
@@ -300,7 +348,7 @@ const TrangChu = () => {
 						<select
 							className="pc-dropdown"
 							value={filterPeriod}
-							onChange={(e) => setFilterPeriod(e.target.value)}
+							onChange={handleFilterChange}
 						>
 							<option value="7 days">7 ngày qua</option>
 							<option value="30 days">30 ngày qua</option>
@@ -308,7 +356,7 @@ const TrangChu = () => {
 						</select>
 					</div>
 					<div className="pc-card-body">
-						<Chart options={appointmentChartOptions} series={appointmentSeries} type="area" height={280} />
+						<Chart options={dynamicChartOptions} series={getAppointmentSeries()} type="area" height={280} />
 					</div>
 				</div>
 
@@ -325,7 +373,7 @@ const TrangChu = () => {
 						<div className="donut-legends">
 							<LegendItem color="#2A3D33" label="Đã khám" count={117} />
 							<LegendItem color="#1F5A3E" label="Chờ khám" count={26} />
-							<LegendItem color="#D6D0C4" label="Hủy lịch" count={8} />
+							<LegendItem color="#E0E0E0" label="Hủy lịch" count={8} />
 							<LegendItem color="#6E3542" label="Khẩn cấp" count={5} />
 						</div>
 					</div>
@@ -354,14 +402,20 @@ const TrangChu = () => {
 							<h3>Thông báo hệ thống</h3>
 							<span className="notif-badge-new">Mới</span>
 						</div>
-						<a className="pc-view-all">
+						<a className="pc-view-all" onClick={handleViewAllNotifs}>
 							Xem tất cả <ArrowRightOutlined />
 						</a>
 					</div>
 					<div className="pc-card-body notif-body">
-						{NOTIFICATIONS.map((item, idx) => (
-							<NotificationItem key={idx} item={item} />
-						))}
+						{displayedNotifs.length > 0 ? (
+							displayedNotifs.map((item, idx) => (
+								<NotificationItem key={idx} item={item} />
+							))
+						) : (
+							<div style={{ textAlign: 'center', padding: '20px', color: '#6B6560' }}>
+								Không tìm thấy thông báo nào.
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
@@ -377,7 +431,7 @@ const TrangChu = () => {
 					<div className="banner-content">
 						<h3>Chăm sóc tận tâm 🐕</h3>
 						<p>Dịch vụ spa cao cấp dành riêng cho thú cưng của bạn</p>
-						<button type="button" className="banner-btn">
+						<button type="button" className="banner-btn" onClick={() => handleBannerClick('spa')}>
 							Khám phá <ArrowRightOutlined />
 						</button>
 					</div>
@@ -392,7 +446,7 @@ const TrangChu = () => {
 					<div className="banner-content">
 						<h3>Sức khỏe là trên hết 🐈</h3>
 						<p>Đội ngũ bác sĩ giàu kinh nghiệm luôn sẵn sàng 24/7</p>
-						<button type="button" className="banner-btn">
+						<button type="button" className="banner-btn" onClick={() => handleBannerClick('health')}>
 							Liên hệ ngay <ArrowRightOutlined />
 						</button>
 					</div>

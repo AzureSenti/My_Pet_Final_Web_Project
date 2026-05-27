@@ -64,6 +64,9 @@ const QuanLyLichHen: React.FC = () => {
 	const [form] = Form.useForm();
 	const [filterForm] = Form.useForm();
 
+	const [currentMonth, setCurrentMonth] = useState(10);
+	const [selectedDay, setSelectedDay] = useState(11);
+
 	// Các filter state
 	const [searchText, setSearchText] = useState('');
 	const [statusFilter, setStatusFilter] = useState('Tất cả');
@@ -99,6 +102,15 @@ const QuanLyLichHen: React.FC = () => {
 	const handleConfirmAppointment = (id: string) => {
 		setAppointments(appointments.map(ap => ap.id === id ? { ...ap, status: 'confirmed', statusText: 'Đã xác nhận' } : ap));
 		message.success('Đã xác nhận lịch hẹn thành công!');
+	};
+
+	const handleCancelAppointment = (id: string) => {
+		setAppointments(appointments.map(ap => ap.id === id ? { ...ap, status: 'cancelled', statusText: 'Hủy' } : ap));
+		message.success('Đã hủy lịch hẹn!');
+	};
+
+	const handlePlaceholder = (featureName: string) => {
+		message.info(`Chức năng "${featureName}" đang được phát triển.`);
 	};
 
 	const handleApplyFilters = (values: any) => {
@@ -299,10 +311,16 @@ const QuanLyLichHen: React.FC = () => {
 														{item.status === 'pending' ? (
 															<>
 																<button className="btn-action btn-confirm" onClick={() => handleConfirmAppointment(item.id)}>Xác nhận</button>
-																<button className="btn-action btn-text">Sửa</button>
+																<button className="btn-action btn-text" onClick={() => handlePlaceholder('Sửa lịch hẹn')}>Sửa</button>
+																<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
 															</>
 														) : (
-															<button className="btn-action btn-text">Chi tiết</button>
+															<>
+																<button className="btn-action btn-text" onClick={() => handlePlaceholder('Chi tiết lịch hẹn')}>Chi tiết</button>
+																{item.status === 'confirmed' && (
+																	<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
+																)}
+															</>
 														)}
 													</div>
 												</td>
@@ -319,10 +337,10 @@ const QuanLyLichHen: React.FC = () => {
 						{/* Widget 1: Mini Calendar */}
 						<div className="widget-card">
 							<div className="calendar-header">
-								<h3>Tháng 10, 2023</h3>
+								<h3>Tháng {currentMonth}, 2023</h3>
 								<div className="calendar-nav">
-									<button>&lt;</button>
-									<button>&gt;</button>
+									<button onClick={() => setCurrentMonth(prev => prev === 1 ? 12 : prev - 1)}>&lt;</button>
+									<button onClick={() => setCurrentMonth(prev => prev === 12 ? 1 : prev + 1)}>&gt;</button>
 								</div>
 							</div>
 							<div className="calendar-grid">
@@ -334,30 +352,22 @@ const QuanLyLichHen: React.FC = () => {
 								<div className="cal-day-header">T7</div>
 								<div className="cal-day-header">CN</div>
 								
-								{/* Placeholder days */}
-								<div className="cal-day empty"></div>
-								<div className="cal-day empty"></div>
-								<div className="cal-day empty"></div>
-								<div className="cal-day">1</div>
-								<div className="cal-day">2</div>
-								<div className="cal-day">3</div>
-								<div className="cal-day">4</div>
-								
-								<div className="cal-day">5</div>
-								<div className="cal-day">6</div>
-								<div className="cal-day">7</div>
-								<div className="cal-day">8</div>
-								<div className="cal-day">9</div>
-								<div className="cal-day">10</div>
-								<div className="cal-day active">11</div>
-								
-								<div className="cal-day">12</div>
-								<div className="cal-day">13</div>
-								<div className="cal-day">14</div>
-								<div className="cal-day">15</div>
-								<div className="cal-day">16</div>
-								<div className="cal-day">17</div>
-								<div className="cal-day">18</div>
+								{/* Dynamic days */}
+								{Array(3).fill(null).map((_, i) => (
+									<div key={`empty-${i}`} className="cal-day empty"></div>
+								))}
+								{Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+									<div 
+										key={day} 
+										className={`cal-day ${selectedDay === day ? 'active' : ''}`}
+										onClick={() => { 
+											setSelectedDay(day); 
+											message.info(`Đã chọn ngày ${day} tháng ${currentMonth}`); 
+										}}
+									>
+										{day}
+									</div>
+								))}
 							</div>
 						</div>
 

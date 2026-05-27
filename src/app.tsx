@@ -100,12 +100,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 		menuItemRender: (item, dom) => {
 			const active = history.location.pathname === item.path;
 			const getLucideIcon = (path: string) => {
-				switch(path) {
-					case '/dashboard': return <LayoutDashboard size={18} strokeWidth={1.75} />;
-					case '/quan-ly-nguoi-dung': return <Users size={18} strokeWidth={1.75} />;
-					case '/quan-ly-bac-si': return <Stethoscope size={18} strokeWidth={1.75} />;
-					case '/quan-ly-thu-cung': return <Cat size={18} strokeWidth={1.75} />;
-					case '/appointments': return <CalendarDays size={18} strokeWidth={1.75} />;
+				switch (path) {
+					case '/dashboard': return <LayoutDashboard size={20} strokeWidth={2} />;
+					case '/quan-ly-nguoi-dung': return <Users size={20} strokeWidth={2} />;
+					case '/quan-ly-bac-si': return <Stethoscope size={20} strokeWidth={2} />;
+					case '/quan-ly-thu-cung': return <Cat size={20} strokeWidth={2} />;
+					case '/appointments': return <CalendarDays size={20} strokeWidth={2} />;
 					default: return null;
 				}
 			};
@@ -146,7 +146,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				)}
 			</div>
 		),
-		menuFooterRender: undefined,
+		menuFooterRender: (props) => {
+			if (props?.collapsed) return undefined;
+			return (
+				<div style={{ padding: '0 16px 16px' }}>
+
+				</div>
+			);
+		},
 		...initialState?.settings,
 	};
 };
