@@ -6,7 +6,7 @@ import {
 	ExclamationCircleOutlined,
 	ArrowRightOutlined,
 } from '@ant-design/icons';
-import { Search, PawPrint, UserCheck, HeartPulse, UserCog, CalendarDays } from 'lucide-react';
+import { Search, PawPrint, UserCheck, HeartPulse, CalendarDays } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
 import HeaderProfile from '@/components/HeaderProfile';
