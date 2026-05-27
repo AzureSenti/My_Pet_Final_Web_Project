@@ -5,60 +5,16 @@ import '../TrangChu/components/style.less'; // Inherit base dashboard layout
 import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
-const MOCK_APPOINTMENTS = [
-	{
-		id: '1',
-		petName: 'Buddy',
-		petBreed: 'Golden Retriever',
-		petAvatar: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=150',
-		ownerName: 'Nguyễn Văn An',
-		vetName: 'Bs. Hoàng Nam',
-		service: 'Checkup',
-		time: '09:00 AM',
-		status: 'confirmed',
-		statusText: 'Đã xác nhận',
-	},
-	{
-		id: '2',
-		petName: 'Luna',
-		petBreed: 'Mèo Anh Lông Ngắn',
-		petAvatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=150',
-		ownerName: 'Trần Thị Bé',
-		vetName: 'Bs. Thanh Hằng',
-		service: 'Grooming',
-		time: '10:30 AM',
-		status: 'pending',
-		statusText: 'Chờ xác nhận',
-	},
-	{
-		id: '3',
-		petName: 'Milo',
-		petBreed: 'Poodle',
-		petAvatar: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=150',
-		ownerName: 'Lê Minh Tâm',
-		vetName: 'Bs. Quốc Bảo',
-		service: 'Vaccination',
-		time: '02:15 PM',
-		status: 'completed',
-		statusText: 'Hoàn thành',
-	},
-	{
-		id: '4',
-		petName: 'Oscar',
-		petBreed: 'Mèo Xiêm',
-		petAvatar: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&q=80&w=150',
-		ownerName: 'Nguyễn Thúy Chi',
-		vetName: 'Bs. Thanh Hằng',
-		service: 'Checkup',
-		time: '04:00 PM',
-		status: 'cancelled',
-		statusText: 'Hủy',
-	},
-];
+import { getAppointments, updateAppointmentStatus, getPets, getDoctors, getServices, createAppointment } from '@/services/QuanLyPetStore';
 
 const QuanLyLichHen: React.FC = () => {
 	const [activeTab, setActiveTab] = useState('Tất cả');
-	const [appointments, setAppointments] = useState(MOCK_APPOINTMENTS);
+	const [appointments, setAppointments] = useState<any[]>([]);
+	const [pets, setPets] = useState<any[]>([]);
+	const [vets, setVets] = useState<any[]>([]);
+	const [services, setServices] = useState<any[]>([]);
+	const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
+	const [loading, setLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 	const [form] = Form.useForm();
@@ -70,35 +26,58 @@ const QuanLyLichHen: React.FC = () => {
 	const [serviceFilter, setServiceFilter] = useState('Tất cả');
 	const [vetFilter, setVetFilter] = useState('Tất cả');
 
-	const TABS = ['Tất cả', 'Sáng', 'Chiều'];
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const [appRes, petRes, vetRes, svcRes] = await Promise.all([
+				getAppointments({
+					status: statusFilter === 'Tất cả' ? undefined : statusFilter,
+					search: searchText || undefined,
+					limit: 100
+				}),
+				getPets(),
+				getDoctors(),
+				getServices()
+			]);
 
-	const handleAddAppointment = (values: any) => {
-		const newAppointment = {
-			id: String(appointments.length + 1),
-			petName: values.petName,
-			petBreed: values.petBreed || 'Chưa xác định',
-			petAvatar: `https://images.unsplash.com/photo-${[
-				'1543466835-00a7907e9de1',
-				'1514888286974-6c03e2ca1dba',
-				'1583511655857-d19b40a7a54e',
-				'1605568427561-40dd23c2acea'
-			][Math.floor(Math.random() * 4)]}?auto=format&fit=crop&q=80&w=150`,
-			ownerName: values.ownerName,
-			vetName: values.vetName,
-			service: values.service,
-			time: values.time,
-			status: 'pending',
-			statusText: 'Chờ xác nhận',
-		};
-		setAppointments([newAppointment, ...appointments]);
-		setIsModalOpen(false);
-		form.resetFields();
-		message.success('Thêm lịch hẹn mới thành công!');
+			setAppointments(appRes.items);
+			setPets(petRes);
+			setVets(vetRes);
+			setServices(svcRes);
+
+			setStats({
+				total: appRes.total,
+				pending: appRes.items.filter((a: any) => a.status === 'pending').length,
+				completed: appRes.items.filter((a: any) => a.status === 'completed' || a.status === 'confirmed').length,
+			});
+		} catch (error) {
+			message.error('Không thể tải dữ liệu lịch hẹn');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	React.useEffect(() => {
+		fetchData();
+	}, [statusFilter, searchText]);
+
+	const handleAddAppointment = async (values: any) => {
+		const selectedPet = pets.find(p => p.id === values.pet_id);
+		const success = await createAppointment({
+			...values,
+			owner_id: selectedPet?.owner_id,
+			scheduled_at: new Date(Date.now() + 86400000).toISOString(), // Mock ngày mai
+			status: 'pending'
+		});
+		if (success) {
+			setIsModalOpen(false);
+			form.resetFields();
+			fetchData();
+		}
 	};
 
 	const handleConfirmAppointment = (id: string) => {
-		setAppointments(appointments.map(ap => ap.id === id ? { ...ap, status: 'confirmed', statusText: 'Đã xác nhận' } : ap));
-		message.success('Đã xác nhận lịch hẹn thành công!');
+		updateAppointmentStatus(id, 'confirmed').then(fetchData);
 	};
 
 	const handleApplyFilters = (values: any) => {
@@ -106,7 +85,6 @@ const QuanLyLichHen: React.FC = () => {
 		setServiceFilter(values.service || 'Tất cả');
 		setVetFilter(values.vetName || 'Tất cả');
 		setIsFilterModalOpen(false);
-		message.success('Đã áp dụng bộ lọc!');
 	};
 
 	const handleResetFilters = () => {
@@ -115,7 +93,6 @@ const QuanLyLichHen: React.FC = () => {
 		setServiceFilter('Tất cả');
 		setVetFilter('Tất cả');
 		setIsFilterModalOpen(false);
-		message.info('Đã xóa tất cả bộ lọc');
 	};
 
 	const getStatusBadge = (status: string, text: string) => {
@@ -128,6 +105,8 @@ const QuanLyLichHen: React.FC = () => {
 		}
 	};
 
+	const TABS = ['Tất cả', 'Sáng', 'Chiều'];
+
 	return (
 		<div className="petcare-dashboard appointment-dashboard">
 			{/* Top Bar matching dashboard */}
@@ -136,9 +115,9 @@ const QuanLyLichHen: React.FC = () => {
 				<div className="pc-header-center">
 					<div className="pc-header-search">
 						<Search size={18} strokeWidth={1.75} className="search-icon" />
-						<input 
-							type="text" 
-							placeholder="Tìm kiếm lịch hẹn..." 
+						<input
+							type="text"
+							placeholder="Tìm kiếm lịch hẹn..."
 							value={searchText}
 							onChange={(e) => setSearchText(e.target.value)}
 						/>
@@ -157,13 +136,9 @@ const QuanLyLichHen: React.FC = () => {
 						<p>Theo dõi và điều phối các lượt thăm khám trong ngày hôm nay.</p>
 					</div>
 					<div className="ap-action-area">
-						<button 
+						<button
 							className={`btn-outline ${(statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') ? 'active-filter' : ''}`}
 							onClick={() => setIsFilterModalOpen(true)}
-							style={{
-								borderColor: (statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') ? '#8B7355' : undefined,
-								background: (statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') ? '#F5F0E8' : undefined
-							}}
 						>
 							<Filter size={16} />
 							Lọc lịch hẹn {(statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') && '•'}
@@ -183,7 +158,7 @@ const QuanLyLichHen: React.FC = () => {
 						</div>
 						<div className="stat-info">
 							<span className="stat-label">TỔNG LỊCH HẸN HÔM NAY</span>
-							<span className="stat-value">{appointments.length}</span>
+							<span className="stat-value">{stats.total}</span>
 						</div>
 					</div>
 					<div className="stat-card">
@@ -192,7 +167,7 @@ const QuanLyLichHen: React.FC = () => {
 						</div>
 						<div className="stat-info">
 							<span className="stat-label">ĐANG CHỜ</span>
-							<span className="stat-value">{appointments.filter(a => a.status === 'pending').length}</span>
+							<span className="stat-value">{stats.pending}</span>
 						</div>
 					</div>
 					<div className="stat-card">
@@ -201,7 +176,7 @@ const QuanLyLichHen: React.FC = () => {
 						</div>
 						<div className="stat-info">
 							<span className="stat-label">ĐÃ HOÀN THÀNH</span>
-							<span className="stat-value">{appointments.filter(a => a.status === 'completed' || a.status === 'confirmed').length}</span>
+							<span className="stat-value">{stats.completed}</span>
 						</div>
 					</div>
 				</div>
@@ -213,8 +188,8 @@ const QuanLyLichHen: React.FC = () => {
 						<div className="table-card">
 							<div className="table-tabs">
 								{TABS.map(tab => (
-									<button 
-										key={tab} 
+									<button
+										key={tab}
 										className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
 										onClick={() => setActiveTab(tab)}
 									>
@@ -224,7 +199,8 @@ const QuanLyLichHen: React.FC = () => {
 							</div>
 
 							<div className="table-wrapper">
-								<table className="ap-table">
+								<div style={{ display: loading ? 'block' : 'none', textAlign: 'center', padding: '20px' }}>Đang tải...</div>
+								<table className="ap-table" style={{ opacity: loading ? 0.5 : 1 }}>
 									<thead>
 										<tr>
 											<th>THÚ CƯNG</th>
@@ -236,62 +212,32 @@ const QuanLyLichHen: React.FC = () => {
 										</tr>
 									</thead>
 									<tbody>
-										{appointments.filter(item => {
-											// 1. Lọc theo tab Sáng/Chiều
-											if (activeTab !== 'Tất cả') {
-												const isPm = item.time.toLowerCase().includes('pm');
-												if (activeTab === 'Sáng' && isPm) return false;
-												if (activeTab === 'Chiều' && !isPm) return false;
-											}
-
-											// 2. Lọc theo thanh tìm kiếm (tên thú cưng, giống thú cưng, tên chủ nuôi)
-											if (searchText) {
-												const query = searchText.toLowerCase();
-												const matchesPet = item.petName.toLowerCase().includes(query);
-												const matchesBreed = item.petBreed.toLowerCase().includes(query);
-												const matchesOwner = item.ownerName.toLowerCase().includes(query);
-												if (!matchesPet && !matchesBreed && !matchesOwner) return false;
-											}
-
-											// 3. Lọc theo trạng thái
-											if (statusFilter !== 'Tất cả' && item.status !== statusFilter) return false;
-
-											// 4. Lọc theo dịch vụ
-											if (serviceFilter !== 'Tất cả' && item.service !== serviceFilter) return false;
-
-											// 5. Lọc theo bác sĩ
-											if (vetFilter !== 'Tất cả' && item.vetName !== vetFilter) return false;
-
-											return true;
-										}).map(item => (
+										{appointments.map(item => (
 											<tr key={item.id}>
 												<td>
 													<div className="cell-pet">
-														<img src={item.petAvatar} alt={item.petName} />
+														<img src={item.pet?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150'} alt={item.pet?.name} />
 														<div>
-															<div className="pet-name">{item.petName}</div>
-															<div className="pet-breed">{item.petBreed}</div>
+															<div className="pet-name">{item.pet?.name || 'Không rõ'}</div>
+															<div className="pet-breed">{item.pet?.breed || 'Chưa rõ'}</div>
 														</div>
 													</div>
 												</td>
 												<td>
-													<span className="cell-text">{item.ownerName}</span>
+													<span className="cell-text">{item.owner?.full_name}</span>
 												</td>
 												<td>
-													<span className="cell-text">{item.vetName}</span>
+													<span className="cell-text">{item.vet?.user?.full_name}</span>
 												</td>
 												<td>
 													<div className="cell-service">
-														<div className="service-name">{item.service}</div>
-														<div className="service-time">{item.time}</div>
+														<div className="service-name">{item.service?.name}</div>
+														<div className="service-time">{new Date(item.scheduled_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
 													</div>
 												</td>
 												<td>
 													<div className="cell-status">
-														{getStatusBadge(item.status, item.statusText)}
-														{item.status === 'cancelled' && (
-															<span className="status-note">Lịch hẹn đã...</span>
-														)}
+														{getStatusBadge(item.status, item.status === 'confirmed' ? 'Đã xác nhận' : item.status === 'pending' ? 'Chờ xác nhận' : item.status === 'completed' ? 'Hoàn thành' : 'Đã hủy')}
 													</div>
 												</td>
 												<td>
@@ -333,7 +279,7 @@ const QuanLyLichHen: React.FC = () => {
 								<div className="cal-day-header">T6</div>
 								<div className="cal-day-header">T7</div>
 								<div className="cal-day-header">CN</div>
-								
+
 								{/* Placeholder days */}
 								<div className="cal-day empty"></div>
 								<div className="cal-day empty"></div>
@@ -342,7 +288,7 @@ const QuanLyLichHen: React.FC = () => {
 								<div className="cal-day">2</div>
 								<div className="cal-day">3</div>
 								<div className="cal-day">4</div>
-								
+
 								<div className="cal-day">5</div>
 								<div className="cal-day">6</div>
 								<div className="cal-day">7</div>
@@ -350,7 +296,7 @@ const QuanLyLichHen: React.FC = () => {
 								<div className="cal-day">9</div>
 								<div className="cal-day">10</div>
 								<div className="cal-day active">11</div>
-								
+
 								<div className="cal-day">12</div>
 								<div className="cal-day">13</div>
 								<div className="cal-day">14</div>
@@ -389,62 +335,49 @@ const QuanLyLichHen: React.FC = () => {
 			>
 				<Form form={form} layout="vertical" onFinish={handleAddAppointment}>
 					<Form.Item
-						name="petName"
-						label="Tên thú cưng"
-						rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
+						name="pet_id"
+						label="Thú cưng"
+						rules={[{ required: true, message: 'Vui lòng chọn thú cưng!' }]}
 					>
-						<Input placeholder="Ví dụ: Buddy, Luna" />
+						<Select placeholder="Chọn thú cưng">
+							{pets.map(pet => (
+								<Select.Option key={pet.id} value={pet.id}>
+									{pet.name} ({pet.owner_name})
+								</Select.Option>
+							))}
+						</Select>
 					</Form.Item>
 					<Form.Item
-						name="petBreed"
-						label="Giống / Loài"
-						rules={[{ required: true, message: 'Vui lòng nhập giống hoặc loài!' }]}
-					>
-						<Input placeholder="Ví dụ: Golden Retriever, Mèo Anh lông ngắn" />
-					</Form.Item>
-					<Form.Item
-						name="ownerName"
-						label="Họ và tên chủ nuôi"
-						rules={[{ required: true, message: 'Vui lòng nhập họ tên chủ nuôi!' }]}
-					>
-						<Input placeholder="Ví dụ: Nguyễn Văn An" />
-					</Form.Item>
-					<Form.Item
-						name="vetName"
+						name="vet_id"
 						label="Bác sĩ phụ trách"
 						rules={[{ required: true, message: 'Vui lòng chọn bác sĩ!' }]}
-						initialValue="Bs. Hoàng Nam"
 					>
-						<Select>
-							<Select.Option value="Bs. Hoàng Nam">Bs. Hoàng Nam</Select.Option>
-							<Select.Option value="Bs. Thanh Hằng">Bs. Thanh Hằng</Select.Option>
-							<Select.Option value="Bs. Quốc Bảo">Bs. Quốc Bảo</Select.Option>
+						<Select placeholder="Chọn bác sĩ">
+							{vets.map(vet => (
+								<Select.Option key={vet.vet_id} value={vet.vet_id}>
+									{vet.full_name} - {vet.specialization}
+								</Select.Option>
+							))}
 						</Select>
 					</Form.Item>
 					<Form.Item
-						name="service"
+						name="service_id"
 						label="Dịch vụ"
 						rules={[{ required: true, message: 'Vui lòng chọn dịch vụ!' }]}
-						initialValue="Checkup"
 					>
-						<Select>
-							<Select.Option value="Checkup">Khám tổng quát (Checkup)</Select.Option>
-							<Select.Option value="Grooming">Làm đẹp & Tắm rửa (Grooming)</Select.Option>
-							<Select.Option value="Vaccination">Tiêm phòng (Vaccination)</Select.Option>
+						<Select placeholder="Chọn dịch vụ">
+							{services.map(svc => (
+								<Select.Option key={svc.id} value={svc.id}>
+									{svc.name} - {svc.price.toLocaleString()}đ
+								</Select.Option>
+							))}
 						</Select>
 					</Form.Item>
 					<Form.Item
-						name="time"
-						label="Thời gian (Giờ hẹn)"
-						rules={[{ required: true, message: 'Vui lòng chọn hoặc nhập giờ hẹn!' }]}
-						initialValue="09:00 AM"
+						name="notes"
+						label="Ghi chú thêm"
 					>
-						<Select>
-							<Select.Option value="09:00 AM">09:00 AM (Sáng)</Select.Option>
-							<Select.Option value="10:30 AM">10:30 AM (Sáng)</Select.Option>
-							<Select.Option value="02:15 PM">02:15 PM (Chiều)</Select.Option>
-							<Select.Option value="04:00 PM">04:00 PM (Chiều)</Select.Option>
-						</Select>
+						<Input.TextArea placeholder="Ví dụ: Thú cưng bị ho, cần kiểm tra kỹ..." />
 					</Form.Item>
 				</Form>
 			</Modal>
@@ -464,9 +397,9 @@ const QuanLyLichHen: React.FC = () => {
 				]}
 				destroyOnClose
 			>
-				<Form 
-					form={filterForm} 
-					layout="vertical" 
+				<Form
+					form={filterForm}
+					layout="vertical"
 					onFinish={handleApplyFilters}
 					initialValues={{
 						status: statusFilter,
@@ -494,9 +427,9 @@ const QuanLyLichHen: React.FC = () => {
 					<Form.Item name="vetName" label="Bác sĩ phụ trách">
 						<Select>
 							<Select.Option value="Tất cả">Tất cả</Select.Option>
-							<Select.Option value="Bs. Hoàng Nam">Bs. Hoàng Nam</Select.Option>
-							<Select.Option value="Bs. Thanh Hằng">Bs. Thanh Hằng</Select.Option>
-							<Select.Option value="Bs. Quốc Bảo">Bs. Quốc Bảo</Select.Option>
+							{vets.map(v => (
+								<Select.Option key={v.vet_id} value={v.full_name}>{v.full_name}</Select.Option>
+							))}
 						</Select>
 					</Form.Item>
 				</Form>
