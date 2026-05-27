@@ -8,6 +8,9 @@ from app.api.v1 import admin as admin_router
 from app.api.v1 import pet_admin as pet_admin_router
 from app.api.v1 import vet as vet_router
 from app.api.v1 import dashboard as dashboard_router
+from app.api.v1 import doctor_appointments as doctor_appointments_router
+from app.api.v1 import doctor_medical_records as doctor_medical_records_router
+from app.api.v1 import doctor_stats as doctor_stats_router
 from app.models.user import User
 
 app = FastAPI(
@@ -46,6 +49,9 @@ app.include_router(admin_router.router, prefix="/api/v1")
 app.include_router(pet_admin_router.router, prefix="/api/v1")
 app.include_router(vet_router.router, prefix="/api/v1")
 app.include_router(dashboard_router.router, prefix="/api/v1")
+app.include_router(doctor_appointments_router.router, prefix="/api/v1")
+app.include_router(doctor_medical_records_router.router, prefix="/api/v1")
+app.include_router(doctor_stats_router.router, prefix="/api/v1")
 
 
 # ─────────────────────────── Health ───────────────────────────
