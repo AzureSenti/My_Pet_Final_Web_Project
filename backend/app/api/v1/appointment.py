@@ -22,11 +22,12 @@ async def get_appointments(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     status: Optional[AppointmentStatus] = None,
+    owner_id: Optional[uuid.UUID] = None,
     search: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
 ):
     """Danh sách tất cả lịch hẹn kèm thông tin chi tiết"""
-    return await appointment_service.list_appointments(db, page, limit, status, search)
+    return await appointment_service.list_appointments(db, page, limit, status, search, owner_id)
 
 
 @router.get("/{appointment_id}", response_model=AppointmentResponse, dependencies=[Depends(admin_only)])

@@ -11,24 +11,30 @@ const HeaderProfile: React.FC = () => {
 		localStorage.removeItem('token');
 		localStorage.removeItem('currentUser');
 		localStorage.removeItem('refreshToken');
-		
+
 		// Cập nhật state
 		setInitialState({
 			...initialState,
 			currentUser: undefined,
 		});
-		
+
 		// Chuyển về trang login
 		history.replace('/user/login');
 	};
 
-	const currentUser = initialState?.currentUser;
-	const name = currentUser?.name || currentUser?.preferred_username || 'Admin';
-	
-	// Trích xuất role từ realm_access hoặc mặc định Administrator
-	const role = currentUser?.realm_access?.roles?.[0] || 'Administrator';
-	const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
-	
+	const currentUser = initialState?.currentUser as any;
+	const name = currentUser?.full_name || currentUser?.name || 'Người dùng';
+
+	const getRoleLabel = (role: string) => {
+		switch (role) {
+			case 'admin': return 'Quản trị viên';
+			case 'vet': return 'Bác sĩ thú y';
+			case 'owner': return 'Chủ nuôi';
+			default: return role || 'Administrator';
+		}
+	};
+	const capitalizedRole = getRoleLabel(currentUser?.role);
+
 	const avatarUrl = currentUser?.picture || 'https://i.pravatar.cc/150?img=12';
 
 	const menuItems = [

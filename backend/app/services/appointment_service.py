@@ -37,6 +37,7 @@ async def list_appointments(
     limit: int = 10,
     status: Optional[AppointmentStatus] = None,
     search: Optional[str] = None,
+    owner_id: Optional[uuid.UUID] = None,
 ) -> AppointmentListResponse:
     query = _base_query()
     count_query = select(func.count()).select_from(Appointment)
@@ -44,6 +45,10 @@ async def list_appointments(
     if status:
         query = query.where(Appointment.status == status)
         count_query = count_query.where(Appointment.status == status)
+
+    if owner_id:
+        query = query.where(Appointment.owner_id == owner_id)
+        count_query = count_query.where(Appointment.owner_id == owner_id)
 
     if search:
         # Tìm kiếm theo tên thú cưng hoặc tên chủ
