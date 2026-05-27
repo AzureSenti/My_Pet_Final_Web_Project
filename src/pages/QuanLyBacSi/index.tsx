@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Modal, Form, Input, Select, message } from 'antd';
+import { Modal, Form, Input, Select, message, Button, Table, Badge, Descriptions } from 'antd';
 import {
 	Search,
 	ClipboardList,
@@ -26,6 +26,12 @@ const QuanLyBacSi: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [form] = Form.useForm();
+	const [filterForm] = Form.useForm();
+	const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+	const [specializationFilter, setSpecializationFilter] = useState('Tất cả');
+	const [isGeneralScheduleModalOpen, setIsGeneralScheduleModalOpen] = useState(false);
+	const [isManageScheduleModalOpen, setIsManageScheduleModalOpen] = useState(false);
+	const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -75,6 +81,13 @@ const QuanLyBacSi: React.FC = () => {
 	const handlePlaceholder = (featureName: string) => {
 		message.info(`Chức năng "${featureName}" đang được phát triển.`);
 	};
+
+	const displayedDoctors = doctors.filter(doc => {
+		if (specializationFilter !== 'Tất cả' && doc.specialization !== specializationFilter) {
+			return false;
+		}
+		return true;
+	});
 	return (
 		<div className="petcare-dashboard">
 			{/* Header giống trang tổng quan */}
@@ -115,10 +128,10 @@ const QuanLyBacSi: React.FC = () => {
 
 				{/* Toolbar Row */}
 				<div className="toolbar-row">
-					<button className="toolbar-btn filter" onClick={() => handlePlaceholder('Bộ lọc bác sĩ')}>
-						<Filter size={18} /> Bộ lọc bác sĩ
+					<button className="toolbar-btn filter" onClick={() => setIsFilterModalOpen(true)}>
+						<Filter size={18} /> Bộ lọc bác sĩ {specializationFilter !== 'Tất cả' ? '•' : ''}
 					</button>
-					<button className="toolbar-btn schedule" onClick={() => handlePlaceholder('Lịch trình tổng quát')}>
+					<button className="toolbar-btn schedule" onClick={() => setIsGeneralScheduleModalOpen(true)}>
 						<Calendar size={18} /> Lịch trình tổng quát
 					</button>
 				</div>
@@ -156,7 +169,7 @@ const QuanLyBacSi: React.FC = () => {
 
 				{/* 2. Lưới danh sách Bác sĩ (Doctor Cards Grid) */}
 				<div className="doctor-grid" style={{ opacity: loading ? 0.6 : 1 }}>
-					{doctors.map(doc => (
+					{displayedDoctors.map(doc => (
 						<div className={`doctor-card ${!doc.is_active ? 'pending' : ''}`} key={doc.id}>
 							{doc.is_active ? (
 								<>
@@ -167,11 +180,11 @@ const QuanLyBacSi: React.FC = () => {
 										<div className="info">
 											<h3>{doc.full_name}</h3>
 											<p className="specialty" style={{ color: '#9F1239' }}>{doc.specialization}</p>
-										</div>
-										<div style={{ position: 'absolute', top: 0, right: 0 }}>
-											<span className="badge" style={{ background: '#A7F3D0', color: '#064E3B', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>
-												Active
-											</span>
+											<div style={{ marginTop: '8px' }}>
+												<span className="badge" style={{ background: '#D1FAE5', color: '#064E3B', padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold' }}>
+													Đang hoạt động
+												</span>
+											</div>
 										</div>
 									</div>
 
@@ -191,7 +204,7 @@ const QuanLyBacSi: React.FC = () => {
 									</div>
 
 									<div className="card-footer" style={{ gap: '12px' }}>
-										<button className="btn-schedule" style={{ flex: '0 0 85%' }} onClick={() => handlePlaceholder('Quản lý lịch trình')}>
+										<button className="btn-schedule" style={{ flex: '0 0 85%' }} onClick={() => { setSelectedDoctor(doc); setIsManageScheduleModalOpen(true); }}>
 											Quản lý lịch trình
 										</button>
 										<button className="btn-icon danger" style={{ flex: '1' }} onClick={() => handleDeleteDoctor(doc.vet_id)}>
@@ -326,6 +339,111 @@ const QuanLyBacSi: React.FC = () => {
 						<Input placeholder="Tùy chọn. Để trống sẽ tự sinh ảnh ngẫu nhiên." />
 					</Form.Item>
 				</Form>
+			</Modal>
+
+			{/* Modal Bộ lọc bác sĩ */}
+			<Modal
+				title={<h3>Bộ lọc bác sĩ 🔍</h3>}
+				visible={isFilterModalOpen}
+				onCancel={() => setIsFilterModalOpen(false)}
+				footer={[
+					<Button key="reset" onClick={() => {
+						filterForm.resetFields();
+						setSpecializationFilter('Tất cả');
+						setIsFilterModalOpen(false);
+					}}>
+						Xóa bộ lọc
+					</Button>,
+					<Button key="submit" type="primary" onClick={() => filterForm.submit()}>
+						Áp dụng
+					</Button>
+				]}
+				destroyOnClose
+			>
+				<Form
+					form={filterForm}
+					layout="vertical"
+					initialValues={{ specialization: specializationFilter }}
+					onFinish={(values) => {
+						setSpecializationFilter(values.specialization || 'Tất cả');
+						setIsFilterModalOpen(false);
+					}}
+				>
+					<Form.Item name="specialization" label="Chuyên môn">
+						<Select>
+							<Select.Option value="Tất cả">Tất cả</Select.Option>
+							<Select.Option value="Nội khoa thú y">Nội khoa thú y</Select.Option>
+							<Select.Option value="Ngoại khoa & Phẫu thuật">Ngoại khoa & Phẫu thuật</Select.Option>
+							<Select.Option value="Da liễu & Dinh dưỡng">Da liễu & Dinh dưỡng</Select.Option>
+							<Select.Option value="Nha khoa">Nha khoa</Select.Option>
+						</Select>
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			{/* Modal Lịch trình tổng quát */}
+			<Modal
+				title={<h3>Lịch trình tổng quát 📅</h3>}
+				visible={isGeneralScheduleModalOpen}
+				onCancel={() => setIsGeneralScheduleModalOpen(false)}
+				footer={[
+					<Button key="close" onClick={() => setIsGeneralScheduleModalOpen(false)}>
+						Đóng
+					</Button>
+				]}
+				width={800}
+				destroyOnClose
+			>
+				<Table 
+					dataSource={doctors.filter(d => d.is_active)} 
+					rowKey="id"
+					pagination={false}
+					columns={[
+						{ title: 'Bác sĩ', dataIndex: 'full_name', key: 'full_name', render: (text) => <strong>{text}</strong> },
+						{ title: 'Chuyên môn', dataIndex: 'specialization', key: 'specialization' },
+						{ title: 'Lịch làm việc', key: 'schedule', render: () => 'Thứ 2 - Thứ 6 (08:00 - 17:00)' },
+						{ title: 'Trạng thái', key: 'status', render: () => <Badge status="success" text="Đang trực" /> }
+					]}
+				/>
+			</Modal>
+
+			{/* Modal Quản lý lịch trình cá nhân */}
+			<Modal
+				title={<h3>Quản lý lịch trình 🕒</h3>}
+				visible={isManageScheduleModalOpen}
+				onCancel={() => setIsManageScheduleModalOpen(false)}
+				footer={[
+					<Button key="close" onClick={() => setIsManageScheduleModalOpen(false)}>
+						Đóng
+					</Button>
+				]}
+				width={500}
+				destroyOnClose
+			>
+				{selectedDoctor && (
+					<div>
+						<Descriptions bordered column={1} labelStyle={{ width: '140px', fontWeight: 600 }}>
+							<Descriptions.Item label="Bác sĩ"><strong>{selectedDoctor.full_name}</strong></Descriptions.Item>
+							<Descriptions.Item label="Chuyên môn">{selectedDoctor.specialization}</Descriptions.Item>
+							<Descriptions.Item label="Lịch hiện tại">Thứ 2 - Thứ 6 (08:00 - 17:00)</Descriptions.Item>
+						</Descriptions>
+						<div style={{ marginTop: '24px', padding: '16px', background: '#F9FAFB', borderRadius: '8px' }}>
+							<h4 style={{ marginBottom: '12px' }}>Điều chỉnh ca làm việc</h4>
+							<Select style={{ width: '100%', marginBottom: '16px' }} defaultValue="full">
+								<Select.Option value="morning">Ca Sáng (08:00 - 12:00)</Select.Option>
+								<Select.Option value="afternoon">Ca Chiều (13:00 - 17:00)</Select.Option>
+								<Select.Option value="full">Cả ngày (08:00 - 17:00)</Select.Option>
+								<Select.Option value="off">Nghỉ phép</Select.Option>
+							</Select>
+							<Button type="primary" block onClick={() => { 
+								message.success(`Đã cập nhật lịch làm việc cho bác sĩ ${selectedDoctor.full_name}!`); 
+								setIsManageScheduleModalOpen(false); 
+							}}>
+								Lưu thay đổi
+							</Button>
+						</div>
+					</div>
+				)}
 			</Modal>
 		</div>
 	);

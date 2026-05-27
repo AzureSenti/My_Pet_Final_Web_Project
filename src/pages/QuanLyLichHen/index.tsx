@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
-import { Modal, Form, Input, Select, message, Button } from 'antd';
+import { Modal, Form, Input, Select, message, Button, DatePicker, Descriptions, Tag } from 'antd';
 import '../TrangChu/components/style.less'; // Inherit base dashboard layout
 import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
@@ -17,11 +17,15 @@ const QuanLyLichHen: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+	const [detailModalOpen, setDetailModalOpen] = useState(false);
+	const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 	const [form] = Form.useForm();
 	const [filterForm] = Form.useForm();
 
-	const [currentMonth, setCurrentMonth] = useState(10);
-	const [selectedDay, setSelectedDay] = useState(11);
+	const today = new Date();
+	const [currentYear, setCurrentYear] = useState(today.getFullYear());
+	const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
+	const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
 	// Các filter state
 	const [searchText, setSearchText] = useState('');
@@ -69,7 +73,7 @@ const QuanLyLichHen: React.FC = () => {
 		const success = await createAppointment({
 			...values,
 			owner_id: selectedPet?.owner_id,
-			scheduled_at: new Date(Date.now() + 86400000).toISOString(), // Mock ngày mai
+			scheduled_at: values.scheduled_at ? values.scheduled_at.toISOString() : new Date().toISOString(),
 			status: 'pending'
 		});
 		if (success) {
@@ -123,6 +127,33 @@ const QuanLyLichHen: React.FC = () => {
 	};
 
 	const TABS = ['Tất cả', 'Sáng', 'Chiều'];
+
+	const displayedAppointments = appointments.filter(app => {
+		// 1. Filter by Active Tab
+		if (activeTab !== 'Tất cả') {
+			const hour = new Date(app.scheduled_at).getHours();
+			if (activeTab === 'Sáng' && hour >= 12) return false;
+			if (activeTab === 'Chiều' && hour < 12) return false;
+		}
+
+		// 2. Filter by Date
+		if (selectedDay !== null) {
+			const appDate = new Date(app.scheduled_at);
+			if (
+				appDate.getFullYear() !== currentYear ||
+				(appDate.getMonth() + 1) !== currentMonth ||
+				appDate.getDate() !== selectedDay
+			) {
+				return false;
+			}
+		}
+		
+		return true;
+	});
+
+	const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+	const firstDayOfMonth = new Date(currentYear, currentMonth - 1, 1).getDay();
+	const emptyDaysCount = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
 	return (
 		<div className="petcare-dashboard appointment-dashboard">
@@ -229,7 +260,7 @@ const QuanLyLichHen: React.FC = () => {
 										</tr>
 									</thead>
 									<tbody>
-										{appointments.map(item => (
+										{displayedAppointments.length > 0 ? displayedAppointments.map(item => (
 											<tr key={item.id}>
 												<td>
 													<div className="cell-pet">
@@ -267,7 +298,7 @@ const QuanLyLichHen: React.FC = () => {
 															</>
 														) : (
 															<>
-																<button className="btn-action btn-text" onClick={() => handlePlaceholder('Chi tiết lịch hẹn')}>Chi tiết</button>
+																<button className="btn-action btn-text" onClick={() => { setSelectedAppointment(item); setDetailModalOpen(true); }}>Chi tiết</button>
 																{item.status === 'confirmed' && (
 																	<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
 																)}
@@ -276,7 +307,11 @@ const QuanLyLichHen: React.FC = () => {
 													</div>
 												</td>
 											</tr>
-										))}
+										)) : (
+											<tr>
+												<td colSpan={6} style={{ textAlign: 'center', padding: '40px' }}>Không có lịch hẹn nào.</td>
+											</tr>
+										)}
 									</tbody>
 								</table>
 							</div>
@@ -288,10 +323,26 @@ const QuanLyLichHen: React.FC = () => {
 						{/* Widget 1: Mini Calendar */}
 						<div className="widget-card">
 							<div className="calendar-header">
-								<h3>Tháng {currentMonth}, 2023</h3>
+								<h3>Tháng {currentMonth}, {currentYear}</h3>
 								<div className="calendar-nav">
-									<button onClick={() => setCurrentMonth(prev => prev === 1 ? 12 : prev - 1)}>&lt;</button>
-									<button onClick={() => setCurrentMonth(prev => prev === 12 ? 1 : prev + 1)}>&gt;</button>
+									<button onClick={() => {
+										if (currentMonth === 1) {
+											setCurrentMonth(12);
+											setCurrentYear(currentYear - 1);
+										} else {
+											setCurrentMonth(currentMonth - 1);
+										}
+										setSelectedDay(null);
+									}}>&lt;</button>
+									<button onClick={() => {
+										if (currentMonth === 12) {
+											setCurrentMonth(1);
+											setCurrentYear(currentYear + 1);
+										} else {
+											setCurrentMonth(currentMonth + 1);
+										}
+										setSelectedDay(null);
+									}}>&gt;</button>
 								</div>
 							</div>
 							<div className="calendar-grid">
@@ -304,17 +355,17 @@ const QuanLyLichHen: React.FC = () => {
 								<div className="cal-day-header">CN</div>
 
 								{/* Dynamic days */}
-								{Array(3).fill(null).map((_, i) => (
+								{Array(emptyDaysCount).fill(null).map((_, i) => (
 									<div key={`empty-${i}`} className="cal-day empty"></div>
 								))}
-								{Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+								{Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => (
 									<div 
 										key={day} 
 										className={`cal-day ${selectedDay === day ? 'active' : ''}`}
 										onClick={() => { 
-											setSelectedDay(day); 
-											message.info(`Đã chọn ngày ${day} tháng ${currentMonth}`); 
+											setSelectedDay(selectedDay === day ? null : day); 
 										}}
+										title={selectedDay === day ? "Bấm để bỏ chọn ngày" : `Xem lịch hẹn ngày ${day}`}
 									>
 										{day}
 									</div>
@@ -389,6 +440,13 @@ const QuanLyLichHen: React.FC = () => {
 						</Select>
 					</Form.Item>
 					<Form.Item
+						name="scheduled_at"
+						label="Ngày giờ hẹn"
+						rules={[{ required: true, message: 'Vui lòng chọn ngày giờ!' }]}
+					>
+						<DatePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: '100%' }} placeholder="Chọn ngày và giờ" />
+					</Form.Item>
+					<Form.Item
 						name="notes"
 						label="Ghi chú thêm"
 					>
@@ -448,6 +506,55 @@ const QuanLyLichHen: React.FC = () => {
 						</Select>
 					</Form.Item>
 				</Form>
+			</Modal>
+
+			{/* Modal Chi Tiết Lịch Hẹn */}
+			<Modal
+				title={<h3>Chi tiết lịch hẹn 📋</h3>}
+				visible={detailModalOpen}
+				onCancel={() => setDetailModalOpen(false)}
+				footer={[
+					<Button key="close" onClick={() => setDetailModalOpen(false)}>
+						Đóng
+					</Button>
+				]}
+				width={600}
+				destroyOnClose
+			>
+				{selectedAppointment && (
+					<Descriptions bordered column={1} labelStyle={{ width: '160px', fontWeight: 600 }}>
+						<Descriptions.Item label="Mã lịch hẹn">
+							{selectedAppointment.id.substring(0, 8).toUpperCase()}
+						</Descriptions.Item>
+						<Descriptions.Item label="Trạng thái">
+							{getStatusBadge(selectedAppointment.status, 
+								selectedAppointment.status === 'confirmed' ? 'Đã xác nhận' : 
+								selectedAppointment.status === 'pending' ? 'Chờ xác nhận' : 
+								selectedAppointment.status === 'completed' ? 'Hoàn thành' : 'Đã hủy')}
+						</Descriptions.Item>
+						<Descriptions.Item label="Thời gian">
+							{new Date(selectedAppointment.scheduled_at).toLocaleString('vi-VN')}
+						</Descriptions.Item>
+						<Descriptions.Item label="Thú cưng">
+							<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+								<img src={selectedAppointment.pet?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150'} alt="pet" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
+								<strong>{selectedAppointment.pet?.name}</strong> ({selectedAppointment.pet?.breed})
+							</div>
+						</Descriptions.Item>
+						<Descriptions.Item label="Chủ sở hữu">
+							{selectedAppointment.owner?.full_name} ({selectedAppointment.owner?.phone})
+						</Descriptions.Item>
+						<Descriptions.Item label="Bác sĩ phụ trách">
+							{selectedAppointment.vet?.user?.full_name} - {selectedAppointment.vet?.specialization}
+						</Descriptions.Item>
+						<Descriptions.Item label="Dịch vụ">
+							{selectedAppointment.service?.name} <Tag color="gold" style={{ marginLeft: 8 }}>{selectedAppointment.service?.price?.toLocaleString()}đ</Tag>
+						</Descriptions.Item>
+						<Descriptions.Item label="Ghi chú">
+							{selectedAppointment.notes || 'Không có ghi chú'}
+						</Descriptions.Item>
+					</Descriptions>
+				)}
 			</Modal>
 		</div>
 	);
