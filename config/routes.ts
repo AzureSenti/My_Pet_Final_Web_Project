@@ -54,6 +54,12 @@ export default [
 		component: './QuanLyLichHen',
 		icon: 'CalendarOutlined',
 	},
+	{
+		path: '/profile',
+		name: 'Hồ sơ cá nhân',
+		component: './HoSo',
+		hideInMenu: true,
+	},
 
 	{
 		path: '/',

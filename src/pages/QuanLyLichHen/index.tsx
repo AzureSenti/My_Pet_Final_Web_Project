@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
+import { Modal, Form, Input, Select, message, Button } from 'antd';
 import '../TrangChu/components/style.less'; // Inherit base dashboard layout
+import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
 const MOCK_APPOINTMENTS = [
@@ -56,7 +58,65 @@ const MOCK_APPOINTMENTS = [
 
 const QuanLyLichHen: React.FC = () => {
 	const [activeTab, setActiveTab] = useState('Tất cả');
+	const [appointments, setAppointments] = useState(MOCK_APPOINTMENTS);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+	const [form] = Form.useForm();
+	const [filterForm] = Form.useForm();
+
+	// Các filter state
+	const [searchText, setSearchText] = useState('');
+	const [statusFilter, setStatusFilter] = useState('Tất cả');
+	const [serviceFilter, setServiceFilter] = useState('Tất cả');
+	const [vetFilter, setVetFilter] = useState('Tất cả');
+
 	const TABS = ['Tất cả', 'Sáng', 'Chiều'];
+
+	const handleAddAppointment = (values: any) => {
+		const newAppointment = {
+			id: String(appointments.length + 1),
+			petName: values.petName,
+			petBreed: values.petBreed || 'Chưa xác định',
+			petAvatar: `https://images.unsplash.com/photo-${[
+				'1543466835-00a7907e9de1',
+				'1514888286974-6c03e2ca1dba',
+				'1583511655857-d19b40a7a54e',
+				'1605568427561-40dd23c2acea'
+			][Math.floor(Math.random() * 4)]}?auto=format&fit=crop&q=80&w=150`,
+			ownerName: values.ownerName,
+			vetName: values.vetName,
+			service: values.service,
+			time: values.time,
+			status: 'pending',
+			statusText: 'Chờ xác nhận',
+		};
+		setAppointments([newAppointment, ...appointments]);
+		setIsModalOpen(false);
+		form.resetFields();
+		message.success('Thêm lịch hẹn mới thành công!');
+	};
+
+	const handleConfirmAppointment = (id: string) => {
+		setAppointments(appointments.map(ap => ap.id === id ? { ...ap, status: 'confirmed', statusText: 'Đã xác nhận' } : ap));
+		message.success('Đã xác nhận lịch hẹn thành công!');
+	};
+
+	const handleApplyFilters = (values: any) => {
+		setStatusFilter(values.status || 'Tất cả');
+		setServiceFilter(values.service || 'Tất cả');
+		setVetFilter(values.vetName || 'Tất cả');
+		setIsFilterModalOpen(false);
+		message.success('Đã áp dụng bộ lọc!');
+	};
+
+	const handleResetFilters = () => {
+		filterForm.resetFields();
+		setStatusFilter('Tất cả');
+		setServiceFilter('Tất cả');
+		setVetFilter('Tất cả');
+		setIsFilterModalOpen(false);
+		message.info('Đã xóa tất cả bộ lọc');
+	};
 
 	const getStatusBadge = (status: string, text: string) => {
 		switch (status) {
@@ -76,19 +136,16 @@ const QuanLyLichHen: React.FC = () => {
 				<div className="pc-header-center">
 					<div className="pc-header-search">
 						<Search size={18} strokeWidth={1.75} className="search-icon" />
-						<input type="text" placeholder="Tìm kiếm lịch hẹn..." />
+						<input 
+							type="text" 
+							placeholder="Tìm kiếm lịch hẹn..." 
+							value={searchText}
+							onChange={(e) => setSearchText(e.target.value)}
+						/>
 					</div>
 				</div>
 				<div className="pc-header-actions">
-					<div className="pc-user-profile">
-						<div className="pc-user-avatar">
-							<img src="https://i.pravatar.cc/150?img=9" alt="User" />
-						</div>
-						<div className="pc-user-info">
-							<span className="pc-user-name">Admin Sarah</span>
-							<span className="pc-user-role">Manager</span>
-						</div>
-					</div>
+					<HeaderProfile />
 				</div>
 			</div>
 
@@ -100,11 +157,18 @@ const QuanLyLichHen: React.FC = () => {
 						<p>Theo dõi và điều phối các lượt thăm khám trong ngày hôm nay.</p>
 					</div>
 					<div className="ap-action-area">
-						<button className="btn-outline">
+						<button 
+							className={`btn-outline ${(statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') ? 'active-filter' : ''}`}
+							onClick={() => setIsFilterModalOpen(true)}
+							style={{
+								borderColor: (statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') ? '#8B7355' : undefined,
+								background: (statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') ? '#F5F0E8' : undefined
+							}}
+						>
 							<Filter size={16} />
-							Lọc lịch hẹn
+							Lọc lịch hẹn {(statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') && '•'}
 						</button>
-						<button className="btn-primary">
+						<button className="btn-primary" onClick={() => setIsModalOpen(true)}>
 							<Plus size={16} />
 							Thêm lịch hẹn mới
 						</button>
@@ -119,7 +183,7 @@ const QuanLyLichHen: React.FC = () => {
 						</div>
 						<div className="stat-info">
 							<span className="stat-label">TỔNG LỊCH HẸN HÔM NAY</span>
-							<span className="stat-value">24</span>
+							<span className="stat-value">{appointments.length}</span>
 						</div>
 					</div>
 					<div className="stat-card">
@@ -128,7 +192,7 @@ const QuanLyLichHen: React.FC = () => {
 						</div>
 						<div className="stat-info">
 							<span className="stat-label">ĐANG CHỜ</span>
-							<span className="stat-value">08</span>
+							<span className="stat-value">{appointments.filter(a => a.status === 'pending').length}</span>
 						</div>
 					</div>
 					<div className="stat-card">
@@ -137,7 +201,7 @@ const QuanLyLichHen: React.FC = () => {
 						</div>
 						<div className="stat-info">
 							<span className="stat-label">ĐÃ HOÀN THÀNH</span>
-							<span className="stat-value">16</span>
+							<span className="stat-value">{appointments.filter(a => a.status === 'completed' || a.status === 'confirmed').length}</span>
 						</div>
 					</div>
 				</div>
@@ -172,7 +236,34 @@ const QuanLyLichHen: React.FC = () => {
 										</tr>
 									</thead>
 									<tbody>
-										{MOCK_APPOINTMENTS.map(item => (
+										{appointments.filter(item => {
+											// 1. Lọc theo tab Sáng/Chiều
+											if (activeTab !== 'Tất cả') {
+												const isPm = item.time.toLowerCase().includes('pm');
+												if (activeTab === 'Sáng' && isPm) return false;
+												if (activeTab === 'Chiều' && !isPm) return false;
+											}
+
+											// 2. Lọc theo thanh tìm kiếm (tên thú cưng, giống thú cưng, tên chủ nuôi)
+											if (searchText) {
+												const query = searchText.toLowerCase();
+												const matchesPet = item.petName.toLowerCase().includes(query);
+												const matchesBreed = item.petBreed.toLowerCase().includes(query);
+												const matchesOwner = item.ownerName.toLowerCase().includes(query);
+												if (!matchesPet && !matchesBreed && !matchesOwner) return false;
+											}
+
+											// 3. Lọc theo trạng thái
+											if (statusFilter !== 'Tất cả' && item.status !== statusFilter) return false;
+
+											// 4. Lọc theo dịch vụ
+											if (serviceFilter !== 'Tất cả' && item.service !== serviceFilter) return false;
+
+											// 5. Lọc theo bác sĩ
+											if (vetFilter !== 'Tất cả' && item.vetName !== vetFilter) return false;
+
+											return true;
+										}).map(item => (
 											<tr key={item.id}>
 												<td>
 													<div className="cell-pet">
@@ -207,7 +298,7 @@ const QuanLyLichHen: React.FC = () => {
 													<div className="cell-actions">
 														{item.status === 'pending' ? (
 															<>
-																<button className="btn-action btn-confirm">Xác nhận</button>
+																<button className="btn-action btn-confirm" onClick={() => handleConfirmAppointment(item.id)}>Xác nhận</button>
 																<button className="btn-action btn-text">Sửa</button>
 															</>
 														) : (
@@ -282,6 +373,134 @@ const QuanLyLichHen: React.FC = () => {
 					</div>
 				</div>
 			</div>
+
+			{/* Modal Thêm lịch hẹn mới */}
+			<Modal
+				title={<h3>Thêm lịch hẹn mới 📅</h3>}
+				visible={isModalOpen}
+				onCancel={() => {
+					setIsModalOpen(false);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				okText="Lưu lại"
+				cancelText="Hủy"
+				destroyOnClose
+			>
+				<Form form={form} layout="vertical" onFinish={handleAddAppointment}>
+					<Form.Item
+						name="petName"
+						label="Tên thú cưng"
+						rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
+					>
+						<Input placeholder="Ví dụ: Buddy, Luna" />
+					</Form.Item>
+					<Form.Item
+						name="petBreed"
+						label="Giống / Loài"
+						rules={[{ required: true, message: 'Vui lòng nhập giống hoặc loài!' }]}
+					>
+						<Input placeholder="Ví dụ: Golden Retriever, Mèo Anh lông ngắn" />
+					</Form.Item>
+					<Form.Item
+						name="ownerName"
+						label="Họ và tên chủ nuôi"
+						rules={[{ required: true, message: 'Vui lòng nhập họ tên chủ nuôi!' }]}
+					>
+						<Input placeholder="Ví dụ: Nguyễn Văn An" />
+					</Form.Item>
+					<Form.Item
+						name="vetName"
+						label="Bác sĩ phụ trách"
+						rules={[{ required: true, message: 'Vui lòng chọn bác sĩ!' }]}
+						initialValue="Bs. Hoàng Nam"
+					>
+						<Select>
+							<Select.Option value="Bs. Hoàng Nam">Bs. Hoàng Nam</Select.Option>
+							<Select.Option value="Bs. Thanh Hằng">Bs. Thanh Hằng</Select.Option>
+							<Select.Option value="Bs. Quốc Bảo">Bs. Quốc Bảo</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="service"
+						label="Dịch vụ"
+						rules={[{ required: true, message: 'Vui lòng chọn dịch vụ!' }]}
+						initialValue="Checkup"
+					>
+						<Select>
+							<Select.Option value="Checkup">Khám tổng quát (Checkup)</Select.Option>
+							<Select.Option value="Grooming">Làm đẹp & Tắm rửa (Grooming)</Select.Option>
+							<Select.Option value="Vaccination">Tiêm phòng (Vaccination)</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="time"
+						label="Thời gian (Giờ hẹn)"
+						rules={[{ required: true, message: 'Vui lòng chọn hoặc nhập giờ hẹn!' }]}
+						initialValue="09:00 AM"
+					>
+						<Select>
+							<Select.Option value="09:00 AM">09:00 AM (Sáng)</Select.Option>
+							<Select.Option value="10:30 AM">10:30 AM (Sáng)</Select.Option>
+							<Select.Option value="02:15 PM">02:15 PM (Chiều)</Select.Option>
+							<Select.Option value="04:00 PM">04:00 PM (Chiều)</Select.Option>
+						</Select>
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			{/* Modal Lọc lịch hẹn */}
+			<Modal
+				title={<h3>Bộ lọc lịch hẹn 🔍</h3>}
+				visible={isFilterModalOpen}
+				onCancel={() => setIsFilterModalOpen(false)}
+				footer={[
+					<Button key="reset" onClick={handleResetFilters}>
+						Xóa bộ lọc
+					</Button>,
+					<Button key="submit" type="primary" onClick={() => filterForm.submit()}>
+						Áp dụng
+					</Button>
+				]}
+				destroyOnClose
+			>
+				<Form 
+					form={filterForm} 
+					layout="vertical" 
+					onFinish={handleApplyFilters}
+					initialValues={{
+						status: statusFilter,
+						service: serviceFilter,
+						vetName: vetFilter
+					}}
+				>
+					<Form.Item name="status" label="Trạng thái lịch hẹn">
+						<Select>
+							<Select.Option value="Tất cả">Tất cả</Select.Option>
+							<Select.Option value="pending">Chờ xác nhận (Pending)</Select.Option>
+							<Select.Option value="confirmed">Đã xác nhận (Confirmed)</Select.Option>
+							<Select.Option value="completed">Hoàn thành (Completed)</Select.Option>
+							<Select.Option value="cancelled">Đã hủy (Cancelled)</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item name="service" label="Loại dịch vụ">
+						<Select>
+							<Select.Option value="Tất cả">Tất cả</Select.Option>
+							<Select.Option value="Checkup">Khám tổng quát (Checkup)</Select.Option>
+							<Select.Option value="Grooming">Làm đẹp (Grooming)</Select.Option>
+							<Select.Option value="Vaccination">Tiêm phòng (Vaccination)</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item name="vetName" label="Bác sĩ phụ trách">
+						<Select>
+							<Select.Option value="Tất cả">Tất cả</Select.Option>
+							<Select.Option value="Bs. Hoàng Nam">Bs. Hoàng Nam</Select.Option>
+							<Select.Option value="Bs. Thanh Hằng">Bs. Thanh Hằng</Select.Option>
+							<Select.Option value="Bs. Quốc Bảo">Bs. Quốc Bảo</Select.Option>
+						</Select>
+					</Form.Item>
+				</Form>
+			</Modal>
 		</div>
 	);
 };

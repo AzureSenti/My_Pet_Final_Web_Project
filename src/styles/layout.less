@@ -7,16 +7,16 @@
 // ─── Design Tokens ────────────────────────────
 @pc-bg: #F5F2EC; // Premium warm ivory — main content
 @pc-sidebar-bg: #F0EDE6; // Sidebar — slightly deeper warm neutral
-@pc-sidebar-border: rgba(0, 0, 0, 0.06);
-@pc-text: #1C1917; // Rich warm charcoal
-@pc-text-secondary: #44403C; // Warm stone secondary
-@pc-text-muted: #A8A29E;
-@pc-olive: #3B4D43; // Dark moss green for elements
-@pc-olive-light: #78716C;
-@pc-olive-bg: rgba(120, 113, 108, 0.06);
-@pc-olive-active: #F5F0E8;
-@pc-gold: #A3865A; // Muted earthy gold
-@pc-gold-bg: #F5F0E8;
+@pc-sidebar-border: rgba(0, 0, 0, 0.08);
+@pc-text: #0D0B0A; // Near-absolute black
+@pc-text-secondary: #2A2520; // Very dark warm stone
+@pc-text-muted: #6B6560;
+@pc-olive: #2A3D33; // Deep dark moss green
+@pc-olive-light: #57524E;
+@pc-olive-bg: rgba(87, 82, 78, 0.08);
+@pc-olive-active: #F0EBE0;
+@pc-gold: #6B4E28; // Deep rich gold
+@pc-gold-bg: #F0EBE0;
 @pc-card: #FEFDFB; // Warm off-white cards
 @pc-radius: 16px;
 @pc-radius-lg: 20px;
@@ -116,8 +116,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #856D33;
-		box-shadow: 0 4px 12px rgba(133, 109, 51, 0.1);
+		color: #5C4A1E;
+		box-shadow: 0 4px 12px rgba(92, 74, 30, 0.15);
 		transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
@@ -131,7 +131,7 @@
 			font-family: 'Inter', sans-serif;
 			font-size: 22px !important;
 			font-weight: 700 !important;
-			color: #856D33 !important;
+			color: #5C4A1E !important;
 			margin: 0 !important;
 			letter-spacing: -0.5px;
 			line-height: 1;
@@ -141,7 +141,7 @@
 			font-family: 'Inter', sans-serif;
 			font-size: 13px;
 			font-weight: 500;
-			color: #6B7280;
+			color: #4A4540;
 			letter-spacing: 0.2px;
 		}
 	}
@@ -169,7 +169,7 @@
 		margin-top: 0 !important;
 		padding: 0 16px !important;
 		border-radius: 999px !important;
-		color: #6B7280;
+		color: #4A4540;
 		font-weight: 500;
 		font-size: 15px;
 		transition: @pc-transition;
@@ -204,7 +204,7 @@
 		background: @pc-gold !important;
 		color: #FFFFFF !important;
 		font-weight: 700;
-		box-shadow: 0 4px 16px rgba(163, 134, 90, 0.2);
+		box-shadow: 0 4px 16px rgba(107, 78, 40, 0.25);
 
 		&:hover {
 			background: darken(@pc-gold, 5%) !important;
@@ -293,8 +293,8 @@
 	}
 
 	&.logout {
-		color: #D97706;
-		.anticon { color: #D97706; }
+		color: #B45309;
+		.anticon { color: #B45309; }
 		&:hover { background: #FEF3C7; }
 	}
 }

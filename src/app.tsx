@@ -10,7 +10,7 @@ import NotAccessible from './pages/exception/403';
 import NotFoundContent from './pages/exception/404';
 import type { IInitialState } from './services/base/typing';
 import './styles/global.less';
-import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, LogOut, Plus, PawPrint } from 'lucide-react';
+import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, PawPrint } from 'lucide-react';
 // currentRole đã được loại bỏ cùng với Keycloak auth
 
 /**  loading */
@@ -146,34 +146,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				)}
 			</div>
 		),
-		menuFooterRender: (props: any) => {
-			const handleLogout = () => {
-				localStorage.removeItem('token');
-				localStorage.removeItem('currentUser');
-				history.replace('/user/login');
-			};
-			return (
-				<div style={{ padding: props?.collapsed ? '0 8px 24px' : '0 16px 24px' }}>
-					<div className="sidebar-footer-menu" style={{ padding: props?.collapsed ? '0' : '0 8px' }}>
-						<button 
-							type="button" 
-							className="sidebar-footer-item logout" 
-							onClick={handleLogout}
-							style={{ 
-								display: 'flex', alignItems: 'center', justifyContent: props?.collapsed ? 'center' : 'flex-start', gap: '12px', 
-								width: '100%', background: 'transparent', border: 'none', 
-								color: '#1A1A1A', fontWeight: 500, fontSize: '14px', cursor: 'pointer',
-								padding: '8px 0', opacity: 0.7, transition: 'all 0.2s'
-							}}
-							onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
-							onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
-						>
-							<LogOut size={18} strokeWidth={1.75} style={{ flexShrink: 0 }} /> {!props?.collapsed && <span>Đăng xuất</span>}
-						</button>
-					</div>
-				</div>
-			);
-		},
+		menuFooterRender: undefined,
 		...initialState?.settings,
 	};
 };
