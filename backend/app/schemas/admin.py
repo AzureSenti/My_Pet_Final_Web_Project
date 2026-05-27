@@ -10,7 +10,7 @@ class UserAdminResponse(BaseModel):
     id: uuid.UUID
     full_name: str
     email: EmailStr
-    phone: Optional[str]
+    phone: Optional[str] = None
     role: UserRole
     is_active: bool
     created_at: datetime

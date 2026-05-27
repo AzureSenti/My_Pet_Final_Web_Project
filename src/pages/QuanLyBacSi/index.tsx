@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Modal, Form, Input, Select, message } from 'antd';
-import { 
-	Search, 
-	ClipboardList, 
-	Clock, 
-	ShieldCheck, 
-	Asterisk, 
-	Filter, 
+import {
+	Search,
+	ClipboardList,
+	Clock,
+	ShieldCheck,
+	Asterisk,
+	Filter,
 	Calendar,
 	Award,
 	GraduationCap,
@@ -19,63 +19,52 @@ import '../TrangChu/components/style.less'; // Import pc-header styles
 import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
-const INITIAL_DOCTORS = [
-	{
-		id: '1',
-		name: 'Dr. Elena Rodriguez',
-		specialty: 'Feline Specialist',
-		status: 'Active',
-		experience: '8 năm kinh nghiệm',
-		scheduleOrSchool: 'Thứ 2, 4, 6 (9am - 5pm)',
-		badges: ['Phẫu thuật', 'Dinh dưỡng'],
-		avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=150'
-	},
-	{
-		id: '2',
-		name: 'Dr. Julian Moore',
-		specialty: 'Exotic Pets Expert',
-		status: 'Pending',
-		experience: '3 năm kinh nghiệm',
-		scheduleOrSchool: 'Đại học Thú y UC Davis',
-		avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150'
-	}
-];
+import { getDoctors, deleteDoctor, toggleDoctorStatus, createDoctor } from '@/services/QuanLyPetStore';
 
 const QuanLyBacSi: React.FC = () => {
-	const [doctors, setDoctors] = useState(INITIAL_DOCTORS);
+	const [doctors, setDoctors] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [form] = Form.useForm();
 
-	const handleAddDoctor = (values: any) => {
-		const newDoc = {
-			id: String(doctors.length + 1),
-			name: values.name,
-			specialty: values.specialty,
-			status: values.status,
-			experience: `${values.experience} năm kinh nghiệm`,
-			scheduleOrSchool: values.scheduleOrSchool,
-			badges: values.badges ? values.badges.split(',').map((b: string) => b.trim()).filter(Boolean) : [],
-			avatar: values.avatar || `https://images.unsplash.com/photo-${[
-				'1584515979956-d9f6e5d09982',
-				'1559839734-2b71ea197ec2',
-				'1622253692010-333f2da6031d',
-				'1612349317150-e413f6a5b16d'
-			][Math.floor(Math.random() * 4)]}?auto=format&fit=crop&q=80&w=150`
-		};
-		setDoctors([...doctors, newDoc]);
-		setIsModalOpen(false);
-		form.resetFields();
-		message.success('Thêm bác sĩ mới thành công!');
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const data = await getDoctors();
+			setDoctors(data);
+		} catch (error) {
+			message.error('Không thể tải danh sách bác sĩ');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	React.useEffect(() => {
+		fetchData();
+	}, []);
+
+	const handleAddDoctor = async (values: any) => {
+		const success = await createDoctor({
+			full_name: values.full_name,
+			email: values.email,
+			password: 'VetPassword123@',
+			specialization: values.specialization,
+			bio: values.scheduleOrSchool,
+			certificate_url: values.avatar || '',
+		});
+		if (success) {
+			setIsModalOpen(false);
+			form.resetFields();
+			fetchData();
+		}
 	};
 
 	const handleDeleteDoctor = (id: string) => {
-		setDoctors(doctors.filter(d => d.id !== id));
-		message.success('Đã xóa bác sĩ!');
+		deleteDoctor(id).then(fetchData);
 	};
 
 	const handleApproveDoctor = (id: string) => {
-		setDoctors(doctors.map(d => d.id === id ? { ...d, status: 'Active' } : d));
-		message.success('Đã duyệt hồ sơ bác sĩ!');
+		toggleDoctorStatus(id).then(fetchData);
 	};
 	return (
 		<div className="petcare-dashboard">
@@ -138,7 +127,7 @@ const QuanLyBacSi: React.FC = () => {
 							<Clock size={24} color="#D97706" style={{ position: 'absolute', bottom: -5, right: -5, background: '#FFF', borderRadius: '50%' }} />
 						</div>
 					</div>
-					
+
 					<div className="metric-card active-doctors">
 						<div className="icon-top" style={{ color: '#10B981', background: '#D1FAE5', padding: '8px', borderRadius: '50%', display: 'inline-flex' }}>
 							<ShieldCheck size={24} />
@@ -157,18 +146,18 @@ const QuanLyBacSi: React.FC = () => {
 				</div>
 
 				{/* 2. Lưới danh sách Bác sĩ (Doctor Cards Grid) */}
-				<div className="doctor-grid">
+				<div className="doctor-grid" style={{ opacity: loading ? 0.6 : 1 }}>
 					{doctors.map(doc => (
-						<div className={`doctor-card ${doc.status === 'Pending' ? 'pending' : ''}`} key={doc.id}>
-							{doc.status === 'Active' ? (
+						<div className={`doctor-card ${!doc.is_active ? 'pending' : ''}`} key={doc.id}>
+							{doc.is_active ? (
 								<>
 									<div className="card-header">
 										<div className="avatar-wrapper">
-											<img src={doc.avatar} alt="Avatar" className="avatar-img" />
+											<img src={doc.avatar_url || 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=150'} alt="Avatar" className="avatar-img" />
 										</div>
 										<div className="info">
-											<h3>{doc.name}</h3>
-											<p className="specialty" style={{ color: '#9F1239' }}>{doc.specialty}</p>
+											<h3>{doc.full_name}</h3>
+											<p className="specialty" style={{ color: '#9F1239' }}>{doc.specialization}</p>
 										</div>
 										<div style={{ position: 'absolute', top: 0, right: 0 }}>
 											<span className="badge" style={{ background: '#A7F3D0', color: '#064E3B', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>
@@ -180,26 +169,23 @@ const QuanLyBacSi: React.FC = () => {
 									<div className="card-body">
 										<div className="info-row">
 											<Award size={18} className="icon" />
-											<span>{doc.experience}</span>
+											<span>5 năm kinh nghiệm</span>
 										</div>
 										<div className="info-row">
 											<Calendar size={18} className="icon" />
-											<span>{doc.scheduleOrSchool}</span>
+											<span>Thứ 2 - Thứ 6</span>
 										</div>
-										{doc.badges && doc.badges.length > 0 && (
-											<div className="badges" style={{ marginTop: '8px' }}>
-												{doc.badges.map((badge, idx) => (
-													<span key={idx} className="badge">{badge}</span>
-												))}
-											</div>
-										)}
+										<div className="badges" style={{ marginTop: '8px' }}>
+											<span className="badge">Chỉnh hình</span>
+											<span className="badge">Nội khoa</span>
+										</div>
 									</div>
 
 									<div className="card-footer" style={{ gap: '12px' }}>
 										<button className="btn-schedule" style={{ flex: '0 0 85%' }}>
 											Quản lý lịch trình
 										</button>
-										<button className="btn-icon danger" style={{ flex: '1' }} onClick={() => handleDeleteDoctor(doc.id)}>
+										<button className="btn-icon danger" style={{ flex: '1' }} onClick={() => handleDeleteDoctor(doc.vet_id)}>
 											<DeleteOutlined />
 										</button>
 									</div>
@@ -208,27 +194,27 @@ const QuanLyBacSi: React.FC = () => {
 								<>
 									<div className="card-header">
 										<div className="avatar-wrapper">
-											<img src={doc.avatar} alt="Avatar" className="avatar-img" />
+											<img src={doc.avatar_url || 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150'} alt="Avatar" className="avatar-img" />
 										</div>
 										<div className="info">
-											<h3>{doc.name}</h3>
-											<p className="specialty" style={{ color: '#3D3835' }}>{doc.specialty}</p>
+											<h3>{doc.full_name}</h3>
+											<p className="specialty" style={{ color: '#3D3835' }}>{doc.specialization}</p>
 										</div>
 									</div>
 
 									<div className="card-body">
 										<div className="info-row">
 											<Award size={18} className="icon" />
-											<span>{doc.experience}</span>
+											<span>Chờ cập nhật</span>
 										</div>
 										<div className="info-row">
 											<GraduationCap size={18} className="icon" />
-											<span>{doc.scheduleOrSchool}</span>
+											<span>Hồ sơ đang xét duyệt</span>
 										</div>
 									</div>
 
 									<div className="card-footer" style={{ flexDirection: 'column', gap: '0' }}>
-										<button className="btn-approve" onClick={() => handleApproveDoctor(doc.id)}>
+										<button className="btn-approve" onClick={() => handleApproveDoctor(doc.vet_id)}>
 											Duyệt hồ sơ
 										</button>
 										<span className="pending-link">
@@ -265,23 +251,33 @@ const QuanLyBacSi: React.FC = () => {
 			>
 				<Form form={form} layout="vertical" onFinish={handleAddDoctor}>
 					<Form.Item
-						name="name"
+						name="full_name"
 						label="Họ và tên bác sĩ"
 						rules={[{ required: true, message: 'Vui lòng nhập họ và tên bác sĩ!' }]}
 					>
 						<Input placeholder="Ví dụ: Dr. Nguyễn Văn A" />
 					</Form.Item>
 					<Form.Item
-						name="specialty"
+						name="email"
+						label="Địa chỉ Email"
+						rules={[
+							{ required: true, message: 'Vui lòng nhập email!' },
+							{ type: 'email', message: 'Email không hợp lệ!' }
+						]}
+					>
+						<Input placeholder="vet@mypet.dev" />
+					</Form.Item>
+					<Form.Item
+						name="specialization"
 						label="Chuyên môn"
 						rules={[{ required: true, message: 'Vui lòng chọn chuyên môn!' }]}
-						initialValue="General Vet"
+						initialValue="Nội khoa thú y"
 					>
 						<Select>
-							<Select.Option value="General Vet">General Vet (Đa khoa)</Select.Option>
-							<Select.Option value="Feline Specialist">Feline Specialist (Chuyên mèo)</Select.Option>
-							<Select.Option value="Exotic Pets Expert">Exotic Pets Expert (Thú lạ)</Select.Option>
-							<Select.Option value="Dental Surgeon">Dental Surgeon (Nha khoa)</Select.Option>
+							<Select.Option value="Nội khoa thú y">Nội khoa thú y</Select.Option>
+							<Select.Option value="Ngoại khoa & Phẫu thuật">Ngoại khoa & Phẫu thuật</Select.Option>
+							<Select.Option value="Da liễu & Dinh dưỡng">Da liễu & Dinh dưỡng</Select.Option>
+							<Select.Option value="Nha khoa">Nha khoa</Select.Option>
 						</Select>
 					</Form.Item>
 					<Form.Item

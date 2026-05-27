@@ -12,6 +12,8 @@ import type { IInitialState } from './services/base/typing';
 import './styles/global.less';
 import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, PawPrint } from 'lucide-react';
 // currentRole đã được loại bỏ cùng với Keycloak auth
+import axios from '@/utils/axios';
+import { ip3 } from '@/utils/ip';
 
 /**  loading */
 export const initialStateConfig = {
@@ -23,22 +25,24 @@ export const initialStateConfig = {
  * // Tobe removed
  * */
 export async function getInitialState(): Promise<IInitialState> {
+	const fetchUserInfo = async () => {
+		try {
+			const token = localStorage.getItem('token');
+			if (!token) return undefined;
+
+			const res = await axios.get(`${ip3}api/v1/auth/me`, {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+			return res.data;
+		} catch (error) {
+			return undefined;
+		}
+	};
+
+	const currentUser = await fetchUserInfo();
 	return {
 		permissionLoading: false,
-		currentUser: {
-			sub: 'mock-id-123',
-			ssoId: 'mock-id-123',
-			email: 'admin@gmail.com',
-			email_verified: true,
-			realm_access: {
-				roles: ['admin'],
-			},
-			name: 'Admin Mock',
-			preferred_username: 'admin',
-			given_name: 'Admin',
-			family_name: 'Mock',
-			picture: 'https://i.pravatar.cc/150?img=12',
-		},
+		currentUser: currentUser,
 	};
 }
 
@@ -100,7 +104,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 		menuItemRender: (item, dom) => {
 			const active = history.location.pathname === item.path;
 			const getLucideIcon = (path: string) => {
-				switch(path) {
+				switch (path) {
 					case '/dashboard': return <LayoutDashboard size={18} strokeWidth={1.75} />;
 					case '/quan-ly-nguoi-dung': return <Users size={18} strokeWidth={1.75} />;
 					case '/quan-ly-bac-si': return <Stethoscope size={18} strokeWidth={1.75} />;

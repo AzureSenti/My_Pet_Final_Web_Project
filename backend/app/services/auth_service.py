@@ -31,6 +31,8 @@ from app.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
     TokenResponse,
+    UserOut,
+    UserUpdate,
 )
 
 
@@ -58,7 +60,7 @@ async def register_user(data: RegisterRequest, db: AsyncSession) -> RegisterResp
         is_active=True,
     )
     db.add(user)
-    await db.flush()   # lấy generated id trước khi commit
+    await db.commit()
     await db.refresh(user)
 
     return RegisterResponse.model_validate(user)
@@ -160,3 +162,20 @@ async def logout_user(refresh_token: str, db: AsyncSession) -> dict:
         rt.revoked = True
 
     return {"detail": "Đăng xuất thành công"}
+
+
+async def update_user_profile(db: AsyncSession, user: User, data: UserUpdate) -> User:
+    """
+    Cập nhật thông tin cá nhân.
+    """
+    if data.full_name is not None:
+        user.full_name = data.full_name
+    if data.phone is not None:
+        user.phone = data.phone
+    if data.password is not None:
+        user.password_hash = hash_password(data.password)
+
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
