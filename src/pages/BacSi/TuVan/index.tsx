@@ -7,6 +7,8 @@ const { Title, Text } = Typography;
 
 type ConsultStatus = 'cho-phan-hoi' | 'da-phan-hoi';
 
+import { history } from 'umi';
+
 interface Consultation {
   id: number;
   title: string;
@@ -141,7 +143,7 @@ const TuVan: React.FC = () => {
               {consult.status === 'cho-phan-hoi' ? (
                 <>
                   <Button variant="outlined" size="small" className={styles.btnViewRecord}>Xem hồ sơ bệnh án</Button>
-                  <Button type="primary" size="small" icon={<MessageOutlined />} className={styles.btnReply}>
+                  <Button type="primary" size="small" icon={<MessageOutlined />} className={styles.btnReply} onClick={() => history.push('/bac-si/tu-van/phan-hoi')}>
                     Phản hồi
                   </Button>
                 </>
@@ -151,7 +153,7 @@ const TuVan: React.FC = () => {
             {/* Urgent floating button */}
             {consult.isUrgent && (
               <div className={styles.urgentAction}>
-                <Button type="primary" danger size="middle" icon={<MessageOutlined />} className={styles.btnReplyNow}>
+                <Button type="primary" danger size="middle" icon={<MessageOutlined />} className={styles.btnReplyNow} onClick={() => history.push('/bac-si/tu-van/phan-hoi')}>
                   ↑ Phản hồi ngay
                 </Button>
               </div>

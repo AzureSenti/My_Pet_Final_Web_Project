@@ -41,9 +41,45 @@ export default [
 				wrappers: ['@/wrappers/VetAuth'],
 			},
 			{
+				path: '/bac-si/lich-hen/kham-moi',
+				layout: false,
+				component: './BacSi/LichHen/KhamMoi',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/lich-hen/benh-an',
+				layout: false,
+				component: './BacSi/LichHen/BenhAn',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/thong-bao',
+				layout: false,
+				component: './BacSi/ThongBao',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
 				path: '/bac-si/tu-van',
 				layout: false,
 				component: './BacSi/TuVan',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/tu-van/phan-hoi',
+				layout: false,
+				component: './BacSi/TuVan/PhanHoi',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/ho-so',
+				layout: false,
+				component: './BacSi/HoSo',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/ho-so/chinh-sua',
+				layout: false,
+				component: './BacSi/HoSo/Edit',
 				wrappers: ['@/wrappers/VetAuth'],
 			},
 			{

@@ -11,10 +11,13 @@ import React, { useState } from 'react';
 import { history, useModel } from 'umi';
 import styles from './index.module.less';
 
+import { UserOutlined } from '@ant-design/icons';
+
 const menuItems = [
   { key: '/bac-si/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
   { key: '/bac-si/lich-hen',  label: 'Lịch hẹn',  icon: <CalendarOutlined /> },
   { key: '/bac-si/tu-van',    label: 'Tư vấn',    icon: <MessageOutlined /> },
+  { key: '/bac-si/ho-so',     label: 'Hồ sơ',     icon: <UserOutlined /> },
 ];
 
 interface VetLayoutProps {
@@ -105,7 +108,12 @@ const VetLayout: React.FC<VetLayoutProps> = ({ children, location }) => {
           </div>
           <div className={styles.headerRight}>
             <Badge count={2} size="small">
-              <button className={styles.iconBtn}>🔔</button>
+              <button 
+                className={styles.iconBtn}
+                onClick={() => history.push('/bac-si/thong-bao')}
+              >
+                🔔
+              </button>
             </Badge>
             <button className={styles.iconBtn}>💬</button>
             <Dropdown overlay={userMenu} placement="bottomRight" trigger={['click']}>
