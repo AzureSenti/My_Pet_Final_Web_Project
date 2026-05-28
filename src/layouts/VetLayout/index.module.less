@@ -1,20 +1,19 @@
 // ============================================
-// 🐾 VetLayout — EXACT match PetCare Admin Sidebar
+// 🐾 VetLayout — NEW Color Palette (Manrope)
 // ============================================
 
-@pc-bg: #FFF8F2;
+@pc-bg: #F4EBD9; // Tertiary
 @pc-card: #FFFFFF;
-@pc-text: #4A3F35;
-@pc-text-secondary: #7D6E5D;
-@pc-text-muted: #9E9385;
-@pc-border: #E3D9CB;
-@pc-primary: #8B7355;
-@pc-olive-light: #FCE38A;
-@pc-olive-bg: #FFF3CD;
-@sidebar-bg: #FFF8F2;
+@pc-text: #2D2C28; // Dark text
+@pc-text-secondary: #706F6C; // Neutral
+@pc-text-muted: #A3A19C; 
+@pc-border: #E0D6C8; // Darker beige for borders
+@pc-primary: #7A631B; // Primary
+@pc-secondary: #135D54; // Secondary
+@sidebar-bg: #F4EBD9;
 @sidebar-width: 250px;
 @sidebar-collapsed: 64px;
-@header-h: 56px;
+@header-h: 60px;
 @radius-lg: 16px;
 @shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
 @transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -23,7 +22,7 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Manrope', sans-serif;
   background: @pc-bg;
 }
 
@@ -39,23 +38,21 @@
   position: relative;
   z-index: 10;
   border-right: 1px solid @pc-border;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
 }
 
 .collapsed {
   width: @sidebar-collapsed;
 }
 
-// Brand - match admin's pc-sidebar-brand
+// Brand
 .brand {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 28px 16px 20px;
+  padding: 32px 24px 24px;
   cursor: pointer;
-  gap: 10px;
-  border-bottom: 1px solid @pc-border;
+  gap: 6px;
   transition: @transition;
 
   &.brandCollapsed {
@@ -65,51 +62,17 @@
   }
 }
 
-.brandIcon {
-  width: 64px;
-  height: 64px;
-  background: #FEF9E7;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5C4A1E;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(92, 74, 30, 0.15);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-  &:hover {
-    transform: scale(1.06) translateY(-2px);
-    box-shadow: 0 12px 28px rgba(133, 109, 51, 0.15);
-  }
-}
-
-.brandIconSmall {
-  width: 44px;
-  height: 44px;
-  background: #FEF9E7;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5C4A1E;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(92, 74, 30, 0.12);
-}
-
 .brandText {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 2px;
-  text-align: center;
 }
 
 .brandName {
   display: block;
-  color: @pc-text;
-  font-size: 20px;
-  font-weight: 700;
+  color: @pc-primary;
+  font-size: 22px;
+  font-weight: 800;
   white-space: nowrap;
   letter-spacing: -0.5px;
   line-height: 1;
@@ -123,10 +86,10 @@
   font-weight: 600;
 }
 
-// Nav - match admin's ant-menu-item style
+// Nav
 .nav {
   flex: 1;
-  padding: 8px 12px;
+  padding: 8px 16px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -142,23 +105,23 @@
 .navItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   height: 48px;
   padding: 0 16px;
-  border-radius: 9999px;
+  border-radius: 12px;
   color: @pc-text-secondary !important;
   font-size: 15px;
   font-weight: 600;
   text-decoration: none !important;
   transition: @transition;
   white-space: nowrap;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   position: relative;
   overflow: hidden;
 
   &:hover {
-    color: @pc-text !important;
-    background: rgba(0, 0, 0, 0.04);
+    color: @pc-primary !important;
+    background: rgba(122, 99, 27, 0.08);
   }
 
   &::after {
@@ -167,18 +130,19 @@
 }
 
 .navActive {
-  background: @pc-olive-light !important;
-  color: @pc-text !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2);
+  background: #FCE38A !important;
+  color: #2D2C28 !important;
+  font-weight: 800 !important;
+  box-shadow: none;
 
   &:hover {
-    background: darken(@pc-olive-light, 3%) !important;
+    background: darken(#FCE38A, 5%) !important;
+    color: #2D2C28 !important;
   }
 }
 
 .navIcon {
-  font-size: 16px;
+  font-size: 18px;
   flex-shrink: 0;
   width: 20px;
   text-align: center;
@@ -189,10 +153,34 @@
   text-overflow: ellipsis;
 }
 
-// Sidebar footer - match admin's sidebar-footer-item
+// Add Appointment Button (from image)
+.btnAddAppointment {
+  margin: auto 16px 20px;
+  background: @pc-primary;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: @transition;
+  box-shadow: 0 4px 12px rgba(122, 99, 27, 0.2);
+
+  &:hover {
+    background: darken(@pc-primary, 5%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(122, 99, 27, 0.3);
+  }
+}
+
+// Sidebar footer
 .sidebarFooter {
-  padding: 12px;
-  border-top: 1px solid @pc-border;
+  padding: 12px 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -201,8 +189,8 @@
 .footerItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 12px;
+  padding: 12px 16px;
   border-radius: 12px;
   color: @pc-text-secondary !important;
   font-size: 14px;
@@ -216,25 +204,12 @@
   width: 100%;
 
   &:hover {
-    background: @pc-olive-bg;
+    background: rgba(0,0,0,0.04);
     color: @pc-text !important;
   }
 
   &::after {
     display: none !important;
-  }
-}
-
-.footerLogout {
-  color: #B45309 !important;
-
-  .footerIcon {
-    color: #B45309;
-  }
-
-  &:hover {
-    background: #FEF3C7;
-    color: #92400E !important;
   }
 }
 
@@ -244,46 +219,48 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: @pc-bg;
+  background: #FEFCF8; // Slightly lighter than sidebar for contrast
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.02);
+  margin: 12px 12px 12px 0;
 }
 
 // Header
 .header {
   height: @header-h;
-  background: @pc-card;
-  border-bottom: 1px solid @pc-border;
+  background: transparent;
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 32px;
   gap: 16px;
   flex-shrink: 0;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  margin-top: 16px;
 }
 
 .headerSearch {
   flex: 1;
-  max-width: 480px;
+  max-width: 400px;
   background: @pc-bg;
-  border-radius: 9999px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  border: 1px solid transparent;
   display: flex;
   align-items: center;
   height: 44px;
-  padding: 0 20px;
+  padding: 0 16px;
   transition: @transition;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
 
   &:focus-within {
-    border-color: #D4A017;
-    box-shadow: 0 0 0 3px rgba(163, 134, 90, 0.08);
-    background: #FEFDFB;
+    border-color: @pc-primary;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(122, 99, 27, 0.08);
   }
 
   :global(.ant-input) {
     background: transparent !important;
     font-size: 14px;
     color: @pc-text;
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'Manrope', sans-serif;
 
     &::placeholder {
       color: @pc-text-muted;
@@ -299,15 +276,15 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-left: auto;
 }
 
 .iconBtn {
   width: 40px;
   height: 40px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: #FEFDFB;
+  border: none;
+  background: @pc-bg;
   border-radius: 50%;
   cursor: pointer;
   font-size: 18px;
@@ -318,9 +295,8 @@
   color: @pc-text-secondary;
 
   &:hover {
-    background: @pc-olive-light;
-    color: @pc-text;
-    border-color: @pc-olive-light;
+    background: @pc-primary;
+    color: #fff;
   }
 }
 
@@ -329,24 +305,25 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px;
   border-radius: 9999px;
   transition: @transition;
 
   &:hover {
-    background: @pc-bg;
+    opacity: 0.8;
   }
 }
 
 .userAvatar {
-  border: 2px solid #FFFFFF !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .userInfo {
   display: flex;
   flex-direction: column;
-  text-align: left;
+  text-align: right;
+  margin-right: 8px;
 }
 
 .userName {
@@ -356,17 +333,10 @@
   line-height: 1.2;
 }
 
-.userRole {
-  font-size: 12px;
-  color: @pc-text-secondary;
-  line-height: 1.2;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
 // Content area
 .content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 16px 32px 32px;
 }
