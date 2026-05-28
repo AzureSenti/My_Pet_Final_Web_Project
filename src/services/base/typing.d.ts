@@ -3,27 +3,16 @@ import type { EModuleKey, EScopeFile, ESettingKey, EStorageFile } from './consta
 
 declare module Login {
 	export interface IUser {
-		sub: string; // SsoId 'b323b6c8-2f1e-4a9b-941b-f1e466b9ba40';
-		ssoId: string;
+		id: string;
+		full_name: string;
 		email: string;
-		email_verified: boolean; // true;
-		realm_access: {
-			roles: string[];
-			//  [
-			// 	'QUAN_TRI_VIEN',
-			// 	'strapi.super_admin',
-			// 	'strapi.Editor',
-			// 	'offline_access',
-			// 	'admin',
-			// 	'uma_authorization',
-			// 	'default-roles-vwa',
-			// ];
-		};
-		name: string; // 'Administrator';
-		preferred_username: string; // 'admin';
-		given_name: string; // 'Administrator';
-		family_name: string; // '';
-		picture: string; // 'https://images2.thanhnien.vn/528068263637045248/2023/10/14/ronaldo-1697254043939678025874.jpeg';
+		phone?: string;
+		role: string; // 'owner' | 'vet' | 'admin'
+		is_active: boolean;
+		created_at: string;
+		// Legacy fields (kept for backward compatibility)
+		name?: string;
+		picture?: string;
 	}
 
 	export interface IPermission {

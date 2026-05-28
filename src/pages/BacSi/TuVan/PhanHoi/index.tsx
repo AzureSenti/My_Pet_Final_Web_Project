@@ -1,14 +1,101 @@
-import React from 'react';
-import { history, Link } from 'umi';
+import React, { useEffect, useState, useRef } from 'react';
+import { history, Link, useLocation, useModel } from 'umi';
+import { Spin, message as antMessage } from 'antd';
 import { 
-  ArrowLeftOutlined, EditOutlined, DownOutlined,
+  ArrowLeftOutlined, EditOutlined,
   BoldOutlined, ItalicOutlined, UnorderedListOutlined,
   PaperClipOutlined, PictureOutlined, LinkOutlined,
-  SendOutlined, MedicineBoxOutlined, FileSearchOutlined
+  SendOutlined
 } from '@ant-design/icons';
+import {
+  getConversationDetail,
+  getConversationMessages,
+  sendMessage,
+} from '@/services/BacSi/doctorService';
 import styles from './index.module.less';
 
 const PhanHoi: React.FC = () => {
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const conversationId = query.get('id');
+
+  const { initialState } = useModel('@@initialState');
+  const currentUserId = initialState?.currentUser?.id;
+
+  const [conversation, setConversation] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const fetchData = async () => {
+    if (!conversationId) {
+      antMessage.error('Không tìm thấy ID cuộc trò chuyện');
+      return;
+    }
+    try {
+      setLoading(true);
+      const [convData, msgData] = await Promise.all([
+        getConversationDetail(conversationId),
+        getConversationMessages(conversationId, 1, 100),
+      ]);
+      setConversation(convData);
+      setMessages(msgData.items || []);
+    } catch (error) {
+      console.error('Lỗi khi tải cuộc trò chuyện:', error);
+      antMessage.error('Lỗi khi tải dữ liệu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [conversationId]);
+
+  const handleSend = async () => {
+    if (!conversationId || !replyText.trim()) {
+      antMessage.warning('Vui lòng nhập nội dung phản hồi');
+      return;
+    }
+    try {
+      setSending(true);
+      await sendMessage(conversationId, replyText.trim());
+      antMessage.success('Đã gửi phản hồi thành công!');
+      setReplyText('');
+      // Reload messages
+      const msgData = await getConversationMessages(conversationId, 1, 100);
+      setMessages(msgData.items || []);
+    } catch (error) {
+      console.error('Lỗi khi gửi phản hồi:', error);
+      antMessage.error('Lỗi khi gửi phản hồi');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const getOtherParticipant = () => {
+    const participants = conversation?.participants || [];
+    return participants.find((p: any) => p.id !== currentUserId) || participants[0];
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.page} style={{ display: 'flex', justifyContent: 'center', padding: '100px' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  const other = getOtherParticipant();
+
+  // Tách tin nhắn: tin nhắn từ khách (không phải mình) vs tin nhắn mình gửi
+  const customerMessages = messages.filter((m) => m.sender?.id !== currentUserId);
+
+  // Lấy tin nhắn đầu tiên của khách làm "câu hỏi"
+  const firstQuestion = customerMessages.length > 0 ? customerMessages[0] : null;
+
   return (
     <div className={styles.page}>
       <div className={styles.breadcrumb}>
@@ -19,62 +106,73 @@ const PhanHoi: React.FC = () => {
         <button className={styles.btnBack} onClick={() => history.push('/bac-si/tu-van')}>
           <ArrowLeftOutlined />
         </button>
-        <h1 className={styles.title}>Phản hồi tư vấn #CV-8821</h1>
+        <h1 className={styles.title}>
+          Cuộc trò chuyện với {other?.full_name || 'Người dùng'}
+        </h1>
       </div>
 
       <div className={styles.gridContainer}>
-        {/* Left Column: Question & History */}
+        {/* Left Column: Messages History */}
         <div className={styles.leftCol}>
           <div className={styles.card}>
             <div className={styles.patientHeader}>
               <div className={styles.patientInfo}>
                 <div className={styles.petIcon}>🐾</div>
                 <div>
-                  <div className={styles.petName}>Mèo Luna</div>
-                  <div className={styles.ownerName}>Chủ nuôi: Nguyễn Thu Hà</div>
+                  <div className={styles.petName}>{other?.full_name || 'Người dùng'}</div>
+                  <div className={styles.ownerName}>{other?.email}</div>
                 </div>
               </div>
-              <div className={styles.tagNew}>MỚI</div>
+              {customerMessages.length > 0 && (
+                <div className={styles.tagNew}>
+                  {customerMessages.length} tin nhắn
+                </div>
+              )}
             </div>
 
-            <div className={styles.timeInfo}>
-              🕒 Gửi lúc: 09:45, 24 Tháng 10, 2023
-            </div>
+            {firstQuestion && (
+              <>
+                <div className={styles.timeInfo}>
+                  🕒 Gửi lúc: {new Date(firstQuestion.created_at).toLocaleString('vi-VN')}
+                </div>
+                <div className={styles.quoteBox}>
+                  {firstQuestion.content || '(Hình ảnh / tệp đính kèm)'}
+                </div>
+              </>
+            )}
 
-            <div className={styles.quoteBox}>
-              "Mèo Luna của em hay gãi tai, tai có mùi hôi và thỉnh thoảng có dịch màu nâu đen chảy ra. Em thấy bé tỏ vẻ khó chịu mỗi khi em chạm vào vùng tai. Em nên làm gì và có cần đưa bé đến phòng khám ngay không ạ?"
-            </div>
-
-            <div className={styles.imagesSection}>
-              <div className={styles.sectionTitle}>HÌNH ẢNH ĐÍNH KÈM (2)</div>
-              <div className={styles.imageGrid}>
-                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=luna1" alt="Tai mèo 1" style={{ background: '#f0f0f0' }} />
-                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=luna2" alt="Tai mèo 2" style={{ background: '#f0f0f0' }} />
+            {/* All messages */}
+            {messages.length > 1 && (
+              <div style={{ marginTop: '16px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#706F6C', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  Lịch sử tin nhắn ({messages.length})
+                </div>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {messages.map((msg) => {
+                    const isMe = msg.sender?.id === currentUserId;
+                    return (
+                      <div
+                        key={msg.id}
+                        style={{
+                          padding: '10px 14px',
+                          marginBottom: '8px',
+                          borderRadius: '10px',
+                          background: isMe ? '#E8F5E9' : '#F5F5F5',
+                          borderLeft: isMe ? '3px solid #135D54' : '3px solid #706F6C',
+                        }}
+                      >
+                        <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>
+                          {msg.sender?.full_name} · {new Date(msg.created_at).toLocaleString('vi-VN')}
+                        </div>
+                        <div style={{ fontSize: '13px', color: '#333' }}>
+                          {msg.content || (msg.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div className={styles.historyCard}>
-            <div className={styles.historyHeader}>
-              <div className={styles.title}>TIỀN SỬ BỆNH ÁN</div>
-              <Link to="/bac-si/lich-hen/benh-an" className={styles.link}>Xem tất cả</Link>
-            </div>
-            
-            <div className={styles.historyItem}>
-              <MedicineBoxOutlined className={styles.hIcon} />
-              <div className={styles.hInfo}>
-                <div className={styles.hName}>Tiêm phòng đại định kỳ</div>
-                <div className={styles.hDate}>12/05/2023</div>
-              </div>
-            </div>
-            
-            <div className={styles.historyItem}>
-              <FileSearchOutlined className={styles.hIcon} />
-              <div className={styles.hInfo}>
-                <div className={styles.hName}>Khám da liễu nhẹ</div>
-                <div className={styles.hDate}>20/01/2023</div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -85,9 +183,6 @@ const PhanHoi: React.FC = () => {
               <div className={styles.icon}><EditOutlined /></div>
               Soạn thảo phản hồi
             </h3>
-            <button className={styles.btnTemplate}>
-              Mẫu trả lời nhanh <DownOutlined style={{ fontSize: '10px' }} />
-            </button>
           </div>
 
           <div className={styles.editorArea}>
@@ -99,21 +194,31 @@ const PhanHoi: React.FC = () => {
               <button><PictureOutlined /></button>
               <button><LinkOutlined /></button>
             </div>
-            <textarea 
-              className={styles.textarea} 
+            <textarea
+              ref={textareaRef}
+              className={styles.textarea}
               placeholder="Nhập nội dung tư vấn chuyên môn tại đây..."
-            ></textarea>
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+            />
           </div>
 
           <div className={styles.editorFooter}>
-            <div className={styles.autoSave}>Tự động lưu bản nháp lúc 10:15</div>
+            <div className={styles.autoSave}></div>
             <div className={styles.actions}>
-              <button className={styles.btnDraft}>Lưu bản nháp</button>
-              <button 
-                className={styles.btnSend}
+              <button
+                className={styles.btnDraft}
                 onClick={() => history.push('/bac-si/tu-van')}
               >
-                <SendOutlined /> Gửi phản hồi
+                Hủy
+              </button>
+              <button
+                className={styles.btnSend}
+                onClick={handleSend}
+                disabled={sending || !replyText.trim()}
+                style={{ opacity: sending || !replyText.trim() ? 0.6 : 1 }}
+              >
+                <SendOutlined /> {sending ? 'Đang gửi...' : 'Gửi phản hồi'}
               </button>
             </div>
           </div>
