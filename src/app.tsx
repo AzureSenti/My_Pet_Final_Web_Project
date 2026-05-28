@@ -10,8 +10,10 @@ import NotAccessible from './pages/exception/403';
 import NotFoundContent from './pages/exception/404';
 import type { IInitialState } from './services/base/typing';
 import './styles/global.less';
-import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, LogOut, Plus, PawPrint } from 'lucide-react';
+import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, PawPrint } from 'lucide-react';
 // currentRole đã được loại bỏ cùng với Keycloak auth
+import axios from '@/utils/axios';
+import { ip3 } from '@/utils/ip';
 
 /**  loading */
 export const initialStateConfig = {
@@ -23,22 +25,24 @@ export const initialStateConfig = {
  * // Tobe removed
  * */
 export async function getInitialState(): Promise<IInitialState> {
+	const fetchUserInfo = async () => {
+		try {
+			const token = localStorage.getItem('token');
+			if (!token) return undefined;
+
+			const res = await axios.get(`${ip3}api/v1/auth/me`, {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+			return res.data;
+		} catch (error) {
+			return undefined;
+		}
+	};
+
+	const currentUser = await fetchUserInfo();
 	return {
 		permissionLoading: false,
-		currentUser: {
-			sub: 'mock-id-123',
-			ssoId: 'mock-id-123',
-			email: 'admin@gmail.com',
-			email_verified: true,
-			realm_access: {
-				roles: ['admin'],
-			},
-			name: 'Admin Mock',
-			preferred_username: 'admin',
-			given_name: 'Admin',
-			family_name: 'Mock',
-			picture: 'https://i.pravatar.cc/150?img=12',
-		},
+		currentUser: currentUser,
 	};
 }
 
@@ -100,7 +104,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 		menuItemRender: (item, dom) => {
 			const active = history.location.pathname === item.path;
 			const getLucideIcon = (path: string) => {
-				switch(path) {
+				switch (path) {
 					case '/dashboard': return <LayoutDashboard size={18} strokeWidth={1.75} />;
 					case '/quan-ly-nguoi-dung': return <Users size={18} strokeWidth={1.75} />;
 					case '/quan-ly-bac-si': return <Stethoscope size={18} strokeWidth={1.75} />;
@@ -146,31 +150,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				)}
 			</div>
 		),
-		menuFooterRender: (props: any) => {
-			const handleLogout = () => {
-				localStorage.removeItem('token');
-				localStorage.removeItem('currentUser');
-				history.replace('/user/login');
-			};
+		menuFooterRender: (props) => {
+			if (props?.collapsed) return undefined;
 			return (
-				<div style={{ padding: props?.collapsed ? '0 8px 24px' : '0 16px 24px' }}>
-					<div className="sidebar-footer-menu" style={{ padding: props?.collapsed ? '0' : '0 8px' }}>
-						<button 
-							type="button" 
-							className="sidebar-footer-item logout" 
-							onClick={handleLogout}
-							style={{ 
-								display: 'flex', alignItems: 'center', justifyContent: props?.collapsed ? 'center' : 'flex-start', gap: '12px', 
-								width: '100%', background: 'transparent', border: 'none', 
-								color: '#1A1A1A', fontWeight: 500, fontSize: '14px', cursor: 'pointer',
-								padding: '8px 0', opacity: 0.7, transition: 'all 0.2s'
-							}}
-							onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
-							onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
-						>
-							<LogOut size={18} strokeWidth={1.75} style={{ flexShrink: 0 }} /> {!props?.collapsed && <span>Đăng xuất</span>}
-						</button>
-					</div>
+				<div style={{ padding: '0 16px 16px' }}>
+
 				</div>
 			);
 		},

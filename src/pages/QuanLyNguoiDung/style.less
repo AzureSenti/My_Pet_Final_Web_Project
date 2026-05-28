@@ -3,13 +3,13 @@
 // ─── Variables ──────────────────────────────────────────────
 @bg-color: #F5F2EC; // Premium warm neutral background
 @card-bg: #FEFDFB; // Premium warm off-white card background
-@text-primary: #1C1917; // Rich warm charcoal
-@text-secondary: #78716C; // Warm stone secondary
-@border-color: rgba(0, 0, 0, 0.06); // Subtle border with low opacity
-@olive-green: #6B635B; // Muted brand olive/charcoal
-@olive-green-hover: #575049;
-@mustard-yellow: #A3865A; // Muted gold/earthy gold
-@mustard-yellow-light: #F5F0E8;
+@text-primary: #000000;      // Rich black for maximum contrast
+@text-secondary: #1A1715;    // Nearly black warm stone
+@border-color: rgba(0, 0, 0, 0.12); // Stronger borders
+@olive-green: #2A2520;      // Near-black brand olive
+@olive-green-hover: #151210;
+@mustard-yellow: #5C4425;   // Deep rich gold
+@mustard-yellow-light: #E8DFD0;
 
 // ─── Layout Container ──────────────────────────────────────
 .user-management-container {
@@ -196,16 +196,16 @@
 		font-weight: 600;
 
 		&.pet-owner {
-			background: #EEF6F3;
-			color: #5B8A72;
+			background: #E0EDE8;
+			color: #1A4030;
 		}
 		&.veterinarian {
-			background: #F8F0F1;
-			color: #9E6B73;
+			background: #F0E2E5;
+			color: #6E3542;
 		}
 		&.staff {
-			background: #FBF6EE;
-			color: #A3865A;
+			background: #F5ECD8;
+			color: #6B4E28;
 		}
 	}
 
@@ -228,9 +228,9 @@
 			height: 8px;
 			border-radius: 50%;
 
-			&.active { background: #5B8A72; }
-			&.suspended { background: #A56060; }
-			&.pending { background: #A3865A; }
+			&.active { background: #1A5A38; }
+			&.suspended { background: #7A2530; }
+			&.pending { background: #6B4E28; }
 		}
 	}
 
@@ -321,12 +321,12 @@
 			.radial-text {
 				font-size: 24px;
 				font-weight: 800;
-				color: #A3865A;
+				color: #6B4E28;
 			}
 			.radial-subtext {
 				font-size: 13px;
 				font-weight: 700;
-				color: #A3865A;
+				color: #6B4E28;
 				letter-spacing: 1px;
 			}
 		}
@@ -338,7 +338,7 @@
 			h3 {
 				font-size: 18px;
 				font-weight: 700;
-				color: #5B8A72;
+				color: #1A4030;
 				margin: 0 0 12px;
 			}
 
@@ -350,7 +350,7 @@
 			}
 
 			.um-card-link {
-				color: #A3865A;
+				color: #6B4E28;
 				font-weight: 600;
 				font-size: 14px;
 				display: flex;
@@ -387,7 +387,7 @@
 				justify-content: center;
 				
 				.shield-icon {
-					color: #5B8A72;
+					color: #1A4030;
 				}
 			}
 
@@ -399,12 +399,12 @@
 					margin: 0;
 					font-size: 16px;
 					font-weight: 700;
-					color: #3D6451;
+					color: #14331F;
 				}
 
 				span {
 					font-size: 13px;
-					color: #5B8A72;
+					color: #1A4030;
 					font-weight: 500;
 				}
 			}
@@ -415,7 +415,7 @@
 		}
 
 		.um-card-right-bottom {
-			background: #5B8A72;
+			background: #1A5A38;
 			padding: 12px 16px;
 			border-radius: 12px;
 			

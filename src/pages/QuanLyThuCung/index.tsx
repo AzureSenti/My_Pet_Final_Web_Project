@@ -1,107 +1,68 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Plus, PawPrint } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Plus, PawPrint, Trash2 } from 'lucide-react';
+import { Modal, Form, Input, Select, message } from 'antd';
 import '../TrangChu/components/style.less';
+import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
-interface PetData {
-	id: string;
-	name: string;
-	species: 'Chó' | 'Mèo' | 'Khác';
-	breed: string;
-	age: string;
-	gender: 'male' | 'female';
-	health: 'Khỏe mạnh' | 'Đến lịch khám' | 'Khẩn cấp' | 'Mới nhập';
-	imageUrl: string;
-	ownerName: string;
-	ownerAvatar: string;
-}
-
-const MOCK_PETS: PetData[] = [
-	{
-		id: '1',
-		name: 'Buddy',
-		species: 'Chó',
-		breed: 'Golden Retriever',
-		age: '3 năm tuổi',
-		gender: 'male',
-		health: 'Khỏe mạnh',
-		imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=400&h=400',
-		ownerName: 'Sarah Johnson',
-		ownerAvatar: 'https://i.pravatar.cc/150?u=sarah',
-	},
-	{
-		id: '2',
-		name: 'Luna',
-		species: 'Mèo',
-		breed: 'Anh lông ngắn',
-		age: '2 năm tuổi',
-		gender: 'female',
-		health: 'Đến lịch khám',
-		imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400&h=400',
-		ownerName: 'Michael Chen',
-		ownerAvatar: 'https://i.pravatar.cc/150?u=michael',
-	},
-	{
-		id: '3',
-		name: 'Oliver',
-		species: 'Chó',
-		breed: 'French Bulldog',
-		age: '5 năm tuổi',
-		gender: 'male',
-		health: 'Khỏe mạnh',
-		imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400&h=400',
-		ownerName: 'Emily White',
-		ownerAvatar: 'https://i.pravatar.cc/150?u=emily',
-	},
-	{
-		id: '4',
-		name: 'Cooper',
-		species: 'Chó',
-		breed: 'Siberian Husky',
-		age: '1 năm tuổi',
-		gender: 'female',
-		health: 'Mới nhập',
-		imageUrl: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?auto=format&fit=crop&q=80&w=400&h=400',
-		ownerName: 'David Wilson',
-		ownerAvatar: 'https://i.pravatar.cc/150?u=david',
-	},
-	{
-		id: '5',
-		name: 'Misty',
-		species: 'Mèo',
-		breed: 'Mèo Calico',
-		age: '4 năm tuổi',
-		gender: 'female',
-		health: 'Khỏe mạnh',
-		imageUrl: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&q=80&w=400&h=400',
-		ownerName: 'Anna Lee',
-		ownerAvatar: 'https://i.pravatar.cc/150?u=anna',
-	},
-	{
-		id: '6',
-		name: 'Nala',
-		species: 'Chó',
-		breed: 'Welsh Corgi',
-		age: '6 năm tuổi',
-		gender: 'female',
-		health: 'Khẩn cấp',
-		imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=400&h=400',
-		ownerName: 'James Park',
-		ownerAvatar: 'https://i.pravatar.cc/150?u=james',
-	},
-];
+import { getPets, createPet, getOwners, User, deletePet } from '@/services/QuanLyPetStore';
 
 const FILTER_TABS = ['Tất cả', 'Chó', 'Mèo', 'Khác'] as const;
 
 const QuanLyThuCung: React.FC = () => {
 	const [activeFilter, setActiveFilter] = useState<string>('Tất cả');
+	const [pets, setPets] = useState<any[]>([]);
+	const [owners, setOwners] = useState<User[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [form] = Form.useForm();
 
-	const filteredPets = useMemo(() => {
-		if (activeFilter === 'Tất cả') return MOCK_PETS;
-		return MOCK_PETS.filter((p) => p.species === activeFilter);
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const [petData, ownerData] = await Promise.all([
+				getPets({ species: activeFilter === 'Tất cả' ? undefined : activeFilter }),
+				getOwners()
+			]);
+			setPets(petData);
+			setOwners(ownerData);
+		} catch (error) {
+			message.error('Không thể tải dữ liệu');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	React.useEffect(() => {
+		fetchData();
 	}, [activeFilter]);
 
-	const getHealthBadgeClass = (health: PetData['health']) => {
+	const handleAddPet = async (values: any) => {
+		const success = await createPet({
+			...values,
+			avatar_url: values.imageUrl || '',
+			date_of_birth: new Date(new Date().getFullYear() - (parseInt(values.age) || 0), 0, 1).toISOString().split('T')[0],
+		});
+		if (success) {
+			setIsModalOpen(false);
+			form.resetFields();
+			fetchData();
+		}
+	};
+
+	const handleDeletePet = (id: string, e: React.MouseEvent) => {
+		e.stopPropagation();
+		Modal.confirm({
+			title: 'Xác nhận xóa',
+			content: 'Bạn có chắc chắn muốn xóa thú cưng này khỏi hệ thống? Thao tác này không thể hoàn tác.',
+			okText: 'Xóa',
+			okType: 'danger',
+			cancelText: 'Hủy',
+			onOk: () => deletePet(id).then(fetchData),
+		});
+	};
+
+	const getHealthBadgeClass = (health: string) => {
 		switch (health) {
 			case 'Khỏe mạnh': return 'badge-healthy';
 			case 'Đến lịch khám': return 'badge-checkup';
@@ -123,15 +84,7 @@ const QuanLyThuCung: React.FC = () => {
 					</div>
 				</div>
 				<div className="pc-header-actions">
-					<div className="pc-user-profile">
-						<div className="pc-user-avatar">
-							<img src="https://i.pravatar.cc/150?img=12" alt="User" />
-						</div>
-						<div className="pc-user-info">
-							<span className="pc-user-name">Nguyễn Văn A</span>
-							<span className="pc-user-role">Administrator</span>
-						</div>
-					</div>
+					<HeaderProfile />
 				</div>
 			</div>
 
@@ -164,18 +117,40 @@ const QuanLyThuCung: React.FC = () => {
 				</div>
 
 				{/* ─── Pet Card Grid ─── */}
-				<div className="pet-card-grid">
-					{filteredPets.map((pet, idx) => (
+				<div className="pet-card-grid" style={{ opacity: loading ? 0.6 : 1 }}>
+					{pets.map((pet, idx) => (
 						<div
 							className="pet-card"
 							key={pet.id}
-							style={{ animationDelay: `${idx * 0.06}s` }}
+							style={{ position: 'relative', animationDelay: `${idx * 0.06}s` }}
 						>
+							<button
+								className="pet-delete-btn"
+								onClick={(e) => handleDeletePet(pet.id, e)}
+								style={{
+									position: 'absolute',
+									top: 10,
+									right: 10,
+									zIndex: 10,
+									background: 'rgba(255,255,255,0.8)',
+									border: 'none',
+									borderRadius: '50%',
+									width: 32,
+									height: 32,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									color: '#ef4444',
+									cursor: 'pointer'
+								}}
+							>
+								<Trash2 size={16} />
+							</button>
 							{/* Photo */}
 							<div className="pet-card-photo">
-								<img src={pet.imageUrl} alt={pet.name} />
-								<span className={`health-badge ${getHealthBadgeClass(pet.health)}`}>
-									{pet.health}
+								<img src={pet.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=400&h=400'} alt={pet.name} />
+								<span className={`health-badge ${getHealthBadgeClass('Khỏe mạnh')}`}>
+									Khỏe mạnh
 								</span>
 							</div>
 
@@ -187,14 +162,14 @@ const QuanLyThuCung: React.FC = () => {
 										{pet.gender === 'male' ? '♂' : '♀'}
 									</span>
 								</div>
-								<span className="pet-breed">{pet.breed} • {pet.age}</span>
+								<span className="pet-breed">{pet.breed || 'Chưa rõ'} • {pet.species}</span>
 
 								{/* Owner */}
 								<div className="pet-owner-row">
-									<img className="owner-avatar" src={pet.ownerAvatar} alt={pet.ownerName} />
+									<img className="owner-avatar" src={pet.owner?.avatar_url || `https://i.pravatar.cc/150?u=${pet.owner_name}`} alt={pet.owner_name} />
 									<div className="owner-text">
 										<span className="owner-label">Chủ nuôi</span>
-										<span className="owner-name">{pet.ownerName}</span>
+										<span className="owner-name">{pet.owner_name}</span>
 									</div>
 								</div>
 							</div>
@@ -202,7 +177,7 @@ const QuanLyThuCung: React.FC = () => {
 					))}
 
 					{/* ─── Add New Card ─── */}
-					<div className="pet-card-add">
+					<div className="pet-card-add" onClick={() => setIsModalOpen(true)} style={{ cursor: 'pointer' }}>
 						<div className="add-circle">
 							<Plus size={28} strokeWidth={2.5} />
 						</div>
@@ -213,9 +188,89 @@ const QuanLyThuCung: React.FC = () => {
 			</div>
 
 			{/* ─── FAB ─── */}
-			<button className="pet-fab" aria-label="Thêm thú cưng">
+			<button className="pet-fab" aria-label="Thêm thú cưng" onClick={() => setIsModalOpen(true)}>
 				<Plus size={26} strokeWidth={3} />
 			</button>
+
+			{/* Modal Thêm thú cưng */}
+			<Modal
+				title={<h3>Đăng ký thú cưng mới 🐶</h3>}
+				visible={isModalOpen}
+				onCancel={() => {
+					setIsModalOpen(false);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				okText="Lưu lại"
+				cancelText="Hủy"
+				destroyOnClose
+			>
+				<Form form={form} layout="vertical" onFinish={handleAddPet}>
+					<Form.Item
+						name="name"
+						label="Tên thú cưng"
+						rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
+					>
+						<Input placeholder="Ví dụ: Buddy" />
+					</Form.Item>
+					<Form.Item
+						name="species"
+						label="Loài"
+						rules={[{ required: true, message: 'Vui lòng chọn loài!' }]}
+						initialValue="Chó"
+					>
+						<Select>
+							<Select.Option value="Chó">Chó 🐶</Select.Option>
+							<Select.Option value="Mèo">Mèo 🐱</Select.Option>
+							<Select.Option value="Khác">Khác 🐾</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="breed"
+						label="Giống"
+						rules={[{ required: true, message: 'Vui lòng nhập giống thú cưng!' }]}
+					>
+						<Input placeholder="Ví dụ: Golden Retriever, Anh lông ngắn" />
+					</Form.Item>
+					<Form.Item
+						name="age"
+						label="Tuổi (năm)"
+						rules={[{ required: true, message: 'Vui lòng nhập tuổi!' }]}
+					>
+						<Input type="number" placeholder="Ví dụ: 3" min={0} />
+					</Form.Item>
+					<Form.Item
+						name="gender"
+						label="Giới tính"
+						rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+						initialValue="male"
+					>
+						<Select>
+							<Select.Option value="male">Đực (♂)</Select.Option>
+							<Select.Option value="female">Cái (♀)</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="owner_id"
+						label="Chủ nuôi"
+						rules={[{ required: true, message: 'Vui lòng chọn chủ nuôi!' }]}
+					>
+						<Select placeholder="Chọn chủ sở hữu">
+							{owners.map(owner => (
+								<Select.Option key={owner.id} value={owner.id}>
+									{owner.full_name} ({owner.email})
+								</Select.Option>
+							))}
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="imageUrl"
+						label="Đường dẫn ảnh thú cưng (URL)"
+					>
+						<Input placeholder="Tùy chọn. Để trống sẽ tự sinh ảnh ngẫu nhiên." />
+					</Form.Item>
+				</Form>
+			</Modal>
 		</div>
 	);
 };
