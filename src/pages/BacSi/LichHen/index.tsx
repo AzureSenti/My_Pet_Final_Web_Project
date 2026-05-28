@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CalendarOutlined, FileSyncOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
+import { getDoctorStats } from '@/services/BacSi/doctorService';
 import styles from './index.module.less';
 import LichHomNay from './components/LichHomNay';
 import DangCho from './components/DangCho';
@@ -7,6 +9,26 @@ import LichSuKham from './components/LichSuKham';
 
 const LichHen: React.FC = () => {
   const [activeTab, setActiveTab] = useState('hom-nay');
+  const [stats, setStats] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoadingStats(true);
+        const data = await getDoctorStats();
+        setStats(data);
+      } catch (error) {
+        console.error('Lỗi khi tải thống kê:', error);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const today = new Date();
+  const dayNames = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
 
   const getTitle = () => {
     switch(activeTab) {
@@ -19,12 +41,15 @@ const LichHen: React.FC = () => {
 
   const getSubtitle = () => {
     switch(activeTab) {
-      case 'hom-nay': return 'Thứ Hai, ngày 14 tháng 10, 2024';
+      case 'hom-nay': return `${dayNames[today.getDay()]}, ngày ${today.getDate()} tháng ${today.getMonth() + 1}, ${today.getFullYear()}`;
       case 'dang-cho': return 'Quản lý các yêu cầu đặt lịch mới cần phản hồi.';
       case 'lich-su': return 'Tra cứu hồ sơ y tế và lịch sử khám của thú cưng.';
       default: return '';
     }
   };
+
+  const totalAppointments = stats?.total_appointments ?? 0;
+  const pendingCount = stats?.appointments_by_status?.pending ?? 0;
 
   return (
     <div className={styles.page}>
@@ -35,24 +60,28 @@ const LichHen: React.FC = () => {
         </div>
         
         <div className={styles.headerActions}>
-          <div className={styles.statsCard}>
-            <div className={`${styles.statIcon} ${styles.teal}`}>
-              <CalendarOutlined />
+          <Spin spinning={loadingStats} size="small">
+            <div className={styles.statsCard}>
+              <div className={`${styles.statIcon} ${styles.teal}`}>
+                <CalendarOutlined />
+              </div>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>{totalAppointments}</span>
+                <span className={styles.statLabel}>Tổng lịch hẹn</span>
+              </div>
             </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statValue}>12</span>
-              <span className={styles.statLabel}>Tổng lịch hẹn</span>
+          </Spin>
+          <Spin spinning={loadingStats} size="small">
+            <div className={styles.statsCard}>
+              <div className={`${styles.statIcon} ${styles.gold}`}>
+                <FileSyncOutlined />
+              </div>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>{pendingCount}</span>
+                <span className={styles.statLabel}>Đang chờ</span>
+              </div>
             </div>
-          </div>
-          <div className={styles.statsCard}>
-            <div className={`${styles.statIcon} ${styles.gold}`}>
-              <FileSyncOutlined />
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statValue}>4</span>
-              <span className={styles.statLabel}>Đang chờ</span>
-            </div>
-          </div>
+          </Spin>
         </div>
       </div>
 

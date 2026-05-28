@@ -1,5 +1,6 @@
-import React from 'react';
-import { history } from 'umi';
+import React, { useState } from 'react';
+import { history, useModel } from 'umi';
+import { message } from 'antd';
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -7,9 +8,48 @@ import {
   ToolOutlined,
   CheckCircleFilled,
 } from '@ant-design/icons';
+import { updateProfile } from '@/services/BacSi/doctorService';
 import styles from './index.module.less';
 
 const HoSoEdit: React.FC = () => {
+  const { initialState, setInitialState } = useModel('@@initialState');
+  const currentUser = initialState?.currentUser;
+
+  const [fullName, setFullName] = useState(currentUser?.full_name || '');
+  const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSave = async () => {
+    if (!fullName.trim()) {
+      message.warning('Vui lòng nhập họ và tên');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const updatedUser = await updateProfile({
+        full_name: fullName.trim(),
+        phone: phone.trim() || undefined,
+      });
+
+      // Cập nhật lại initialState để các trang khác cũng hiện dữ liệu mới
+      if (setInitialState) {
+        setInitialState((prev: any) => ({
+          ...prev,
+          currentUser: { ...prev?.currentUser, ...updatedUser },
+        }));
+      }
+
+      message.success('Cập nhật hồ sơ thành công!');
+      history.push('/bac-si/ho-so');
+    } catch (error) {
+      console.error('Lỗi khi cập nhật hồ sơ:', error);
+      message.error('Lỗi khi cập nhật hồ sơ');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
@@ -27,10 +67,10 @@ const HoSoEdit: React.FC = () => {
         <div className={styles.leftCol}>
           <div className={`${styles.card} ${styles.avatarCard}`}>
             <div className={styles.avatarBox}>
-              <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=doctor" alt="Doctor Avatar" />
+              <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${fullName}`} alt="Doctor Avatar" />
             </div>
-            <h2 className={styles.docName}>Dr. Nguyễn Văn A</h2>
-            <span className={styles.docRole}>Bác sĩ Thú y Cao cấp</span>
+            <h2 className={styles.docName}>Dr. {fullName || currentUser?.full_name}</h2>
+            <span className={styles.docRole}>Bác sĩ Thú y</span>
           </div>
 
           <div className={styles.card}>
@@ -40,14 +80,22 @@ const HoSoEdit: React.FC = () => {
               </h3>
             </div>
             <div className={styles.statusItem}>
-              <span className={styles.statusLabel}>Đã xác minh</span>
+              <span className={styles.statusLabel}>Trạng thái</span>
               <span className={styles.statusVal}>
-                <CheckCircleFilled className={styles.checkIcon} />
+                {currentUser?.is_active ? (
+                  <CheckCircleFilled className={styles.checkIcon} />
+                ) : (
+                  'Chưa kích hoạt'
+                )}
               </span>
             </div>
             <div className={styles.statusItem}>
               <span className={styles.statusLabel}>Ngày tham gia</span>
-              <span className={styles.statusVal}>12/05/2021</span>
+              <span className={styles.statusVal}>
+                {currentUser?.created_at
+                  ? new Date(currentUser.created_at).toLocaleDateString('vi-VN')
+                  : '—'}
+              </span>
             </div>
           </div>
         </div>
@@ -61,19 +109,38 @@ const HoSoEdit: React.FC = () => {
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Họ và Tên</label>
-                <input className={styles.input} defaultValue="Nguyễn Văn A" />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Chuyên khoa</label>
-                <input className={styles.input} defaultValue="Nội khoa, Phẫu thuật" />
+                <input
+                  className={styles.input}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Email</label>
-                <input className={styles.input} defaultValue="nguyenvana@clinic.vn" />
+                <input
+                  className={styles.input}
+                  value={currentUser?.email || ''}
+                  readOnly
+                  style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Số điện thoại</label>
-                <input className={styles.input} defaultValue="+84 901 234 567" />
+                <input
+                  className={styles.input}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+84..."
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Vai trò</label>
+                <input
+                  className={styles.input}
+                  value={currentUser?.role === 'vet' ? 'Bác sĩ Thú y' : currentUser?.role || '—'}
+                  readOnly
+                  style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                />
               </div>
             </div>
           </div>
@@ -84,7 +151,12 @@ const HoSoEdit: React.FC = () => {
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>Tiểu sử chuyên môn</label>
-              <textarea className={styles.textarea} defaultValue="Với hơn 10 năm kinh nghiệm trong lĩnh vực y học thú y, tôi cam kết mang lại sự chăm sóc tận tâm nhất cho thú cưng của bạn. Tôi đã thực hiện hàng nghìn ca phẫu thuật phức tạp và luôn cập nhật những kiến thức y khoa mới nhất." />
+              {/* TODO: Thêm field bio vào backend UserUpdate schema nếu cần */}
+              <textarea
+                className={styles.textarea}
+                defaultValue={`Bác sĩ ${fullName} chuyên sâu trong lĩnh vực thú y.`}
+                placeholder="Mô tả tiểu sử chuyên môn của bạn..."
+              />
             </div>
           </div>
 
@@ -93,23 +165,56 @@ const HoSoEdit: React.FC = () => {
               <h3><ToolOutlined className={styles.icon} /> Kinh nghiệm làm việc</h3>
               <button className={styles.btnAdd}>+ Thêm mới</button>
             </div>
-            
+            {/* TODO: Kết nối API kinh nghiệm khi backend có field tương ứng */}
             <div className={styles.expFormItem}>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Thời gian</label>
-                  <input className={styles.input} defaultValue="2018 - Nay" />
+                  <input className={styles.input} placeholder="VD: 2018 - Nay" />
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Chức vụ & Đơn vị</label>
-                  <input className={styles.input} defaultValue="Bác sĩ trưởng - Green Valley Clinic" />
+                  <input className={styles.input} placeholder="VD: Bác sĩ trưởng - Phòng khám ABC" />
                 </div>
                 <div className={`${styles.formGroup} ${styles.full}`}>
                   <label className={styles.label}>Mô tả công việc</label>
-                  <input className={styles.input} defaultValue="Điều hành đội ngũ y tế, chẩn đoán hình ảnh cao cấp và phẫu thuật nội soi." />
+                  <input className={styles.input} placeholder="Mô tả ngắn gọn công việc..." />
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Save button */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
+            <button
+              style={{
+                padding: '10px 24px',
+                borderRadius: '8px',
+                border: '1px solid #d9d9d9',
+                background: '#fff',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+              onClick={() => history.push('/bac-si/ho-so')}
+            >
+              Hủy
+            </button>
+            <button
+              style={{
+                padding: '10px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                background: '#135D54',
+                color: '#fff',
+                cursor: submitting ? 'not-allowed' : 'pointer',
+                fontWeight: 600,
+                opacity: submitting ? 0.6 : 1,
+              }}
+              onClick={handleSave}
+              disabled={submitting}
+            >
+              {submitting ? 'Đang lưu...' : 'Lưu thay đổi'}
+            </button>
           </div>
         </div>
       </div>
