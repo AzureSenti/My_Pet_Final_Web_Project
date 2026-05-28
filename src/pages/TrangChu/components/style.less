@@ -5,28 +5,28 @@
 // ============================================
 
 // ─── Design Tokens ────────────────────────────
-@pc-bg: #F5F2EC;
-@pc-card: #FEFDFB;
-@pc-text: #1C1917;
-@pc-text-secondary: #78716C;
-@pc-text-muted: #A8A29E;
-@pc-border: rgba(0, 0, 0, 0.06);
+@pc-bg: #FFF8F2;
+@pc-card: #FFFFFF;
+@pc-text: #4A3F35;               // Absolute black for maximum prominent text
+@pc-text-secondary: #7D6E5D;     // Nearly black warm stone for secondary text
+@pc-text-muted: #9E9385;         // Darker muted for readability
+@pc-border: #E3D9CB; // Softer borders
 
 // PetCare Brand Colors
-@pc-olive: #6B635B;
-@pc-olive-light: #78716C;
-@pc-gold: #A3865A;
-@pc-gold-light: #F5F0E8;
+@pc-olive: #D4A017;              // Near-black olive brand
+@pc-olive-light: #FCE38A;
+@pc-gold: #D4A017;               // Deep rich gold
+@pc-gold-light: #FFF3CD;         // Warmer contrast background for gold text
 
 // Metric Card Colors (Muted Premium)
-@mc-warm-bg: #FBF6EE;
-@mc-warm-text: #A3865A;
-@mc-mint-bg: #EEF6F3;
-@mc-mint-text: #5B8A72;
-@mc-pink-bg: #F8F0F1;
-@mc-pink-text: #9E6B73;
-@mc-peach-bg: #F7F0EB;
-@mc-peach-text: #A67B5B;
+@mc-warm-bg: #F8F0E2;
+@mc-warm-text: #4A3820;          // Very deep gold
+@mc-mint-bg: #E5F0EC;
+@mc-mint-text: #1A4030;          // Very dark forest green
+@mc-pink-bg: #F2E6E8;
+@mc-pink-text: #5A2E36;          // Very deep crimson
+@mc-peach-bg: #F0E6DF;
+@mc-peach-text: #5E3A1F;         // Very dark terracotta orange
 
 // Layout & Radius
 @radius-md: 12px;
@@ -34,13 +34,13 @@
 @radius-xl: 20px;
 @radius-2xl: 24px;
 @radius-full: 9999px;
-@shadow-card: 0 2px 16px rgba(0, 0, 0, 0.03);
-@shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.06);
+@shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
+@shadow-card-hover: 0 10px 36px rgba(0, 0, 0, 0.08);
 @transition-base: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
 // ─── Base Dashboard ───────────────────────────
 .petcare-dashboard {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: 'Quicksand', sans-serif;
 	color: @pc-text;
 	padding: 8px 0 32px;
 	
@@ -165,7 +165,7 @@
 
 		&:hover {
 			background: @pc-olive-light;
-			color: #FFFFFF;
+			color: #4A3F35;
 			border-color: @pc-olive-light;
 		}
 
@@ -248,7 +248,7 @@
 
 .pc-metric-card {
 	background: @pc-card;
-	border-radius: 16px;
+	border-radius: 20px;
 	padding: 24px;
 	display: flex;
 	align-items: center;
@@ -287,7 +287,7 @@
 	}
 
 	.metric-value {
-		font-size: 24px;
+		font-size: 32px;
 		font-weight: 800;
 		color: @pc-text;
 		line-height: 1.1;
@@ -301,23 +301,23 @@
 
 	// Muted Premium Palette
 	&.warm {
-		.metric-icon-box { background: linear-gradient(135deg, #FBF6EE, #F0E4D0); color: #A3865A; box-shadow: 0 4px 14px rgba(163, 134, 90, 0.12); }
-		.metric-sub { color: #A3865A; }
+		.metric-icon-box { background: linear-gradient(135deg, #FFF4CC, #FFEBA3); color: #B28200; box-shadow: 0 4px 14px rgba(178, 130, 0, 0.18); }
+		.metric-sub { color: #8C6600; }
 		&:hover .metric-icon-box { transform: scale(1.08); }
 	}
 	&.mint {
-		.metric-icon-box { background: linear-gradient(135deg, #EEF6F3, #D4EDE4); color: #5B8A72; box-shadow: 0 4px 14px rgba(91, 138, 114, 0.12); }
-		.metric-sub { color: #5B8A72; }
+		.metric-icon-box { background: linear-gradient(135deg, #E0F2E9, #C2E5D3); color: #1F7A4E; box-shadow: 0 4px 14px rgba(31, 122, 78, 0.18); }
+		.metric-sub { color: #155737; }
 		&:hover .metric-icon-box { transform: scale(1.08); }
 	}
 	&.pink {
-		.metric-icon-box { background: linear-gradient(135deg, #F8F0F1, #EADADE); color: #9E6B73; box-shadow: 0 4px 14px rgba(158, 107, 115, 0.12); }
-		.metric-sub { color: #9E6B73; }
+		.metric-icon-box { background: linear-gradient(135deg, #FFE8F0, #FFD1E0); color: #A62152; box-shadow: 0 4px 14px rgba(166, 33, 82, 0.18); }
+		.metric-sub { color: #851A42; }
 		&:hover .metric-icon-box { transform: scale(1.08); }
 	}
 	&.peach {
-		.metric-icon-box { background: linear-gradient(135deg, #F7F0EB, #E8DCD2); color: #A67B5B; box-shadow: 0 4px 14px rgba(166, 123, 91, 0.12); }
-		.metric-sub { color: #A67B5B; }
+		.metric-icon-box { background: linear-gradient(135deg, #FFEFE5, #FFDEC2); color: #A65D1B; box-shadow: 0 4px 14px rgba(166, 93, 27, 0.18); }
+		.metric-sub { color: #854A15; }
 		&:hover .metric-icon-box { transform: scale(1.08); }
 	}
 }
@@ -410,7 +410,7 @@
 .donut-legends {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 12px 24px;
+	gap: 16px 24px;
 	margin-top: 16px;
 	width: 100%;
 }
@@ -418,14 +418,14 @@
 .legend-item {
 	display: flex;
 	align-items: center;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 
 	.legend-dot {
-		width: 10px;
-		height: 10px;
+		width: 12px;
+		height: 12px;
 		border-radius: 50%;
-		margin-right: 8px;
+		margin-right: 12px;
 	}
 	.legend-label {
 		color: @pc-text-secondary;
@@ -433,7 +433,7 @@
 	}
 	.legend-count {
 		color: @pc-text;
-		font-weight: 600;
+		font-weight: 700;
 	}
 }
 
@@ -514,10 +514,10 @@
 
 	// Types
 	&.success {
-		.notif-icon-box { background: @mc-mint-bg; color: @mc-mint-text; }
+		.notif-icon-box { background: @mc-mint-bg; color: #14593A; }
 	}
 	&.warning {
-		.notif-icon-box { background: @mc-pink-bg; color: @mc-pink-text; }
+		.notif-icon-box { background: @mc-pink-bg; color: #4D2530; }
 	}
 }
 

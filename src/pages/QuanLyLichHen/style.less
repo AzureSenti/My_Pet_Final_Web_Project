@@ -1,11 +1,11 @@
 @import '~antd/es/style/themes/default.less';
 
-@primary-olive: #3B4D43; // Olive brand color
-@accent-gold: #A3865A; // Muted earthy gold
-@bg-cream: #F5F2EC; // Warm neutral background
-@text-dark: #1C1917; // Rich warm charcoal
-@text-gray: #78716C; // Warm stone secondary
-@card-bg: #FEFDFB; // Warm off-white card background
+@primary-olive: #D4A017; // Honey Mustard
+@accent-gold: #D4A017; // Honey Mustard
+@bg-cream: #FFF8F2; // Warm neutral background
+@text-dark: #4A3F35; // Rich absolute black
+@text-gray: #7D6E5D; // Nearly black warm stone
+@card-bg: #FFFFFF; // Warm off-white card background
 @radius-card: 16px;
 @radius-btn: 8px;
 @shadow-light: 0 2px 16px rgba(0,0,0,0.03);
@@ -101,16 +101,16 @@
 				justify-content: center;
 				
 				&.icon-yellow {
-					background: fade(@accent-gold, 15%);
-					color: @accent-gold;
+					background: fade(@accent-gold, 20%);
+					color: #4A3518;
 				}
 				&.icon-teal {
-					background: #E0F2FE;
-					color: #0284C7;
+					background: #D0E8F5;
+					color: #0260A0;
 				}
 				&.icon-pink {
-					background: #F8F0F1;
-					color: #9E6B73;
+					background: #F0E2E5;
+					color: #6E3542;
 				}
 			}
 
@@ -289,20 +289,20 @@
 					font-weight: 600;
 
 					&.badge-confirmed {
-						background: #EEF6F3;
-						color: #5B8A72;
+						background: #E0EDE8;
+						color: #0F2E1E; // Very deep green
 					}
 					&.badge-pending {
-						background: #FBF6EE;
-						color: #A3865A;
+						background: #F5ECD8;
+						color: #4A3518; // Very deep gold
 					}
 					&.badge-completed {
-						background: #F8F0F1;
-						color: #9E6B73;
+						background: #F0E2E5;
+						color: #4D2530; // Very deep crimson
 					}
 					&.badge-cancelled {
-						background: #F5EDED;
-						color: #A56060;
+						background: #EADADA;
+						color: #5A1F2B; // Very deep red
 					}
 				}
 
@@ -356,19 +356,19 @@
 		border: 1px solid rgba(0,0,0,0.03);
 
 		&.tip-card {
-			background: #FBF6EE;
-			border: 1px solid rgba(163, 134, 90, 0.2);
+			background: #F5ECD8;
+			border: 1px solid rgba(107, 78, 40, 0.25);
 
 			h3 {
 				font-size: 16px;
 				font-weight: 700;
-				color: #A3865A;
+				color: #4A3518;
 				margin: 0 0 12px 0;
 			}
 
 			p {
 				font-size: 14px;
-				color: #A3865A;
+				color: #3E2E15;
 				font-style: italic;
 				line-height: 1.5;
 				margin: 0 0 16px 0;
@@ -377,7 +377,7 @@
 			a {
 				font-size: 13px;
 				font-weight: 600;
-				color: #A3865A;
+				color: #4A3518;
 				text-decoration: none;
 				&:hover {
 					text-decoration: underline;

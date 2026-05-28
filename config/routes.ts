@@ -23,7 +23,71 @@ export default [
 	},
 
 	///////////////////////////////////
-	// DEFAULT MENU
+	// BÁC SĨ THÚ Y — CMS RIÊNG
+	{
+		path: '/bac-si',
+		layout: false,
+		routes: [
+			{
+				path: '/bac-si/dashboard',
+				layout: false,
+				component: './BacSi/Dashboard',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/lich-hen',
+				layout: false,
+				component: './BacSi/LichHen',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/lich-hen/kham-moi',
+				layout: false,
+				component: './BacSi/LichHen/KhamMoi',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/lich-hen/benh-an',
+				layout: false,
+				component: './BacSi/LichHen/BenhAn',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/thong-bao',
+				layout: false,
+				component: './BacSi/ThongBao',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/tu-van',
+				layout: false,
+				component: './BacSi/TuVan',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/tu-van/phan-hoi',
+				layout: false,
+				component: './BacSi/TuVan/PhanHoi',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/ho-so',
+				layout: false,
+				component: './BacSi/HoSo',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si/ho-so/chinh-sua',
+				layout: false,
+				component: './BacSi/HoSo/Edit',
+				wrappers: ['@/wrappers/VetAuth'],
+			},
+			{
+				path: '/bac-si',
+				redirect: '/bac-si/dashboard',
+			},
+		],
+	},
 	{
 		path: '/dashboard',
 		name: 'Tổng quan',
@@ -53,6 +117,12 @@ export default [
 		name: 'Quản lý lịch hẹn',
 		component: './QuanLyLichHen',
 		icon: 'CalendarOutlined',
+	},
+	{
+		path: '/profile',
+		name: 'Hồ sơ cá nhân',
+		component: './HoSo',
+		hideInMenu: true,
 	},
 
 	{

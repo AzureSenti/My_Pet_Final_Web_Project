@@ -1,46 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useModel } from 'umi';
+import { message } from 'antd';
+import { history } from 'umi';
 import {
 	SyncOutlined,
 	ExclamationCircleOutlined,
 	ArrowRightOutlined,
 } from '@ant-design/icons';
-import { Search, Bell, Settings, PawPrint, UserCheck, HeartPulse, UserCog } from 'lucide-react';
+import { Search, PawPrint, UserCheck, HeartPulse, CalendarDays } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
+import HeaderProfile from '@/components/HeaderProfile';
 import './components/style.less';
 
 // ─── Metric Cards Data ────────────────────────
-const METRICS = [
-	{
-		label: 'Tổng người dùng',
-		value: 1248,
-		sub: '+12% tháng này',
-		icon: 'user',
-		color: 'warm',
-	},
-	{
-		label: 'Bác sĩ',
-		value: 56,
-		sub: '+2 nhân sự mới',
-		icon: 'doctor',
-		color: 'mint',
-	},
-	{
-		label: 'Thú cưng',
-		value: 3892,
-		sub: '+45 đăng ký',
-		icon: 'paw',
-		color: 'pink',
-	},
-	{
-		label: 'Lịch hẹn',
-		value: 156,
-		sub: 'Hôm nay',
-		icon: 'calendar',
-		color: 'peach',
-	},
-];
 
 // ─── Notifications Data ───────────────────────
 const NOTIFICATIONS = [
@@ -78,17 +50,17 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 		zoom: { enabled: false },
 	},
-	colors: ['#3B4D43'], // Dark moss green
+	colors: ['#8A9A5B'], // Soft moss green / Earthy yellow
 	fill: {
 		type: 'gradient',
 		gradient: {
 			shadeIntensity: 1,
-			opacityFrom: 0.1,
+			opacityFrom: 0.25,
 			opacityTo: 0,
 			stops: [0, 90, 100],
 		},
 	},
-	stroke: { curve: 'smooth', width: 3 },
+	stroke: { curve: 'smooth', width: 4 },
 	grid: {
 		show: false, // Remove harsh grid lines
 		padding: {
@@ -104,7 +76,7 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 		axisTicks: { show: false },
 		labels: {
 			style: {
-				colors: ['#B5AFA5', '#B5AFA5', '#4A5B3E', '#B5AFA5', '#B5AFA5', '#B5AFA5', '#B5AFA5'], // Highlight T4
+				colors: ['#7A756E', '#7A756E', '#2A3D2E', '#7A756E', '#7A756E', '#7A756E', '#7A756E'], // Highlight T4
 				fontSize: '13px',
 				fontWeight: 500
 			}
@@ -126,9 +98,7 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 	},
 };
 
-const appointmentSeries = [
-	{ name: 'Lịch hẹn', data: [18, 22, 15, 28, 20, 35, 24] },
-];
+// Dynamic Chart options and series will be handled inside the component
 
 // ─── Status Donut Chart ───────────────────────
 const statusDonutOptions: ApexCharts.ApexOptions = {
@@ -137,7 +107,7 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 		fontFamily: 'Inter, sans-serif',
 	},
 	labels: ['Đã khám', 'Chờ khám', 'Hủy lịch', 'Khẩn cấp'],
-	colors: ['#3B4D43', '#5B8A72', '#E8E2D2', '#8B5A5A'],
+	colors: ['#2A3D33', '#1F5A3E', '#E0E0E0', '#6E3542'], // Dark moss green, dark turquoise, light gray, dark red
 	stroke: { width: 6, colors: ['#FFFFFF'] },
 	plotOptions: {
 		pie: {
@@ -145,14 +115,14 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 				size: '80%',
 				labels: {
 					show: true,
-					name: { fontSize: '12px', fontWeight: 700, color: '#8A8478', offsetY: 25 },
+					name: { fontSize: '12px', fontWeight: 700, color: '#5A554E', offsetY: 25 },
 					value: { fontSize: '42px', fontWeight: 800, color: '#2D2A26', offsetY: -10 },
 					total: {
 						show: true,
 						label: 'HOÀN TẤT',
-						fontSize: '12px',
-						fontWeight: 700,
-						color: '#B5AFA5',
+						fontSize: '14px',
+						fontWeight: 800,
+						color: '#0D0B0A',
 						formatter: () => '75%',
 					},
 				},
@@ -166,9 +136,35 @@ const statusDonutOptions: ApexCharts.ApexOptions = {
 	},
 };
 
-const statusDonutSeries = [117, 26, 8, 5];
+const statusDonutSeriesData = (stats: any) => [
+	stats?.appointments_completed || 0,
+	stats?.appointments_pending || 0,
+	stats?.appointments_cancelled || 0,
+	stats?.appointments_confirmed || 0,
+];
 
-// ─── Growth Bar Chart ─────────────────────────
+const getDynamicDonutOptions = (stats: any): ApexCharts.ApexOptions => ({
+	...statusDonutOptions,
+	plotOptions: {
+		pie: {
+			donut: {
+				...statusDonutOptions.plotOptions?.pie?.donut,
+				labels: {
+					...statusDonutOptions.plotOptions?.pie?.donut?.labels,
+					total: {
+						...statusDonutOptions.plotOptions?.pie?.donut?.labels?.total,
+						formatter: (w) => {
+							const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+							if (total === 0) return '0%';
+							const percent = Math.round((w.globals.seriesTotals[0] / total) * 100);
+							return `${percent}%`;
+						}
+					}
+				}
+			}
+		}
+	}
+});
 const growthChartOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'bar',
@@ -208,28 +204,6 @@ const growthSeries = [
 ];
 
 // ─── Sub Components ───────────────────────────
-const MetricCard = ({ item }: { item: typeof METRICS[0] }) => {
-	const iconMap: Record<string, React.ReactNode> = {
-		user: <UserOutlined />,
-		doctor: <MedicineBoxOutlined />,
-		paw: <span style={{ fontSize: 22 }}>🐾</span>,
-		calendar: <CalendarOutlined />,
-	};
-
-	return (
-		<div className={`pc-metric-card ${item.color}`}>
-			<div className="metric-icon-box">{iconMap[item.icon]}</div>
-			<div className="metric-content">
-				<div className="metric-label">{item.label}</div>
-				<div className="metric-value">
-					<CountUp end={item.value} duration={1.5} separator="," />
-				</div>
-				<div className="metric-sub">{item.sub}</div>
-			</div>
-		</div>
-	);
-};
-
 const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
 	<div className={`notif-item ${item.type}`}>
 		<div className="notif-icon-box">
@@ -242,82 +216,6 @@ const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
 		<div className="notif-time">{item.time}</div>
 	</div>
 );
-
-const ACTIVITIES = [
-	{ title: 'Lịch hẹn mới', desc: 'BS. Hoa, Chó "Bông"', time: 'Vừa xong', dot: 'blue' },
-	{ title: 'Thanh toán', desc: '500,000đ - Max', time: '2 giờ trước', dot: 'green' },
-	{ title: 'Hủy lịch', desc: 'Mèo "Luna"', time: '5 giờ trước', dot: 'red' },
-];
-
-const ActivityItem = ({ item, isLast }: { item: typeof ACTIVITIES[0]; isLast: boolean }) => (
-	<li className="activity-item">
-		<div className="activity-dot-wrapper">
-			<div className={`activity-dot ${item.dot}`} />
-			{!isLast && <div className="activity-line" />}
-		</div>
-		<div className="activity-content">
-			<div className="activity-title">{item.title}</div>
-			<div className="activity-time">{item.desc} · {item.time}</div>
-		</div>
-	</li>
-);
-
-const TOP_USERS = [
-	{ name: 'Trần Thị Lan', pets: 3, spending: '4,200k', avatar: 'https://i.pravatar.cc/150?u=lan' },
-	{ name: 'Lê Văn Minh', pets: 2, spending: '3,800k', avatar: 'https://i.pravatar.cc/150?u=minh' },
-	{ name: 'Phạm Hồng Anh', pets: 4, spending: '2,900k', avatar: 'https://i.pravatar.cc/150?u=anh' },
-];
-
-const UserItem = ({ user, rank }: { user: typeof TOP_USERS[0]; rank: number }) => {
-	const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : 'default';
-	return (
-		<li className="user-item">
-			<div className={`user-rank ${rankClass}`}>{rank + 1}</div>
-			<div className="user-avatar">
-				<img src={user.avatar} alt={user.name} />
-			</div>
-			<div className="user-info">
-				<div className="user-name">{user.name}</div>
-				<div className="user-pets">{user.pets} thú cưng</div>
-			</div>
-			<div className="user-spending">{user.spending}</div>
-		</li>
-	);
-};
-
-const PET_STATS = [
-	{ label: 'Chó', count: 124, total: 200, emoji: '🐶', color: 'blue' },
-	{ label: 'Mèo', count: 86, total: 200, emoji: '🐱', color: 'orange' },
-];
-
-const PetStatBar = ({ stat }: { stat: typeof PET_STATS[0] }) => {
-	const [width, setWidth] = useState(0);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setWidth(Math.round((stat.count / stat.total) * 100));
-		}, 300);
-		return () => clearTimeout(timer);
-	}, [stat]);
-
-	return (
-		<li className="pet-stat-item">
-			<div className="pet-stat-top">
-				<div className="pet-stat-label">
-					<span className="pet-stat-emoji">{stat.emoji}</span>
-					{stat.label}
-				</div>
-				<div className="pet-stat-count">{stat.count}</div>
-			</div>
-			<div className="pet-stat-bar">
-				<div
-					className={`pet-stat-fill ${stat.color}`}
-					style={{ width: `${width}%` }}
-				/>
-			</div>
-		</li>
-	);
-};
 
 const KPICard = ({ item }: { item: any }) => (
 	<div className={`pc-metric-card ${item.color}`}>
@@ -345,8 +243,8 @@ const LegendItem = ({ color, label, count }: { color: string; label: string; cou
 import { getDashboardStats } from '@/services/QuanLyPetStore';
 
 const TrangChu = () => {
-	const [activePeriod, setActivePeriod] = useState('12T');
 	const [filterPeriod, setFilterPeriod] = useState('7 days');
+	const [searchQuery, setSearchQuery] = useState('');
 	const [stats, setStats] = useState<any>(null);
 
 	useEffect(() => {
@@ -357,6 +255,48 @@ const TrangChu = () => {
 		fetchStats();
 	}, []);
 
+	// Handle button clicks
+	const handleViewAllNotifs = () => {
+		message.info('Chức năng "Xem tất cả thông báo" đang được phát triển.');
+	};
+
+	const handleBannerClick = (type: string) => {
+		if (type === 'spa') {
+			message.success('Đang chuyển đến trang Đặt lịch...');
+			history.push('/appointments');
+		} else {
+			message.success('Đang chuyển đến danh sách Bác sĩ...');
+			history.push('/quan-ly-bac-si');
+		}
+	};
+
+	const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFilterPeriod(e.target.value);
+		message.success(`Đã cập nhật dữ liệu biểu đồ theo: ${e.target.options[e.target.selectedIndex].text}`);
+	};
+
+	// Dynamic data derivations
+	const displayedNotifs = NOTIFICATIONS.filter(item =>
+		item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+		item.desc.toLowerCase().includes(searchQuery.toLowerCase())
+	);
+
+	const getAppointmentSeries = () => {
+		if (filterPeriod === '30 days') return [{ name: 'Lịch hẹn', data: [45, 52, 38, 60, 48, 72, 65] }];
+		if (filterPeriod === '3 months') return [{ name: 'Lịch hẹn', data: [120, 145, 110, 180, 135, 210, 190] }];
+		return [{ name: 'Lịch hẹn', data: [18, 22, 15, 28, 20, 35, 24] }];
+	};
+
+	const dynamicChartOptions: ApexCharts.ApexOptions = {
+		...appointmentChartOptions,
+		xaxis: {
+			...appointmentChartOptions.xaxis,
+			categories: filterPeriod === '7 days' ? ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'] :
+				filterPeriod === '30 days' ? ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7'] :
+					['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7']
+		}
+	};
+
 	// Mapping dữ liệu từ API vào UI
 	const dynamicKPI = [
 		{
@@ -365,7 +305,7 @@ const TrangChu = () => {
 			trend: '+12.5%',
 			trendDir: 'up',
 			icon: <PawPrint size={24} strokeWidth={1.75} />,
-			color: 'warm',
+			color: 'pink',
 		},
 		{
 			label: 'Tổng khách hàng',
@@ -373,7 +313,7 @@ const TrangChu = () => {
 			trend: '+8.2%',
 			trendDir: 'up',
 			icon: <UserCheck size={24} strokeWidth={1.75} />,
-			color: 'mint',
+			color: 'warm',
 		},
 		{
 			label: 'Tổng bác sĩ',
@@ -381,14 +321,14 @@ const TrangChu = () => {
 			trend: '+5.7%',
 			trendDir: 'up',
 			icon: <HeartPulse size={24} strokeWidth={1.75} />,
-			color: 'pink',
+			color: 'mint',
 		},
 		{
-			label: 'Tổng tài khoản',
+			label: 'Tổng lịch hẹn',
 			value: stats?.total_users || 6,
 			trend: '+2.1%',
 			trendDir: 'up',
-			icon: <UserCog size={24} strokeWidth={1.75} />,
+			icon: <CalendarDays size={24} strokeWidth={1.75} />,
 			color: 'peach',
 		},
 	];
@@ -402,19 +342,16 @@ const TrangChu = () => {
 				<div className="pc-header-center">
 					<div className="pc-header-search">
 						<Search size={18} strokeWidth={1.75} className="search-icon" />
-						<input type="text" placeholder="Tìm kiếm hệ thống..." />
+						<input
+							type="text"
+							placeholder="Tìm kiếm thông báo..."
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
 					</div>
 				</div>
 				<div className="pc-header-actions">
-					<div className="pc-user-profile">
-						<div className="pc-user-avatar">
-							<img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" />
-						</div>
-						<div className="pc-user-info">
-							<span className="pc-user-name">Nguyễn Văn A</span>
-							<span className="pc-user-role">Administrator</span>
-						</div>
-					</div>
+					<HeaderProfile />
 				</div>
 			</div>
 
@@ -437,7 +374,7 @@ const TrangChu = () => {
 						<select
 							className="pc-dropdown"
 							value={filterPeriod}
-							onChange={(e) => setFilterPeriod(e.target.value)}
+							onChange={handleFilterChange}
 						>
 							<option value="7 days">7 ngày qua</option>
 							<option value="30 days">30 ngày qua</option>
@@ -445,7 +382,7 @@ const TrangChu = () => {
 						</select>
 					</div>
 					<div className="pc-card-body">
-						<Chart options={appointmentChartOptions} series={appointmentSeries} type="area" height={280} />
+						<Chart options={dynamicChartOptions} series={getAppointmentSeries()} type="area" height={280} />
 					</div>
 				</div>
 
@@ -458,12 +395,12 @@ const TrangChu = () => {
 						</div>
 					</div>
 					<div className="pc-card-body donut-body">
-						<Chart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={260} />
+						<Chart options={getDynamicDonutOptions(stats)} series={statusDonutSeriesData(stats)} type="donut" height={260} />
 						<div className="donut-legends">
-							<LegendItem color="#3B4D43" label="Đã khám" count={117} />
-							<LegendItem color="#5B8A72" label="Chờ khám" count={26} />
-							<LegendItem color="#E8E2D2" label="Hủy lịch" count={8} />
-							<LegendItem color="#8B5A5A" label="Khẩn cấp" count={5} />
+							<LegendItem color="#2A3D33" label="Đã khám" count={stats?.appointments_completed || 0} />
+							<LegendItem color="#1F5A3E" label="Chờ khám" count={stats?.appointments_pending || 0} />
+							<LegendItem color="#D6D0C4" label="Hủy lịch" count={stats?.appointments_cancelled || 0} />
+							<LegendItem color="#6E3542" label="Khẩn cấp" count={stats?.appointments_confirmed || 0} />
 						</div>
 					</div>
 				</div>
@@ -491,14 +428,20 @@ const TrangChu = () => {
 							<h3>Thông báo hệ thống</h3>
 							<span className="notif-badge-new">Mới</span>
 						</div>
-						<a className="pc-view-all">
+						<a className="pc-view-all" onClick={handleViewAllNotifs}>
 							Xem tất cả <ArrowRightOutlined />
 						</a>
 					</div>
 					<div className="pc-card-body notif-body">
-						{NOTIFICATIONS.map((item, idx) => (
-							<NotificationItem key={idx} item={item} />
-						))}
+						{displayedNotifs.length > 0 ? (
+							displayedNotifs.map((item, idx) => (
+								<NotificationItem key={idx} item={item} />
+							))
+						) : (
+							<div style={{ textAlign: 'center', padding: '20px', color: '#6B6560' }}>
+								Không tìm thấy thông báo nào.
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
@@ -514,7 +457,7 @@ const TrangChu = () => {
 					<div className="banner-content">
 						<h3>Chăm sóc tận tâm 🐕</h3>
 						<p>Dịch vụ spa cao cấp dành riêng cho thú cưng của bạn</p>
-						<button type="button" className="banner-btn">
+						<button type="button" className="banner-btn" onClick={() => handleBannerClick('spa')}>
 							Khám phá <ArrowRightOutlined />
 						</button>
 					</div>
@@ -529,7 +472,7 @@ const TrangChu = () => {
 					<div className="banner-content">
 						<h3>Sức khỏe là trên hết 🐈</h3>
 						<p>Đội ngũ bác sĩ giàu kinh nghiệm luôn sẵn sàng 24/7</p>
-						<button type="button" className="banner-btn">
+						<button type="button" className="banner-btn" onClick={() => handleBannerClick('health')}>
 							Liên hệ ngay <ArrowRightOutlined />
 						</button>
 					</div>
