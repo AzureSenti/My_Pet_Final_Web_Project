@@ -6,9 +6,10 @@ import {
 	ExclamationCircleOutlined,
 	ArrowRightOutlined,
 } from '@ant-design/icons';
-import { Search, PawPrint, UserCheck, HeartPulse, CalendarDays } from 'lucide-react';
+import { Search, PawPrint, UserCheck, HeartPulse, CalendarDays, PhoneCall, Mail } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
+import { Modal } from 'antd';
 import HeaderProfile from '@/components/HeaderProfile';
 import './components/style.less';
 
@@ -187,10 +188,10 @@ const growthChartOptions: ApexCharts.ApexOptions = {
 		categories: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6'],
 		axisBorder: { show: false },
 		axisTicks: { show: false },
-		labels: { style: { colors: '#B5AFA5', fontSize: '12px', fontWeight: 500 } },
+		labels: { style: { colors: '#7A756E', fontSize: '12px', fontWeight: 500 } },
 	},
 	yaxis: {
-		labels: { style: { colors: '#B5AFA5', fontSize: '12px', fontWeight: 500 } },
+		labels: { style: { colors: '#7A756E', fontSize: '12px', fontWeight: 500 } },
 	},
 	dataLabels: { enabled: false },
 	tooltip: {
@@ -246,6 +247,8 @@ const TrangChu = () => {
 	const [filterPeriod, setFilterPeriod] = useState('7 days');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [stats, setStats] = useState<any>(null);
+	const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
+	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
 	useEffect(() => {
 		const fetchStats = async () => {
@@ -257,16 +260,15 @@ const TrangChu = () => {
 
 	// Handle button clicks
 	const handleViewAllNotifs = () => {
-		message.info('Chức năng "Xem tất cả thông báo" đang được phát triển.');
+		setIsNotifModalOpen(true);
 	};
 
 	const handleBannerClick = (type: string) => {
 		if (type === 'spa') {
 			message.success('Đang chuyển đến trang Đặt lịch...');
-			history.push('/appointments');
+			history.push('/quan-ly-lich-hen');
 		} else {
-			message.success('Đang chuyển đến danh sách Bác sĩ...');
-			history.push('/quan-ly-bac-si');
+			setIsContactModalOpen(true);
 		}
 	};
 
@@ -478,6 +480,58 @@ const TrangChu = () => {
 					</div>
 				</div>
 			</div>
+
+			{/* Modal Xem Tất cả Thông báo */}
+			<Modal
+				title={<h3>Tất cả thông báo 🔔</h3>}
+				visible={isNotifModalOpen}
+				onCancel={() => setIsNotifModalOpen(false)}
+				footer={null}
+				width={600}
+			>
+				<div style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px 0' }}>
+					{NOTIFICATIONS.map((item, idx) => (
+						<div key={idx} style={{ padding: '12px 16px', borderBottom: '1px solid #E5E0D8', display: 'flex', gap: '16px', alignItems: 'center' }}>
+							<div style={{ color: item.type === 'success' ? '#0F5132' : '#842029', background: item.type === 'success' ? '#D1E7DD' : '#F8D7DA', padding: '12px', borderRadius: '50%' }}>
+								{item.type === 'success' ? <SyncOutlined style={{ fontSize: '18px' }} /> : <ExclamationCircleOutlined style={{ fontSize: '18px' }} />}
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontWeight: 600, color: '#4A3F35', fontSize: '15px' }}>{item.title}</div>
+								<div style={{ color: '#7D6E5D', fontSize: '13px', marginTop: '4px' }}>{item.desc}</div>
+							</div>
+							<div style={{ fontSize: '12px', color: '#B5AFA5' }}>{item.time}</div>
+						</div>
+					))}
+				</div>
+			</Modal>
+
+			{/* Modal Liên Hệ */}
+			<Modal
+				title={<h3>Thông tin liên hệ 🏥</h3>}
+				visible={isContactModalOpen}
+				onCancel={() => setIsContactModalOpen(false)}
+				footer={null}
+			>
+				<div style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+					<p style={{ color: '#7D6E5D', fontSize: '15px' }}>Đội ngũ y bác sĩ thú y của chúng tôi sẵn sàng hỗ trợ sức khỏe thú cưng của bạn 24/7. Vui lòng liên hệ qua các kênh dưới đây:</p>
+					
+					<div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: '#FFF8F2', padding: '16px', borderRadius: '12px' }}>
+						<div style={{ background: '#D4A017', color: '#FFF', padding: '12px', borderRadius: '50%' }}><PhoneCall size={24} /></div>
+						<div>
+							<h4 style={{ margin: 0, color: '#4A3F35' }}>Hotline Cấp cứu 24/7</h4>
+							<div style={{ fontSize: '18px', fontWeight: 'bold', color: '#D4A017', marginTop: '4px' }}>1900 1088</div>
+						</div>
+					</div>
+
+					<div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: '#FFF8F2', padding: '16px', borderRadius: '12px' }}>
+						<div style={{ background: '#A7F3D0', color: '#065F46', padding: '12px', borderRadius: '50%' }}><Mail size={24} /></div>
+						<div>
+							<h4 style={{ margin: 0, color: '#4A3F35' }}>Email Hỗ trợ</h4>
+							<div style={{ fontSize: '16px', fontWeight: 'bold', color: '#065F46', marginTop: '4px' }}>support@mypet.com</div>
+						</div>
+					</div>
+				</div>
+			</Modal>
 		</div>
 	);
 };
