@@ -2,8 +2,7 @@ import uuid
 import enum
 from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
-from sqlalchemy import Enum as sqlalchemy_Enum
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -21,21 +20,35 @@ class Appointment(Base):
     __tablename__ = "appointments"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    pet_id = Column(UUID(as_uuid=True), ForeignKey("pets.id"), nullable=False)
-    vet_id = Column(UUID(as_uuid=True), ForeignKey("veterinarians.id"), nullable=False)
-    service_id = Column(UUID(as_uuid=True), ForeignKey("services.id"), nullable=False)
+    owner_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    pet_id = Column(
+        UUID(as_uuid=True), ForeignKey("pets.id"), nullable=False
+    )
+    vet_id = Column(
+        UUID(as_uuid=True), ForeignKey("veterinarians.id"), nullable=False
+    )
+    service_id = Column(
+        UUID(as_uuid=True), ForeignKey("services.id"), nullable=False
+    )
     scheduled_at = Column(DateTime(timezone=True), nullable=False)
     status = Column(
-        sqlalchemy_Enum(AppointmentStatus, name="appointment_status"),
+        Enum(AppointmentStatus, name="appointment_status", create_type=False),
         default=AppointmentStatus.pending,
         nullable=False,
     )
     notes = Column(Text)
-    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
     # Relationships
-    owner = relationship("User", foreign_keys=[owner_id])
-    pet = relationship("Pet", foreign_keys=[pet_id])
-    vet = relationship("Veterinarian", foreign_keys=[vet_id])
-    service = relationship("Service", foreign_keys=[service_id])
+    owner = relationship("User", foreign_keys=[owner_id], backref="appointments_as_owner")
+    pet = relationship("Pet", backref="appointments")
+    vet = relationship("Veterinarian", backref="appointments")
+    service = relationship("Service", backref="appointments")
+    medical_record = relationship(
+        "MedicalRecord", back_populates="appointment", uselist=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<Appointment id={self.id} status={self.status}>"
