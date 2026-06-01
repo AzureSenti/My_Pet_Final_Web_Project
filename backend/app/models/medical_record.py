@@ -18,15 +18,24 @@ class MedicalRecord(Base):
         unique=True,
         nullable=False,
     )
-    pet_id = Column(UUID(as_uuid=True), ForeignKey("pets.id"), nullable=False)
-    vet_id = Column(UUID(as_uuid=True), ForeignKey("veterinarians.id"), nullable=False)
+    pet_id = Column(
+        UUID(as_uuid=True), ForeignKey("pets.id"), nullable=False
+    )
+    vet_id = Column(
+        UUID(as_uuid=True), ForeignKey("veterinarians.id"), nullable=False
+    )
     diagnosis = Column(Text, nullable=False)
     treatment = Column(Text, nullable=False)
     prescription = Column(Text)
     notes = Column(Text)
-    recorded_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    recorded_at = Column(
+        DateTime(timezone=True), default=datetime.utcnow, nullable=False
+    )
 
     # Relationships
-    appointment = relationship("Appointment", foreign_keys=[appointment_id])
-    pet = relationship("Pet", foreign_keys=[pet_id])
-    vet = relationship("Veterinarian", foreign_keys=[vet_id])
+    appointment = relationship("Appointment", back_populates="medical_record")
+    pet = relationship("Pet", backref="medical_records")
+    vet = relationship("Veterinarian", backref="medical_records")
+
+    def __repr__(self) -> str:
+        return f"<MedicalRecord id={self.id} pet_id={self.pet_id}>"

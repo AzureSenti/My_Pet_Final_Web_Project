@@ -1,12 +1,9 @@
 import uuid
 import enum
-from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime, ForeignKey
-from sqlalchemy import Enum as sqlalchemy_Enum
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import DECIMAL
 
 from app.db.session import Base
 
@@ -33,14 +30,16 @@ class Payment(Base):
         unique=True,
         nullable=False,
     )
-    owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    amount = Column(DECIMAL(10, 2), nullable=False)
+    owner_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    amount = Column(Numeric(10, 2), nullable=False)
     method = Column(
-        sqlalchemy_Enum(PaymentMethod, name="payment_method"),
+        Enum(PaymentMethod, name="payment_method", create_type=False),
         nullable=False,
     )
     status = Column(
-        sqlalchemy_Enum(PaymentStatus, name="payment_status"),
+        Enum(PaymentStatus, name="payment_status", create_type=False),
         default=PaymentStatus.pending,
         nullable=False,
     )
@@ -48,5 +47,8 @@ class Payment(Base):
     paid_at = Column(DateTime(timezone=True))
 
     # Relationships
-    appointment = relationship("Appointment", foreign_keys=[appointment_id])
-    owner = relationship("User", foreign_keys=[owner_id])
+    appointment = relationship("Appointment", backref="payment")
+    owner = relationship("User", backref="payments")
+
+    def __repr__(self) -> str:
+        return f"<Payment id={self.id} status={self.status}>"
