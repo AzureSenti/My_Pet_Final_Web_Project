@@ -1,16 +1,16 @@
 // ============================================
-// 🐾 VetLayout — NEW Color Palette (Manrope)
+// 🐾 VetLayout — Color Palette (Matching Admin)
 // ============================================
 
-@pc-bg: #F4EBD9; // Tertiary
+@pc-bg: #FFF8F2; // Creamy Honey background
 @pc-card: #FFFFFF;
-@pc-text: #2D2C28; // Dark text
-@pc-text-secondary: #706F6C; // Neutral
-@pc-text-muted: #A3A19C; 
-@pc-border: #E0D6C8; // Darker beige for borders
-@pc-primary: #7A631B; // Primary
+@pc-text: #4A3F35; // Headings dark brown
+@pc-text-secondary: #7D6E5D; // Body text warm gray
+@pc-text-muted: #9E9385; // Muted text
+@pc-border: #E3D9CB; // Surface Dim
+@pc-primary: #D4A017; // Primary Honey Gold
 @pc-secondary: #135D54; // Secondary
-@sidebar-bg: #F4EBD9;
+@sidebar-bg: #FFF8F2;
 @sidebar-width: 250px;
 @sidebar-collapsed: 64px;
 @header-h: 60px;
@@ -42,6 +42,39 @@
 
 .collapsed {
   width: @sidebar-collapsed;
+
+  .brand {
+    padding: 20px 8px 16px;
+    align-items: center;
+  }
+
+  .nav {
+    padding: 8px 4px;
+
+    &::before {
+      height: 8px;
+    }
+  }
+
+  .navItem {
+    padding: 0 8px;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 8px;
+  }
+
+  .navIcon {
+    margin: 0;
+  }
+
+  .sidebarToggle {
+    padding: 12px 8px 20px;
+  }
+
+  .toggleBtn {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 // Brand
@@ -66,6 +99,17 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+
+  .collapsed & {
+    display: none;
+  }
+}
+
+.brandIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .brandName {
@@ -121,7 +165,7 @@
 
   &:hover {
     color: @pc-primary !important;
-    background: rgba(122, 99, 27, 0.08);
+    background: rgba(212, 160, 23, 0.08);
   }
 
   &::after {
@@ -131,13 +175,13 @@
 
 .navActive {
   background: #FCE38A !important;
-  color: #2D2C28 !important;
+  color: #4A3F35 !important;
   font-weight: 800 !important;
   box-shadow: none;
 
   &:hover {
     background: darken(#FCE38A, 5%) !important;
-    color: #2D2C28 !important;
+    color: #4A3F35 !important;
   }
 }
 
@@ -169,47 +213,40 @@
   gap: 8px;
   cursor: pointer;
   transition: @transition;
-  box-shadow: 0 4px 12px rgba(122, 99, 27, 0.2);
+  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2);
 
   &:hover {
     background: darken(@pc-primary, 5%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(122, 99, 27, 0.3);
+    box-shadow: 0 6px 16px rgba(212, 160, 23, 0.3);
   }
 }
 
-// Sidebar footer
-.sidebarFooter {
+// Sidebar toggle button
+.sidebarToggle {
   padding: 12px 16px 24px;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: center;
 }
 
-.footerItem {
+.toggleBtn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid @pc-border;
   border-radius: 12px;
-  color: @pc-text-secondary !important;
-  font-size: 14px;
-  font-weight: 600;
+  background: @pc-card;
+  color: @pc-primary;
   cursor: pointer;
-  text-decoration: none !important;
+  font-size: 18px;
   transition: @transition;
-  white-space: nowrap;
-  border: none;
-  background: none;
-  width: 100%;
 
   &:hover {
-    background: rgba(0,0,0,0.04);
-    color: @pc-text !important;
-  }
-
-  &::after {
-    display: none !important;
+    background: @pc-primary;
+    color: @pc-card;
+    border-color: @pc-primary;
   }
 }
 
