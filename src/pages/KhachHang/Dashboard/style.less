@@ -1,0 +1,308 @@
+@import '../../../styles/theme.less';
+
+.saasDashboard {
+    .welcomeSection {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+
+        .welcomeText {
+            h1 {
+                font-size: 34px;
+                font-weight: 800;
+                color: @text-main;
+                margin-bottom: 4px;
+                letter-spacing: -1.2px;
+            }
+
+            p {
+                font-size: 16px;
+                color: #71717A;
+            }
+        }
+
+        .headerActions {
+            display: flex;
+            gap: 12px;
+
+            .iconBtn {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                border: 1px solid @border-soft;
+                background: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #71717A;
+
+                &:hover {
+                    color: @primary;
+                    border-color: @primary;
+                }
+            }
+
+            .btnPrimary {
+                background: @primary;
+                border: none;
+                height: 44px;
+                padding: 0 28px;
+                border-radius: 12px;
+                font-weight: 700;
+                color: white;
+                box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+
+                &:hover {
+                    background: #B88A12;
+                    transform: translateY(-2px);
+                }
+            }
+        }
+    }
+
+    .metricGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+
+        .metricCard {
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid @border-soft;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            .iconBox {
+                width: 60px;
+                height: 60px;
+                border-radius: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &.green {
+                    background: rgba(212, 160, 23, 0.1);
+                    color: @primary;
+                }
+
+                &.gold {
+                    background: #FEF3C7;
+                    color: #D97706;
+                }
+
+                &.blue {
+                    background: #E0E7FF;
+                    color: #4338CA;
+                }
+            }
+
+            .info {
+                .label {
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: #71717A;
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                }
+
+                .value {
+                    font-size: 32px;
+                    font-weight: 900;
+                    color: @text-main;
+                }
+            }
+        }
+    }
+
+    .mainCard {
+        background: white;
+        padding: 32px;
+        border-radius: 24px;
+        border: 1px solid @border-soft;
+
+        .cardHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+
+            h3 {
+                font-size: 22px;
+                font-weight: 800;
+                color: @text-main;
+                margin: 0;
+            }
+
+            .viewAll {
+                color: @primary;
+                font-weight: 700;
+            }
+        }
+
+        .highlightBooking {
+            background: @bg-container;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid @border-soft;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            .bookingInfo {
+                .statusTag {
+                    border-radius: 20px;
+                    font-weight: 700;
+                    border: none;
+                    padding: 4px 16px;
+                    background: @primary;
+                    color: white;
+                    margin-bottom: 12px;
+                }
+
+                h2 {
+                    font-size: 26px;
+                    font-weight: 800;
+                    color: @text-main;
+                    margin: 0 0 8px;
+                }
+
+                .meta {
+                    display: flex;
+                    gap: 16px;
+                    color: #71717A;
+                    font-weight: 600;
+
+                    span {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    }
+                }
+            }
+
+            .petMini {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                background: white;
+                padding: 10px 20px;
+                border-radius: 40px;
+                border: 1px solid @border-soft;
+
+                .name {
+                    strong {
+                        font-size: 16px;
+                        color: @text-main;
+                    }
+
+                    span {
+                        font-size: 12px;
+                        color: #71717A;
+                    }
+                }
+            }
+        }
+    }
+
+    .sideCard {
+        background: @text-main;
+        padding: 32px;
+        border-radius: 24px;
+        color: white;
+
+        h3 {
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        .tipList {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 40px;
+
+            .tipItem {
+                display: flex;
+                gap: 16px;
+
+                .tipDot {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: @primary;
+                    margin-top: 6px;
+                    flex-shrink: 0;
+                }
+
+                strong {
+                    color: white;
+                    display: block;
+                    margin-bottom: 4px;
+                    font-size: 16px;
+                }
+
+                p {
+                    color: rgba(255, 255, 255, 0.6);
+                    margin: 0;
+                    line-height: 1.6;
+                }
+            }
+        }
+
+        .promoBox {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+
+            h4 {
+                color: white;
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 12px;
+            }
+
+            p {
+                color: rgba(255, 255, 255, 0.6);
+                margin-bottom: 20px;
+            }
+
+            .btnSecondary {
+                background: @primary;
+                border: none;
+                color: white;
+                font-weight: 800;
+                height: 44px;
+                border-radius: 12px;
+
+                &:hover {
+                    background: #B88A12;
+                }
+            }
+        }
+    }
+
+    .emptyState {
+        text-align: center;
+        padding: 40px 0;
+
+        .btnOutline {
+            border: 2px solid @primary;
+            color: @primary;
+            font-weight: 800;
+            border-radius: 12px;
+            margin-top: 16px;
+            height: 44px;
+
+            &:hover {
+                background: rgba(212, 160, 23, 0.05);
+            }
+        }
+    }
+}

@@ -10,14 +10,26 @@ const RegisterForm: React.FC = () => {
     const handleSubmit = async (values: any) => {
         setSubmitting(true);
         try {
-            // Giả lập API register
-            console.log('Register values:', values);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const response = await fetch(`${process.env.UMI_APP_API_URL || 'http://localhost:8001'}/api/v1/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    full_name: values.username,
+                    email: values.email,
+                    password: values.password,
+                    role: 'owner'
+                })
+            });
 
-            message.success('Đăng ký thành công! Vui lòng đăng nhập.');
-            history.push('/user/login');
+            if (response.ok) {
+                message.success('Đăng ký thành công! Vui lòng đăng nhập.');
+                history.push('/user/login');
+            } else {
+                const err = await response.json();
+                message.error(err.detail || 'Đăng ký thất bại!');
+            }
         } catch (error) {
-            message.error('Đăng ký thất bại!');
+            message.error('Lỗi kết nối máy chủ!');
         } finally {
             setSubmitting(false);
         }

@@ -1,0 +1,415 @@
+@import '../../../styles/theme.less';
+
+@bg-surface: @bg-page;
+
+.saasAppointmentsPage {
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+
+        .headerLeft {
+            h1 {
+                font-size: 34px;
+                font-weight: 800;
+                color: @text-main;
+                letter-spacing: -1.2px;
+            }
+
+            p {
+                font-size: 16px;
+                color: #71717A;
+            }
+        }
+
+        .btnPrimary {
+            background: @primary;
+            border: none;
+            height: 48px;
+            padding: 0 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+
+            &:hover {
+                background: #B88A12;
+                transform: translateY(-2px);
+            }
+        }
+    }
+
+    .layoutBody {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 40px;
+    }
+
+    .timelineSection {
+        .timelineHeader {
+            margin-bottom: 24px;
+
+            h3 {
+                font-size: 20px;
+                font-weight: 800;
+                color: @text-main;
+            }
+        }
+
+        .appCardSaaS {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid @border-soft;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 24px;
+
+            &:hover {
+                border-color: @primary;
+
+                .btnArrow {
+                    background: @primary;
+                    color: white;
+                }
+            }
+
+            .timeLabel {
+                width: 80px;
+                text-align: center;
+                border-right: 1px solid @border-soft;
+                padding-right: 24px;
+
+                .day {
+                    font-size: 30px;
+                    font-weight: 900;
+                    color: @text-main;
+                    line-height: 1;
+                }
+
+                .month {
+                    font-size: 12px;
+                    font-weight: 800;
+                    color: @primary;
+                    text-transform: uppercase;
+                    margin-bottom: 8px;
+                }
+
+                .exactTime {
+                    font-size: 13px;
+                    font-weight: 800;
+                    color: white;
+                    background: @text-main;
+                    border-radius: 8px;
+                    padding: 4px 0;
+                }
+            }
+
+            .cardInfo {
+                flex: 1;
+
+                .badgeRow {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 12px;
+
+                    .statusBadge {
+                        border: none;
+                        font-weight: 800;
+                        border-radius: 20px;
+                        padding: 4px 14px;
+
+                        &.confirmed {
+                            background: rgba(212, 160, 23, 0.1);
+                            color: @primary;
+                        }
+
+                        &.pending {
+                            background: @bg-container;
+                            color: #71717A;
+                        }
+                    }
+
+                    .svcName {
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #71717A;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    }
+                }
+
+                .mainTitle {
+                    font-size: 20px;
+                    font-weight: 800;
+                    color: @text-main;
+                    margin-bottom: 16px;
+
+                    strong {
+                        color: @primary;
+                    }
+                }
+
+                .doctorInfo {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 14px;
+                    color: #71717A;
+
+                    strong {
+                        color: @text-main;
+                    }
+                }
+            }
+
+            .btnArrow {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                background: @bg-container;
+                border: none;
+                color: #BCB8B1;
+                transition: all 0.3s;
+            }
+        }
+    }
+
+    .infoSection {
+        .clinicDetails {
+            background: white;
+            border-radius: 28px;
+            border: 1px solid @border-soft;
+            padding: 32px;
+
+            h3 {
+                font-size: 22px;
+                font-weight: 800;
+                color: @text-main;
+                margin-bottom: 32px;
+            }
+
+            .infoList {
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+                margin-bottom: 40px;
+
+                .infoItem {
+                    display: flex;
+                    gap: 16px;
+
+                    .iconBox {
+                        width: 44px;
+                        height: 44px;
+                        border-radius: 12px;
+                        background: @bg-container;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: @primary;
+                    }
+
+                    .text {
+                        strong {
+                            font-size: 16px;
+                            color: @text-main;
+                            display: block;
+                            margin-bottom: 4px;
+                        }
+
+                        p {
+                            font-size: 14px;
+                            color: #71717A;
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+
+            .reminderBox {
+                background: rgba(212, 160, 23, 0.05);
+                padding: 24px;
+                border-radius: 20px;
+                border: 1px solid rgba(212, 160, 23, 0.1);
+
+                h4 {
+                    color: @primary;
+                    font-weight: 800;
+                    margin-bottom: 12px;
+                }
+
+                ul {
+                    padding-left: 20px;
+                    margin: 0;
+
+                    li {
+                        font-size: 14px;
+                        color: #71717A;
+                        font-weight: 600;
+                        margin-bottom: 8px;
+                    }
+                }
+            }
+        }
+    }
+
+    .emptyCard {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 28px;
+        border: 1px dashed @border-soft;
+
+        svg {
+            color: @border-soft;
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #71717A;
+            font-weight: 600;
+        }
+    }
+}
+
+/* Enhanced Premium SaaS Modal Styling */
+.saasModal {
+    :global {
+        .ant-modal-content {
+            border-radius: 32px;
+            background: @bg-surface;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .ant-modal-header {
+            background: white;
+            padding: 32px 40px;
+            border-bottom: 1px solid @border-soft;
+
+            .ant-modal-title {
+                h3 {
+                    font-size: 26px;
+                    font-weight: 800;
+                    color: @text-main;
+                    margin: 0;
+                    letter-spacing: -0.5px;
+                }
+            }
+        }
+
+        .ant-modal-close {
+            top: 32px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            background: @bg-container;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+
+            &:hover {
+                background: #E5E7EB;
+                color: @text-main;
+            }
+        }
+
+        .ant-modal-body {
+            padding: 40px;
+            background: @bg-surface;
+        }
+
+        .ant-modal-footer {
+            border-top: 1px solid @border-soft;
+            padding: 24px 40px;
+            background: white;
+
+            .ant-btn {
+                height: 52px;
+                padding: 0 32px;
+                border-radius: 16px;
+                font-weight: 800;
+                font-size: 15px;
+                border: 2px solid @border-soft;
+                color: @text-main;
+
+                &:hover {
+                    border-color: @text-main;
+                }
+
+                &.ant-btn-primary {
+                    background: @primary;
+                    border: none;
+                    color: white;
+                    box-shadow: 0 10px 20px rgba(212, 160, 23, 0.2);
+
+                    &:hover {
+                        background: #B88A12;
+                        transform: translateY(-2px);
+                        box-shadow: 0 15px 30px rgba(212, 160, 23, 0.3);
+                    }
+                }
+            }
+        }
+
+        /* Form Fields Redesign */
+        .ant-form-item-label {
+            padding-bottom: 12px;
+
+            label {
+                font-weight: 800;
+                color: @text-main;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        .ant-input,
+        .ant-select-selector,
+        .ant-picker {
+            border: 2px solid @border-soft !important;
+            border-radius: 16px !important;
+            background: white !important;
+            padding: 12px 20px !important;
+            height: auto !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+
+            &:hover {
+                border-color: @primary !important;
+            }
+
+            &:focus,
+            &-focused {
+                border-color: @primary !important;
+                box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.1) !important;
+            }
+        }
+
+        .ant-select-selection-item {
+            font-weight: 600;
+            line-height: 24px !important;
+        }
+
+        .ant-input-textarea {
+            border: 2px solid @border-soft !important;
+            border-radius: 18px !important;
+            padding: 16px 20px !important;
+
+            &:focus {
+                border-color: @primary !important;
+            }
+        }
+    }
+}
