@@ -2,7 +2,8 @@ import {
   CalendarOutlined,
   LogoutOutlined,
   MessageOutlined,
-  QuestionCircleOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   DashboardOutlined,
 } from '@ant-design/icons';
 import { Avatar, Input, Badge, Dropdown, Menu } from 'antd';
@@ -51,14 +52,14 @@ const VetLayout: React.FC<VetLayoutProps> = ({ children, location }) => {
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
         {/* Brand */}
-        <div className={styles.brand} onClick={() => setCollapsed(!collapsed)}>
+        <div className={`${styles.brand} ${collapsed ? styles.brandCollapsed : ''}`} onClick={() => setCollapsed(!collapsed)}>
           <div className={styles.brandIcon}>
             <PawPrint size={collapsed ? 22 : 28} strokeWidth={2.5} />
           </div>
           {!collapsed && (
             <div className={styles.brandText}>
-              <span className={styles.brandName}>PetCare Pro</span>
-              <span className={styles.brandRole}>Veterinary Specialist</span>
+              <span className={styles.brandName}>PetCare</span>
+              <span className={styles.brandRole}>Doctor Suite</span>
             </div>
           )}
         </div>
@@ -81,16 +82,15 @@ const VetLayout: React.FC<VetLayoutProps> = ({ children, location }) => {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className={styles.sidebarFooter}>
-          <a className={styles.footerItem} href="#support">
-            <QuestionCircleOutlined />
-            {!collapsed && <span>Support</span>}
-          </a>
-          <div className={styles.footerItem} onClick={handleLogout} style={{ cursor: 'pointer' }}>
-            <LogoutOutlined />
-            {!collapsed && <span>Logout</span>}
-          </div>
+        {/* Sidebar Toggle Button */}
+        <div className={styles.sidebarToggle}>
+          <button
+            className={styles.toggleBtn}
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? 'Mở rộng sidebar' : 'Thu hẹp sidebar'}
+          >
+            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </button>
         </div>
       </aside>
 
