@@ -127,7 +127,8 @@ export default [
 
 	{
 		path: '/',
-		redirect: '/dashboard',
+		layout: false,
+		component: './LandingPage',
 	},
 	{
 		path: '/403',
