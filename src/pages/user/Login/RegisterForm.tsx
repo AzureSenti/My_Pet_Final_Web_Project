@@ -1,4 +1,4 @@
-import { LockOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
+import { User, Mail, Lock } from 'lucide-react';
 import { Button, Form, Input, message } from 'antd';
 import React, { useState } from 'react';
 import { history } from 'umi';
@@ -42,7 +42,7 @@ const RegisterForm: React.FC = () => {
                 rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
             >
                 <Input
-                    prefix={<UserOutlined />}
+                    prefix={<User size={18} style={{ opacity: 0.5, marginRight: 8 }} />}
                     placeholder="Họ và tên"
                     size="large"
                 />
@@ -56,7 +56,7 @@ const RegisterForm: React.FC = () => {
                 ]}
             >
                 <Input
-                    prefix={<MailOutlined />}
+                    prefix={<Mail size={18} style={{ opacity: 0.5, marginRight: 8 }} />}
                     placeholder="Email"
                     size="large"
                 />
@@ -67,7 +67,7 @@ const RegisterForm: React.FC = () => {
                 rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
             >
                 <Input.Password
-                    prefix={<LockOutlined />}
+                    prefix={<Lock size={18} style={{ opacity: 0.5, marginRight: 8 }} />}
                     placeholder="Mật khẩu"
                     size="large"
                 />
@@ -89,14 +89,14 @@ const RegisterForm: React.FC = () => {
                 ]}
             >
                 <Input.Password
-                    prefix={<LockOutlined />}
+                    prefix={<Lock size={18} style={{ opacity: 0.5, marginRight: 8 }} />}
                     placeholder="Xác nhận mật khẩu"
                     size="large"
                 />
             </Form.Item>
 
             <Button type="primary" htmlType="submit" block size="large" loading={submitting}>
-                Đăng ký
+                Tạo tài khoản ngay
             </Button>
         </Form>
     );
