@@ -1,0 +1,103 @@
+@import '../../styles/theme.less';
+
+.userLayout {
+    min-height: 100vh;
+    background-color: @bg-page;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: @text-main;
+
+    .navContainer {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        height: 80px;
+        padding: 0 40px;
+        background: rgba(251, 249, 249, 0.85);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid @border-soft;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .logoWrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+
+            .logoIcon {
+                width: 44px;
+                height: 44px;
+                background: @text-main;
+                color: white;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 8px 16px rgba(29, 27, 26, 0.1);
+            }
+
+            span {
+                font-weight: 800;
+                font-size: 22px;
+                color: @text-main;
+                letter-spacing: -1px;
+            }
+        }
+
+        .mainMenu {
+            display: flex;
+            gap: 12px;
+            background: @bg-container;
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid @border-soft;
+
+            .menuItem {
+                padding: 8px 24px;
+                border-radius: 10px;
+                color: @text-secondary;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                transition: @transition-smooth;
+
+                &:hover {
+                    color: @primary;
+                    background: white;
+                }
+
+                &.active {
+                    color: white;
+                    background: @primary;
+                    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+                }
+            }
+        }
+
+        .rightActions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+    }
+
+    .contentArea {
+        padding: 40px;
+        max-width: 1440px;
+        margin: 0 auto;
+        animation: fadeIn 0.4s ease-out;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
