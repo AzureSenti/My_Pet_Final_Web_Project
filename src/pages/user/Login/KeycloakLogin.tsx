@@ -30,7 +30,11 @@ const LoginWithCredentials: React.FC = () => {
 				});
 
 				message.success('Đăng nhập thành công!');
-				history.push('/dashboard');
+				if (userData?.role === 'vet') {
+					history.push('/bac-si/dashboard');
+				} else {
+					history.push('/dashboard');
+				}
 			} else {
 				message.error('Email hoặc mật khẩu không đúng!');
 			}
