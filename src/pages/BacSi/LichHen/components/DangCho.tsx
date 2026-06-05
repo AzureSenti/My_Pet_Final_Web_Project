@@ -1,113 +1,116 @@
-import React from 'react';
-import { Table, Pagination } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Pagination, Spin, message } from 'antd';
+import { getAppointments, updateAppointmentStatus } from '@/services/BacSi/doctorService';
 import styles from '../index.module.less';
-import { FieldTimeOutlined, CheckCircleOutlined, CalendarOutlined } from '@ant-design/icons';
-
-const data = [
-  {
-    id: 1,
-    date: '25/10/2023',
-    time: '09:30',
-    petName: 'Heo',
-    petType: 'Mèo',
-    petAge: '2 tuổi',
-    ownerName: 'Lê Văn C',
-    phone: '0901234567',
-    reason: 'Khám tổng quát',
-    note: 'Cần kiểm tra cân nặng',
-    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=heo',
-  },
-  {
-    id: 2,
-    date: '25/10/2023',
-    time: '10:15',
-    petName: 'Milo',
-    petType: 'Chó Poodle',
-    petAge: '4 tuổi',
-    ownerName: 'Trần Thị B',
-    phone: '0988777666',
-    reason: 'Tiêm phòng',
-    note: '—',
-    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=milo2',
-  },
-  {
-    id: 3,
-    date: '26/10/2023',
-    time: '14:00',
-    petName: 'Luna',
-    petType: 'Mèo Anh',
-    petAge: '1 tuổi',
-    ownerName: 'Phạm Minh H',
-    phone: '0933222111',
-    reason: 'Tư vấn dinh dưỡng',
-    note: 'Nôn mửa kéo dài',
-    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=luna2',
-  },
-  {
-    id: 4,
-    date: '26/10/2023',
-    time: '15:30',
-    petName: 'Bobi',
-    petType: 'Hamster',
-    petAge: '6 tháng',
-    ownerName: 'Hoàng An',
-    phone: '0944555666',
-    reason: 'Khám răng',
-    note: 'Chăm sóc thú nhỏ',
-    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=bobi',
-  },
-];
 
 const DangCho: React.FC = () => {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const fetchData = async (currentPage: number = 1) => {
+    try {
+      setLoading(true);
+      const result = await getAppointments(currentPage, pageSize, 'pending');
+      setData(result.items || []);
+      setTotal(result.total || 0);
+    } catch (error) {
+      console.error('Lỗi khi tải lịch hẹn chờ:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(page);
+  }, [page]);
+
+  const handleConfirm = async (id: string) => {
+    try {
+      await updateAppointmentStatus(id, 'confirmed');
+      message.success('Đã xác nhận lịch hẹn');
+      fetchData(page);
+    } catch (error) {
+      message.error('Lỗi khi xác nhận lịch hẹn');
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      await updateAppointmentStatus(id, 'cancelled');
+      message.success('Đã từ chối lịch hẹn');
+      fetchData(page);
+    } catch (error) {
+      message.error('Lỗi khi từ chối lịch hẹn');
+    }
+  };
+
   const columns = [
     {
       title: 'Ngày',
-      dataIndex: 'date',
       key: 'date',
-      render: (text: string) => <span style={{ fontWeight: 700, color: '#706F6C' }}>{text}</span>,
+      render: (_: any, record: any) => {
+        const date = new Date(record.scheduled_at);
+        return <span style={{ fontWeight: 700, color: '#706F6C' }}>{date.toLocaleDateString('vi-VN')}</span>;
+      },
     },
     {
       title: 'Giờ',
-      dataIndex: 'time',
       key: 'time',
-      render: (text: string) => <span style={{ fontWeight: 800, fontSize: '15px', color: '#2D2C28' }}>{text}</span>,
+      render: (_: any, record: any) => {
+        const date = new Date(record.scheduled_at);
+        const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        return <span style={{ fontWeight: 800, fontSize: '15px', color: '#2D2C28' }}>{timeStr}</span>;
+      },
     },
     {
       title: 'Thú cưng & Chủ nuôi',
       key: 'pet',
       render: (_: any, record: any) => (
         <div className={styles.petCell}>
-          <div className={`${styles.petIcon} ${record.petType.includes('Mèo') ? styles.teal : styles.gold}`}>
+          <div className={`${styles.petIcon} ${styles.teal}`}>
             🐾
           </div>
           <div className={styles.petInfo}>
             <span className={styles.petName}>
-              {record.petName} <span className={styles.spec}>{record.petType}</span>
+              {record.pet?.name} <span className={styles.spec}>{record.pet?.breed || record.pet?.species}</span>
             </span>
-            <span className={styles.petDesc}>{record.ownerName} • {record.phone}</span>
+            <span className={styles.petDesc}>{record.owner?.full_name} • {record.owner?.phone || record.owner?.email}</span>
           </div>
         </div>
       ),
     },
     {
       title: 'Lý do',
-      dataIndex: 'reason',
       key: 'reason',
-      render: (text: string) => <span style={{ fontWeight: 600, color: '#2D2C28' }}>{text}</span>,
+      render: (_: any, record: any) => (
+        <span style={{ fontWeight: 600, color: '#2D2C28' }}>{record.service?.name}</span>
+      ),
     },
     {
       title: 'Ghi chú',
-      dataIndex: 'note',
       key: 'note',
-      render: (text: string) => <span style={{ color: '#706F6C', fontStyle: 'italic' }}>{text}</span>,
+      render: (_: any, record: any) => (
+        <span style={{ color: '#706F6C', fontStyle: 'italic' }}>{record.notes || '—'}</span>
+      ),
     },
     {
       title: 'Hành động',
       key: 'action',
-      render: () => (
+      render: (_: any, record: any) => (
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className={`${styles.btnAction} ${styles.primary}`}>Xác nhận</button>
-          <button className={`${styles.btnAction} ${styles.outlined}`} style={{ color: '#E53E3E', borderColor: '#E53E3E' }}>Từ chối</button>
+          <button className={`${styles.btnAction} ${styles.primary}`} onClick={() => handleConfirm(record.id)}>
+            Xác nhận
+          </button>
+          <button
+            className={`${styles.btnAction} ${styles.outlined}`}
+            style={{ color: '#E53E3E', borderColor: '#E53E3E' }}
+            onClick={() => handleReject(record.id)}
+          >
+            Từ chối
+          </button>
         </div>
       ),
     },
@@ -116,15 +119,25 @@ const DangCho: React.FC = () => {
   return (
     <>
       <div className={styles.tableContainer}>
-        <Table 
-          columns={columns} 
-          dataSource={data} 
-          pagination={false} 
-          rowKey="id"
-        />
+        <Spin spinning={loading}>
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            rowKey="id"
+            locale={{ emptyText: 'Không có lịch hẹn nào đang chờ xác nhận' }}
+          />
+        </Spin>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px' }}>
-          <span style={{ fontSize: '13px', color: '#706F6C', fontWeight: 600 }}>Hiển thị 1 - 4 trên tổng số 4 yêu cầu</span>
-          <Pagination defaultCurrent={1} total={4} pageSize={4} />
+          <span style={{ fontSize: '13px', color: '#706F6C', fontWeight: 600 }}>
+            Hiển thị {data.length} trên tổng số {total} yêu cầu
+          </span>
+          <Pagination
+            current={page}
+            total={total}
+            pageSize={pageSize}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       </div>
     </>

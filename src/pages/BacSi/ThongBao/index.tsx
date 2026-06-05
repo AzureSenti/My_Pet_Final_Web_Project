@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import styles from './index.module.less';
 
+// TODO: Kết nối API notifications khi backend sẵn sàng (hiện tại đang dùng dữ liệu mẫu)
 const ThongBao: React.FC = () => {
   return (
     <div className={styles.page}>

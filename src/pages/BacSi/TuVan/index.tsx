@@ -1,166 +1,166 @@
 import { MessageOutlined } from '@ant-design/icons';
-import { Button, Space, Tag, Tabs, Typography } from 'antd';
-import React, { useState } from 'react';
+import { Button, Tag, Tabs, Typography, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { history } from 'umi';
+import { getConversations, getUnreadCount } from '@/services/BacSi/doctorService';
 import styles from './index.module.less';
 
 const { Title, Text } = Typography;
 
-type ConsultStatus = 'cho-phan-hoi' | 'da-phan-hoi';
-
-import { history } from 'umi';
-
-interface Consultation {
-  id: number;
-  title: string;
-  ownerName: string;
-  petName: string;
-  petType: string;
-  content: string;
-  status: ConsultStatus;
-  isUrgent?: boolean;
-  time: string;
-  reply?: string;
-  replyTime?: string;
-}
-
-const mockConsultations: Consultation[] = [
-  {
-    id: 1,
-    title: 'Luna hay gãi tai',
-    ownerName: 'Phạm Thu E',
-    petName: 'Luna',
-    petType: 'Mèo',
-    content: '"Mèo Luna của em hay gãi tai, tai có mủi hôi. Em nên làm gì ạ?"',
-    status: 'cho-phan-hoi',
-    time: '12/05/2026 21:00',
-  },
-  {
-    id: 2,
-    title: 'Mimi không chịu ăn',
-    ownerName: 'Nguyễn Minh D',
-    petName: 'Mimi',
-    petType: 'Mèo',
-    content: '"Mimi bỏ ăn từ sáng nay, nằm lờ đờ không muốn vận động."',
-    status: 'da-phan-hoi',
-    time: '11/05/2026 23:00',
-    reply: '"Chào bạn, tình trạng lờ đờ bỏ ăn ở mèo có thể là dấu hiệu sốt hoặc nhiễm trùng. Bạn nên đưa Mimi đến phòng khám sớm để xét nghiệm máu..."',
-    replyTime: '12/05/2026 08:30',
-  },
-  {
-    id: 3,
-    title: 'Chó bị nôn mửa liên tục',
-    ownerName: 'Trần Hoàng L',
-    petName: 'Bắp',
-    petType: 'Chó Poodle',
-    content: '"Bắp bị nôn ra dịch vàng từ 3h sáng đến giờ đã 5 lần rồi bác sĩ ơi. Giờ bé mệt lắm."',
-    status: 'cho-phan-hoi',
-    isUrgent: true,
-    time: '13/05/2026 08:15',
-  },
-];
-
 const TuVan: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('tat-ca');
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalUnread, setTotalUnread] = useState(0);
 
-  const filtered = mockConsultations.filter((c) => {
-    if (activeTab === 'cho-phan-hoi') return c.status === 'cho-phan-hoi';
-    if (activeTab === 'da-phan-hoi') return c.status === 'da-phan-hoi';
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [convData, unreadData] = await Promise.all([
+          getConversations(1, 50),
+          getUnreadCount(),
+        ]);
+        setConversations(convData.items || []);
+        setTotalUnread(unreadData.total_unread || 0);
+      } catch (error) {
+        console.error('Lỗi khi tải cuộc trò chuyện:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const filtered = conversations.filter((c) => {
+    if (activeTab === 'cho-phan-hoi') return c.unread_count > 0;
+    if (activeTab === 'da-phan-hoi') return c.unread_count === 0;
     return true;
   });
+
+  const getOtherParticipant = (conv: any) => {
+    // Lấy participant không phải mình (bác sĩ)
+    const participants = conv.participants || [];
+    const other = participants.find((p: any) => p.role !== 'vet') || participants[0];
+    return other;
+  };
+
+  const formatTime = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 60) return `${minutes} phút trước`;
+    if (hours < 24) return `${hours} giờ trước`;
+    return `${days} ngày trước`;
+  };
 
   return (
     <div className={styles.page}>
       {/* Header */}
       <div className={styles.pageHeader}>
         <div>
-          <Title level={3} className={styles.title}>Xin chào, Bác sĩ</Title>
+          <Title level={3} className={styles.title}>Tư vấn trực tuyến</Title>
           <Text className={styles.subtitle}>
-            Hôm nay bạn có <strong>3 yêu cầu tư vấn mới</strong> đang chờ phản hồi.
+            {totalUnread > 0 ? (
+              <>Bạn có <strong>{totalUnread} cuộc trò chuyện</strong> chưa đọc.</>
+            ) : (
+              'Tất cả cuộc trò chuyện đã được phản hồi.'
+            )}
           </Text>
         </div>
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
           className={styles.filterTabs}
-          items={[
-            { key: 'tat-ca', label: 'Tất cả' },
-            { key: 'cho-phan-hoi', label: 'Chờ phản hồi' },
-            { key: 'da-phan-hoi', label: 'Đã phản hồi' },
-          ]}
-        />
+        >
+          <Tabs.TabPane tab="Tất cả" key="tat-ca" />
+          <Tabs.TabPane tab="Chờ phản hồi" key="cho-phan-hoi" />
+          <Tabs.TabPane tab="Đã phản hồi" key="da-phan-hoi" />
+        </Tabs>
       </div>
 
-      {/* Consultation cards */}
-      <div className={styles.cardList}>
-        {filtered.map((consult) => (
-          <div
-            key={consult.id}
-            className={`${styles.consultCard} ${consult.isUrgent ? styles.cardUrgent : ''} ${consult.status === 'da-phan-hoi' ? styles.cardReplied : ''}`}
-          >
-            {/* Card header */}
-            <div className={styles.cardHeader}>
-              <div className={styles.cardLeft}>
-                <div className={styles.petIconBg}>🐾</div>
-                <div>
-                  <div className={styles.consultTitle}>{consult.title}</div>
-                  <div className={styles.consultMeta}>
-                    <span>👤 Chủ nuôi: {consult.ownerName}</span>
-                    <span>🐾 Thú cưng: {consult.petName} ({consult.petType})</span>
+      {/* Conversation cards */}
+      <Spin spinning={loading}>
+        <div className={styles.cardList}>
+          {filtered.length === 0 && !loading ? (
+            <div style={{ textAlign: 'center', padding: '48px', color: '#999' }}>
+              Không có cuộc trò chuyện nào
+            </div>
+          ) : (
+            filtered.map((conv) => {
+              const other = getOtherParticipant(conv);
+              const isUnread = conv.unread_count > 0;
+              const lastMsg = conv.last_message;
+
+              return (
+                <div
+                  key={conv.id}
+                  className={`${styles.consultCard} ${isUnread ? styles.cardUrgent : styles.cardReplied}`}
+                >
+                  {/* Card header */}
+                  <div className={styles.cardHeader}>
+                    <div className={styles.cardLeft}>
+                      <div className={styles.petIconBg}>🐾</div>
+                      <div>
+                        <div className={styles.consultTitle}>
+                          {other?.full_name || 'Người dùng'}
+                        </div>
+                        <div className={styles.consultMeta}>
+                          <span>👤 {other?.email}</span>
+                          {other?.phone && <span>📞 {other?.phone}</span>}
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.cardRight}>
+                      <div className={styles.badgeGroup}>
+                        <Tag
+                          className={`${styles.statusTag} ${isUnread ? styles.tagPending : styles.tagDone}`}
+                        >
+                          {isUnread ? `Chưa đọc (${conv.unread_count})` : 'Đã phản hồi'}
+                        </Tag>
+                      </div>
+                      <div className={styles.timeText}>
+                        THỜI GIAN<br />
+                        {lastMsg?.created_at ? formatTime(lastMsg.created_at) : formatTime(conv.updated_at)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  {lastMsg && (
+                    <div className={styles.contentBox}>
+                      <div className={styles.contentLabel}>
+                        {lastMsg.sender_name ? `${lastMsg.sender_name}:` : 'Tin nhắn mới nhất:'}
+                      </div>
+                      <div className={styles.contentText}>
+                        {lastMsg.content || (lastMsg.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className={styles.cardActions}>
+                    <Button
+                      type="primary"
+                      size="small"
+                      icon={<MessageOutlined />}
+                      className={styles.btnReply}
+                      onClick={() => history.push(`/bac-si/tu-van/phan-hoi?id=${conv.id}`)}
+                    >
+                      {isUnread ? 'Phản hồi' : 'Xem cuộc trò chuyện'}
+                    </Button>
                   </div>
                 </div>
-              </div>
-              <div className={styles.cardRight}>
-                <div className={styles.badgeGroup}>
-                  <Tag
-                    className={`${styles.statusTag} ${consult.status === 'cho-phan-hoi' ? styles.tagPending : styles.tagDone}`}
-                  >
-                    {consult.status === 'cho-phan-hoi' ? 'Chờ phản hồi' : 'Đã phản hồi'}
-                  </Tag>
-                  {consult.isUrgent && <Tag className={styles.tagUrgent}>Khẩn cấp</Tag>}
-                </div>
-                <div className={styles.timeText}>THỜI GIAN GỬI<br />{consult.time}</div>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className={styles.contentBox}>
-              <div className={styles.contentLabel}>Nội dung:</div>
-              <div className={styles.contentText}>{consult.content}</div>
-            </div>
-
-            {/* Reply (if replied) */}
-            {consult.reply && (
-              <div className={styles.replyBox}>
-                <div className={styles.replyLabel}>
-                  ✅ Phản hồi của bạn ({consult.replyTime}):
-                </div>
-                <div className={styles.replyText}>{consult.reply}</div>
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className={styles.cardActions}>
-              {consult.status === 'cho-phan-hoi' ? (
-                <>
-                  <Button variant="outlined" size="small" className={styles.btnViewRecord}>Xem hồ sơ bệnh án</Button>
-                  <Button type="primary" size="small" icon={<MessageOutlined />} className={styles.btnReply} onClick={() => history.push('/bac-si/tu-van/phan-hoi')}>
-                    Phản hồi
-                  </Button>
-                </>
-              ) : null}
-            </div>
-
-            {/* Urgent floating button */}
-            {consult.isUrgent && (
-              <div className={styles.urgentAction}>
-                <Button type="primary" danger size="middle" icon={<MessageOutlined />} className={styles.btnReplyNow} onClick={() => history.push('/bac-si/tu-van/phan-hoi')}>
-                  ↑ Phản hồi ngay
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+              );
+            })
+          )}
+        </div>
+      </Spin>
     </div>
   );
 };
