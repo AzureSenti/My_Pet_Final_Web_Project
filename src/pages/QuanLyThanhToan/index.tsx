@@ -1,39 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Select, message, Button, Modal, Tag, Space, Tooltip } from 'antd';
+import { message, Modal, Button, Tag, Space, Tooltip } from 'antd';
 import {
     Search,
-    CreditCard,
-    DollarSign,
-    Clock,
-    CheckCircle2,
-    Filter,
     Download,
     Eye,
-    Receipt,
-    Wallet
+    Trash2,
+    FileText,
+    CheckCircle2,
+    CreditCard,
+    MoreHorizontal,
+    Filter,
+    Clock,
+    AlertTriangle
 } from 'lucide-react';
 import HeaderProfile from '@/components/HeaderProfile';
 import { getPayments, updatePaymentStatus } from '@/services/QuanLyPetStore';
 import './style.less';
 
-const { Option } = Select;
-
 const QuanLyThanhToan: React.FC = () => {
     const [payments, setPayments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [statusFilter, setStatusFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPayment, setSelectedPayment] = useState<any>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const data = await getPayments({
-                status: statusFilter === 'all' ? undefined : statusFilter,
-                limit: 100
-            });
-            setPayments(data.items);
+            const data = await getPayments({ limit: 100 });
+            setPayments(data.items || []);
         } catch (error) {
             message.error('Không thể lấy danh sách thanh toán');
         } finally {
@@ -43,108 +40,62 @@ const QuanLyThanhToan: React.FC = () => {
 
     useEffect(() => {
         fetchData();
-    }, [statusFilter]);
+    }, []);
 
     const handleConfirmPayment = async (id: string) => {
         const success = await updatePaymentStatus(id, 'paid');
         if (success) {
             fetchData();
+            setIsDetailModalOpen(false);
         }
     };
 
-    const columns = [
-        {
-            title: 'Mã hóa đơn',
-            key: 'id',
-            render: (_: any, record: any) => (
-                <div className="cell-order-info">
-                    <span className="order-id">#{record.id.substring(0, 8).toUpperCase()}</span>
-                    <span className="order-date">
-                        {new Date(record.created_at || Date.now()).toLocaleDateString('vi-VN')}
-                    </span>
-                </div>
-            )
-        },
-        {
-            title: 'Khách hàng',
-            key: 'customer',
-            render: (_: any, record: any) => (
-                <div className="cell-customer">
-                    <div className="avatar">
-                        {record.owner?.full_name?.charAt(0) || 'U'}
-                    </div>
-                    <div>
-                        <span className="name">{record.owner?.full_name || 'Khách vãng lai'}</span>
-                        <span style={{ fontSize: '12px', color: '#6B7280' }}>{record.owner?.phone}</span>
-                    </div>
-                </div>
-            )
-        },
-        {
-            title: 'Dịch vụ',
-            key: 'service',
-            render: (_: any, record: any) => (
-                <span>{record.appointment?.service?.name || 'Dịch vụ lẻ'}</span>
-            )
-        },
-        {
-            title: 'Số tiền',
-            dataIndex: 'amount',
-            key: 'amount',
-            render: (amount: number) => (
-                <span className="cell-amount">{amount.toLocaleString('vi-VN')} VND</span>
-            )
-        },
-        {
-            title: 'Phương thức',
-            dataIndex: 'method',
-            key: 'method',
-            render: (method: string) => (
-                <div className="payment-method">
-                    {method === 'cash' ? <Wallet size={16} /> : <CreditCard size={16} />}
-                    <span>{method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</span>
-                </div>
-            )
-        },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status: string) => (
-                <div className={`status-tag ${status}`}>
-                    {status === 'pending' ? 'Chờ thanh toán' : status === 'paid' ? 'Đã thu tiền' : 'Đã hoàn'}
-                </div>
-            )
-        },
-        {
-            title: 'Thao tác',
-            key: 'actions',
-            render: (_: any, record: any) => (
-                <Space>
-                    {record.status === 'pending' && (
-                        <Tooltip title="Xác nhận đã thu tiền">
-                            <button
-                                className="btn-confirm"
-                                onClick={() => handleConfirmPayment(record.id)}
-                            >
-                                <CheckCircle2 size={16} />
-                            </button>
-                        </Tooltip>
-                    )}
-                    <button
-                        className="pm-action-btn"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}
-                        onClick={() => { setSelectedPayment(record); setIsDetailModalOpen(true); }}
-                    >
-                        <Eye size={18} />
-                    </button>
-                </Space>
-            )
-        }
+    const mockData = [
+        { id: 'mock-1', displayId: '#INV-2023-001', owner: { full_name: 'Alex Johnson' }, appointment: { service: { name: 'Grooming Spa' } }, amount: 450000, method: 'transfer', status: 'paid', created_at: new Date().toISOString() },
+        { id: 'mock-2', displayId: '#INV-2023-002', owner: { full_name: 'Sarah Parker' }, appointment: { service: { name: 'Vaccination' } }, amount: 250000, method: 'cash', status: 'pending', created_at: new Date().toISOString() },
+        { id: 'mock-3', displayId: '#INV-2023-003', owner: { full_name: 'Mike Davis' }, appointment: { service: { name: 'Surgery Check' } }, amount: 1200000, method: 'transfer', status: 'overdue', created_at: new Date().toISOString() },
     ];
 
+    const displayData = payments.length > 0 ? payments : mockData;
+
+    const filteredData = displayData.filter(p =>
+        (p.owner?.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.displayId || p.id).toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    // Calculate Stats
+    const totalInvoices = displayData.length;
+    const paidCount = displayData.filter(p => p.status === 'paid').length;
+    
+    const calculateAvgValue = () => {
+        if (displayData.length === 0) return '0 VND';
+        let total = 0;
+        let validCount = 0;
+        displayData.forEach(p => {
+            const val = parseFloat(p.amount as any);
+            if (!isNaN(val)) {
+                total += val;
+                validCount++;
+            }
+        });
+        if (validCount === 0) return '0 VND';
+        const avg = total / validCount;
+        if (avg >= 1000000) return `${(avg / 1000000).toFixed(1)}m VND`;
+        if (avg >= 1000) return `${Math.round(avg / 1000)}k VND`;
+        return `${Math.round(avg)} VND`;
+    };
+
+    const formatId = (id: string, displayId?: string) => {
+        if (displayId) return displayId;
+        return `#INV-${id.substring(0, 6).toUpperCase()}`;
+    };
+
     return (
-        <div className="payment-management-container petcare-dashboard">
+        <div className="billing-management-wrapper">
+            {/* Global Header */}
             <div className="pc-header">
                 <div className="pc-header-left" />
                 <div className="pc-header-center">
@@ -152,9 +103,12 @@ const QuanLyThanhToan: React.FC = () => {
                         <Search size={18} strokeWidth={1.75} className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Tìm theo tên khách hoặc mã HĐ..."
+                            placeholder="Tìm kiếm hóa đơn..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         />
                     </div>
                 </div>
@@ -163,98 +117,199 @@ const QuanLyThanhToan: React.FC = () => {
                 </div>
             </div>
 
-            <div className="pm-page-content">
-                <div className="pm-header-row">
-                    <div className="pm-title-section">
-                        <div className="pm-icon-wrapper">
-                            <Receipt size={28} />
-                        </div>
-                        <div>
-                            <h1>Quản lý Hóa đơn & Thanh toán</h1>
-                            <p>Theo dõi luồng tiền, xác nhận giao dịch và quản lý doanh thu dịch vụ.</p>
-                        </div>
+            <div className="billing-container">
+                {/* Page Header */}
+                <div className="bm-header">
+                    <div className="bm-header-left">
+                        <h1>Quản lý Hóa đơn</h1>
+                        <p>Xem và quản lý tất cả các bản ghi thanh toán và hóa đơn.</p>
                     </div>
-                    <Button icon={<Download size={16} />} style={{ borderRadius: '10px', height: '40px', fontWeight: 600 }}>
-                        Xuất sao kê
-                    </Button>
+                    <button className="bm-export-btn" onClick={() => message.success('Đang xuất báo cáo...')}>
+                        Xuất báo cáo <Download size={16} strokeWidth={2.5} />
+                    </button>
                 </div>
 
-                <div className="pm-filter-bar">
-                    <div className="filter-item">
-                        <Filter size={16} />
-                        <span>Trạng thái:</span>
-                        <Select value={statusFilter} onChange={setStatusFilter} bordered={false}>
-                            <Option value="all">Tất cả hóa đơn</Option>
-                            <Option value="pending">Chờ thanh toán</Option>
-                            <Option value="paid">Đã thanh toán</Option>
-                            <Option value="refunded">Đã hoàn tiền</Option>
-                        </Select>
+                {/* Stats Cards */}
+                <div className="bm-stats-grid">
+                    <div className="bm-stat-card">
+                        <div className="info">
+                            <div className="label">Tổng Hóa đơn</div>
+                            <div className="value">{totalInvoices}</div>
+                        </div>
+                        <div className="icon-wrap orange">
+                            <FileText size={24} />
+                        </div>
+                    </div>
+                    <div className="bm-stat-card">
+                        <div className="info">
+                            <div className="label">Đã Thu Tiền</div>
+                            <div className="value">{paidCount}</div>
+                        </div>
+                        <div className="icon-wrap teal">
+                            <CheckCircle2 size={24} />
+                        </div>
+                    </div>
+                    <div className="bm-stat-card">
+                        <div className="info">
+                            <div className="label">Giá trị trung bình</div>
+                            <div className="value">{calculateAvgValue()}</div>
+                        </div>
+                        <div className="icon-wrap pink">
+                            <CreditCard size={24} />
+                        </div>
                     </div>
                 </div>
 
-                <div className="pm-table-card">
-                    <Table
-                        columns={columns}
-                        dataSource={payments.filter(p =>
-                            p.owner?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            p.id.includes(searchQuery)
+                {/* Invoice List Section */}
+                <div className="bm-table-section">
+                    <div className="bm-table-header">
+                        <h2>Hóa đơn gần đây</h2>
+                        <div className="actions">
+                            <button className="icon-btn"><Filter size={18} /></button>
+                            <button className="icon-btn"><MoreHorizontal size={18} /></button>
+                        </div>
+                    </div>
+
+                    <div className="bm-table-wrapper">
+                        {/* Table Header */}
+                        <div className="bm-tr header-row">
+                            <div className="bm-th col-id">MÃ HÓA ĐƠN</div>
+                            <div className="bm-th col-customer">KHÁCH HÀNG</div>
+                            <div className="bm-th col-service">DỊCH VỤ</div>
+                            <div className="bm-th col-amount">SỐ TIỀN</div>
+                            <div className="bm-th col-method">PHƯƠNG THỨC</div>
+                            <div className="bm-th col-status">TRẠNG THÁI</div>
+                            <div className="bm-th col-actions">THAO TÁC</div>
+                        </div>
+
+                        {/* Table Body */}
+                        {loading ? (
+                            <div className="bm-empty">Đang tải dữ liệu...</div>
+                        ) : currentData.length > 0 ? (
+                            currentData.map((row) => (
+                                <div className="bm-tr body-row" key={row.id}>
+                                    <div className="bm-td col-id">
+                                        <span className="id-text">{formatId(row.id, row.displayId)}</span>
+                                    </div>
+                                    <div className="bm-td col-customer">
+                                        <div className="customer-cell">
+                                            <div className="avatar">
+                                                {row.owner?.full_name ? row.owner.full_name.charAt(0).toUpperCase() : 'U'}
+                                            </div>
+                                            <span className="name">{row.owner?.full_name || 'Khách vãng lai'}</span>
+                                        </div>
+                                    </div>
+                                    <div className="bm-td col-service">
+                                        {row.appointment?.service?.name || 'Dịch vụ lẻ'}
+                                    </div>
+                                    <div className="bm-td col-amount">
+                                        {parseFloat(row.amount).toLocaleString('vi-VN')} VND
+                                    </div>
+                                    <div className="bm-td col-method">
+                                        <span className="method-text">
+                                            {row.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}
+                                        </span>
+                                    </div>
+                                    <div className="bm-td col-status">
+                                        {row.status === 'paid' ? (
+                                            <span className="status-badge paid"><CheckCircle2 size={14} /> Đã thu</span>
+                                        ) : row.status === 'pending' ? (
+                                            <span className="status-badge pending"><Clock size={14} /> Chờ thu</span>
+                                        ) : (
+                                            <span className="status-badge overdue"><AlertTriangle size={14} /> Quá hạn</span>
+                                        )}
+                                    </div>
+                                    <div className="bm-td col-actions">
+                                        <button className="action-btn" onClick={() => { setSelectedPayment(row); setIsDetailModalOpen(true); }}>
+                                            <Eye size={18} />
+                                        </button>
+                                        <button className="action-btn delete">
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="bm-empty">Không tìm thấy hóa đơn nào.</div>
                         )}
-                        loading={loading}
-                        rowKey="id"
-                        pagination={{ pageSize: 10 }}
-                    />
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="bm-pagination">
+                        <div className="page-info">
+                            Hiển thị {(currentPage - 1) * itemsPerPage + 1} đến {Math.min(currentPage * itemsPerPage, filteredData.length)} trong tổng số {filteredData.length} mục
+                        </div>
+                        <div className="page-controls">
+                            <button 
+                                className="text-btn" 
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            >
+                                Trước
+                            </button>
+                            <button 
+                                className="text-btn"
+                                disabled={currentPage === totalPages || totalPages === 0}
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            >
+                                Sau
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <Modal
-                title={<h3>Chi tiết hóa đơn ✨</h3>}
+                title={<h3 style={{ margin: 0, fontWeight: 700, fontSize: 18 }}>Chi tiết hóa đơn</h3>}
                 visible={isDetailModalOpen}
                 onCancel={() => setIsDetailModalOpen(false)}
-                footer={[
-                    <Button key="close" onClick={() => setIsDetailModalOpen(false)}>Đóng</Button>,
-                    selectedPayment?.status === 'pending' && (
-                        <Button key="pay" type="primary" onClick={() => { handleConfirmPayment(selectedPayment.id); setIsDetailModalOpen(false); }}>
-                            Xác nhận thanh toán ngay
-                        </Button>
-                    )
-                ]}
-                width={500}
+                footer={null}
+                width={480}
+                className="bm-modal"
             >
                 {selectedPayment && (
-                    <div className="payment-detail-content">
-                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                            <div style={{ color: '#6B7280', fontSize: '13px' }}>SỐ TIỀN THANH TOÁN</div>
-                            <div style={{ fontSize: '32px', fontWeight: 800, color: '#111827' }}>
-                                {selectedPayment.amount.toLocaleString('vi-VN')} VND
-                            </div>
-                            <Tag color={selectedPayment.status === 'paid' ? 'green' : 'orange'} style={{ marginTop: '8px', borderRadius: '12px' }}>
-                                {selectedPayment.status === 'paid' ? 'GIAO DỊCH THÀNH CÔNG' : 'ĐANG CHỜ THANH TOÁN'}
-                            </Tag>
+                    <div className="invoice-detail">
+                        <div className="amount-display">
+                            <div className="label">TỔNG TIỀN</div>
+                            <div className="value">{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</div>
+                            {selectedPayment.status === 'paid' ? (
+                                <Tag color="success" style={{ marginTop: 8, borderRadius: 12 }}>THANH TOÁN THÀNH CÔNG</Tag>
+                            ) : (
+                                <Tag color="warning" style={{ marginTop: 8, borderRadius: 12 }}>CHỜ THANH TOÁN</Tag>
+                            )}
                         </div>
 
-                        <div style={{ padding: '20px', background: '#F9FAFB', borderRadius: '16px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#6B7280' }}>Khách hàng</span>
-                                <span style={{ fontWeight: 600 }}>{selectedPayment.owner?.full_name}</span>
+                        <div className="info-box">
+                            <div className="info-row">
+                                <span className="lbl">Khách hàng</span>
+                                <span className="val">{selectedPayment.owner?.full_name}</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#6B7280' }}>Dịch vụ</span>
-                                <span style={{ fontWeight: 600 }}>{selectedPayment.appointment?.service?.name}</span>
+                            <div className="info-row">
+                                <span className="lbl">Dịch vụ</span>
+                                <span className="val">{selectedPayment.appointment?.service?.name || 'N/A'}</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#6B7280' }}>Thú cưng</span>
-                                <span style={{ fontWeight: 600 }}>{selectedPayment.appointment?.pet?.name}</span>
+                            <div className="divider" />
+                            <div className="info-row">
+                                <span className="lbl">Phương thức</span>
+                                <span className="val">{selectedPayment.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</span>
                             </div>
-                            <div style={{ borderTop: '1px dashed #D1D5DB', margin: '12px 0' }} />
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#6B7280' }}>Phương thức</span>
-                                <span style={{ fontWeight: 600 }}>{selectedPayment.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#6B7280' }}>Ngày tạo</span>
-                                <span style={{ fontWeight: 600 }}>{new Date(selectedPayment.created_at).toLocaleString('vi-VN')}</span>
+                            <div className="info-row">
+                                <span className="lbl">Ngày tạo</span>
+                                <span className="val">{new Date(selectedPayment.created_at).toLocaleString('vi-VN')}</span>
                             </div>
                         </div>
+
+                        {selectedPayment.status !== 'paid' && !selectedPayment.id.startsWith('mock-') && (
+                            <Button 
+                                type="primary" 
+                                block 
+                                size="large" 
+                                style={{ marginTop: 24, borderRadius: 8, background: '#F5C842', borderColor: '#F5C842', color: 'black', fontWeight: 600 }}
+                                onClick={() => handleConfirmPayment(selectedPayment.id)}
+                            >
+                                Xác nhận đã thu tiền
+                            </Button>
+                        )}
                     </div>
                 )}
             </Modal>

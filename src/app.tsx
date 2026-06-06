@@ -10,7 +10,7 @@ import NotAccessible from './pages/exception/403';
 import NotFoundContent from './pages/exception/404';
 import type { IInitialState } from './services/base/typing';
 import './styles/global.less';
-import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, PawPrint } from 'lucide-react';
+import { LayoutDashboard, Users, Stethoscope, Cat, CalendarDays, PawPrint, Layers, CreditCard } from 'lucide-react';
 // currentRole đã được loại bỏ cùng với Keycloak auth
 import axios from '@/utils/axios';
 import { ip3 } from '@/utils/ip';
@@ -124,6 +124,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 					case '/quan-ly-bac-si': return <Stethoscope size={18} strokeWidth={1.75} />;
 					case '/quan-ly-thu-cung': return <Cat size={18} strokeWidth={1.75} />;
 					case '/appointments': return <CalendarDays size={18} strokeWidth={1.75} />;
+					case '/quan-ly-dich-vu': return <Layers size={18} strokeWidth={1.75} />;
+					case '/quan-ly-thanh-toan': return <CreditCard size={18} strokeWidth={1.75} />;
 					default: return null;
 				}
 			};
