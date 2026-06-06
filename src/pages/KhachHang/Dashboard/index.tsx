@@ -10,7 +10,7 @@ import {
     Plus
 } from 'lucide-react';
 import { useModel, history } from 'umi';
-import { getOwnerDetails, Pet, Appointment } from '@/services/QuanLyPetStore';
+import { getMyPets, getMyAppointments, Pet, Appointment } from '@/services/QuanLyPetStore';
 import styles from './style.less';
 
 const KhachHangDashboard: React.FC = () => {
@@ -30,10 +30,18 @@ const KhachHangDashboard: React.FC = () => {
 
     const fetchData = async () => {
         try {
-            const res = await getOwnerDetails(currentUser!.id);
+            const [pets, appointments] = await Promise.all([
+                getMyPets(),
+                getMyAppointments(),
+            ]);
             setData({
-                pets: res.pets,
-                appointments: res.appointments,
+                pets,
+                appointments: appointments.map((app: any) => ({
+                    ...app,
+                    pet_name: app.pet?.name || 'Không rõ',
+                    service_name: app.service?.name || 'Dịch vụ lẻ',
+                    vet_name: app.vet?.user?.full_name || 'Bác sĩ trực ban',
+                })),
             });
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu dashboard:', error);
@@ -79,8 +87,8 @@ const KhachHangDashboard: React.FC = () => {
                 <div className={styles.metricCard}>
                     <div className={`${styles.iconBox} ${styles.blue}`}><Zap size={24} /></div>
                     <div className={styles.info}>
-                        <span className={styles.label}>Điểm tích lũy</span>
-                        <div className={styles.value}>1,450</div>
+                        <span className={styles.label}>Đã hoàn thành</span>
+                        <div className={styles.value}>{data.appointments.filter(a => a.status === 'completed').length}</div>
                     </div>
                 </div>
             </div>
@@ -132,7 +140,7 @@ const KhachHangDashboard: React.FC = () => {
                                     <img src={pet.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100'} alt={pet.name} />
                                     <div className={styles.info}>
                                         <h4>{pet.name}</h4>
-                                        <Progress percent={90} size="small" strokeColor="#8A9A5B" trailColor="#F0EDE8" />
+                                        <span style={{ fontSize: '12px', color: '#7A6B5D' }}>{pet.species}{pet.breed ? ` • ${pet.breed}` : ''}</span>
                                     </div>
                                 </div>
                             ))}

@@ -14,6 +14,23 @@ class MedicalRecordCreateRequest(BaseModel):
     notes: Optional[str] = None
 
 
+# Nested schema cho thông tin bác sĩ
+class MedicalRecordVetUserInfo(BaseModel):
+    id: uuid.UUID
+    full_name: str
+
+    class Config:
+        from_attributes = True
+
+class MedicalRecordVetInfo(BaseModel):
+    id: uuid.UUID
+    specialization: str
+    user: Optional[MedicalRecordVetUserInfo] = None
+
+    class Config:
+        from_attributes = True
+
+
 class MedicalRecordResponse(BaseModel):
     id: uuid.UUID
     appointment_id: uuid.UUID
@@ -24,6 +41,7 @@ class MedicalRecordResponse(BaseModel):
     prescription: Optional[str]
     notes: Optional[str]
     recorded_at: datetime
+    vet: Optional[MedicalRecordVetInfo] = None
 
     class Config:
         from_attributes = True

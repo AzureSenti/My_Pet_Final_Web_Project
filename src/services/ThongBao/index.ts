@@ -50,10 +50,8 @@ export async function guiThongBaoDanhSach(payload: {
 export async function getThongBao(payload: {
 	page: number;
 	limit: number;
-	condition: any;
-	sort: { createdAt: 1 | -1 };
 }) {
-	return axios.get(`${ipNotif}`, { params: payload });
+	return axios.get(`${ipNotif}`, { params: { page: payload.page, limit: payload.limit } });
 }
 
 export async function getReceiver(

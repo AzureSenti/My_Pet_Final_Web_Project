@@ -12,8 +12,8 @@ import {
     getMyAppointments,
     bookAppointment,
     getMyPets,
-    getDoctors,
-    getServices,
+    getOwnerVets,
+    getOwnerServices,
     Pet,
     Service
 } from '@/services/QuanLyPetStore';
@@ -23,19 +23,21 @@ const MyAppointments: React.FC = () => {
     const [appointments, setAppointments] = useState<any[]>([]);
     const [pets, setPets] = useState<Pet[]>([]);
     const [services, setServices] = useState<Service[]>([]);
+    const [doctors, setDoctors] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
 
     const fetchData = async () => {
         try {
-            const [appData, petData, , svcData] = await Promise.all([
+            const [appData, petData, docData, svcData] = await Promise.all([
                 getMyAppointments(),
                 getMyPets(),
-                getDoctors(),
-                getServices(),
+                getOwnerVets(),
+                getOwnerServices(),
             ]);
             setAppointments(appData);
             setPets(petData);
+            setDoctors(docData);
             setServices(svcData);
         } catch (error) {
             message.error('Không thể tải dữ liệu lịch hẹn');
@@ -179,6 +181,18 @@ const MyAppointments: React.FC = () => {
                         <Select size="large">
                             {services.map(svc => (
                                 <Select.Option key={svc.id} value={svc.id}>{svc.name} — {svc.price.toLocaleString()}đ</Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="vet_id" label="Bác sĩ phụ trách" rules={[{ required: true, message: 'Vui lòng chọn bác sĩ!' }]}>
+                        <Select size="large" placeholder="Chọn bác sĩ thú y">
+                            {doctors.map((doc: any) => (
+                                <Select.Option key={doc.vet_id} value={doc.vet_id}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <Avatar size="small" src={`https://i.pravatar.cc/150?u=${doc.id}`} />
+                                        BS. {doc.full_name} — {doc.specialization}
+                                    </div>
+                                </Select.Option>
                             ))}
                         </Select>
                     </Form.Item>
