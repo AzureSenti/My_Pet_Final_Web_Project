@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Table, Progress, Modal, Form, Input, Select, message } from 'antd';
-import { Search, Plus, ChevronRight, ArrowRight, ShieldCheck, Users } from 'lucide-react';
+import { Table, Progress, Modal, Form, Input, Select, message, Upload, Image } from 'antd';
+import { Search, Plus, ChevronRight, ArrowRight, ShieldCheck, Users, UploadCloud, Lock } from 'lucide-react';
 import '../TrangChu/components/style.less';
 import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
 import { getOwners, toggleUserStatus, User, createOwner } from '@/services/QuanLyPetStore';
+import { ip3 } from '@/utils/ip';
 
 const FILTERS = ['Tất cả', 'Chủ nuôi', 'Bác sĩ thú y', 'Nhân viên', 'Chờ duyệt'];
 
@@ -15,6 +16,8 @@ const UserManagement: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [form] = Form.useForm();
+	const [avatarUrl, setAvatarUrl] = useState<string>('');
+	const [uploading, setUploading] = useState(false);
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -36,11 +39,12 @@ const UserManagement: React.FC = () => {
 		const success = await createOwner({
 			...values,
 			phone: values.phone || '',
-			password: 'Password123@', // Mật khẩu mặc định cho user mới tạo từ admin
+			avatar_url: avatarUrl,
 		});
 		if (success) {
 			setIsModalOpen(false);
 			form.resetFields();
+			setAvatarUrl('');
 			fetchData();
 		}
 	};
@@ -52,11 +56,21 @@ const UserManagement: React.FC = () => {
 			key: 'name',
 			render: (_: any, record: User) => (
 				<div className="cell-user-profile">
-					<div className="avatar">
+					<div className="avatar" style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EC' }}>
 						{record.avatar_url ? (
-							<img src={record.avatar_url} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
+							<Image
+								src={record.avatar_url.startsWith('http') ? record.avatar_url : `${ip3}${record.avatar_url.replace(/^\//, '')}`}
+								alt=""
+								width={40}
+								height={40}
+								style={{ borderRadius: '50%', objectFit: 'cover' }}
+								preview={true}
+								fallback="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+							/>
 						) : (
-							record.full_name.split(' ').pop()?.charAt(0).toUpperCase()
+							<span style={{ fontSize: '14px', fontWeight: 700, color: '#A16207' }}>
+								{record.full_name.split(' ').pop()?.charAt(0).toUpperCase()}
+							</span>
 						)}
 					</div>
 					<div className="info">
@@ -279,6 +293,51 @@ const UserManagement: React.FC = () => {
 				destroyOnClose
 			>
 				<Form form={form} layout="vertical" onFinish={handleAddUser}>
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
+						<Upload
+							name="file"
+							listType="picture-card"
+							className="avatar-uploader"
+							showUploadList={false}
+							action={`${ip3}api/v1/upload/avatar`}
+							headers={{
+								Authorization: `Bearer ${localStorage.getItem('token')}`,
+							}}
+							onChange={(info) => {
+								if (info.file.status === 'uploading') {
+									setUploading(true);
+									return;
+								}
+								if (info.file.status === 'done') {
+									setAvatarUrl(info.file.response.url);
+									setUploading(false);
+									message.success('Tải ảnh lên thành công!');
+								} else if (info.file.status === 'error') {
+									setUploading(false);
+									message.error('Tải ảnh thất bại!');
+								}
+							}}
+						>
+							{avatarUrl ? (
+								<Image
+									src={avatarUrl.startsWith('http') ? avatarUrl : `${ip3}${avatarUrl.replace(/^\//, '')}`}
+									alt="avatar"
+									width={100}
+									height={100}
+									style={{ borderRadius: '8px', objectFit: 'cover' }}
+									preview={false}
+									fallback="https://via.placeholder.com/100?text=Error"
+								/>
+							) : (
+								<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+									<UploadCloud size={24} color="#D4A017" />
+									<div style={{ marginTop: 8, fontSize: '12px', color: '#7D6E5D' }}>{uploading ? 'Đang tải...' : 'Upload Ảnh'}</div>
+								</div>
+							)}
+						</Upload>
+						<p style={{ fontSize: '12px', color: '#7D6E5D', marginTop: '8px' }}>Chọn ảnh đại diện cho người dùng</p>
+					</div>
+
 					<Form.Item
 						name="full_name"
 						label="Họ và tên"
@@ -286,46 +345,67 @@ const UserManagement: React.FC = () => {
 					>
 						<Input placeholder="Ví dụ: Nguyễn Văn A" />
 					</Form.Item>
+
+					<div style={{ display: 'flex', gap: '16px' }}>
+						<Form.Item
+							name="email"
+							label="Địa chỉ Email"
+							style={{ flex: 1 }}
+							rules={[
+								{ required: true, message: 'Vui lòng nhập email!' },
+								{ type: 'email', message: 'Email không hợp lệ!' }
+							]}
+						>
+							<Input placeholder="email@example.com" />
+						</Form.Item>
+						<Form.Item
+							name="phone"
+							label="Số điện thoại"
+							style={{ flex: 1 }}
+							rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+						>
+							<Input placeholder="Ví dụ: 0987xxx" />
+						</Form.Item>
+					</div>
+
 					<Form.Item
-						name="role"
-						label="Loại tài khoản"
-						rules={[{ required: true, message: 'Vui lòng chọn loại tài khoản!' }]}
-						initialValue="owner"
-					>
-						<Select>
-							<Select.Option value="owner">Chủ nuôi</Select.Option>
-							<Select.Option value="vet">Bác sĩ thú y</Select.Option>
-							<Select.Option value="admin">Nhân viên</Select.Option>
-						</Select>
-					</Form.Item>
-					<Form.Item
-						name="email"
-						label="Địa chỉ Email"
+						name="password"
+						label="Mật khẩu khởi tạo"
 						rules={[
-							{ required: true, message: 'Vui lòng nhập email!' },
-							{ type: 'email', message: 'Email không hợp lệ!' }
+							{ required: true, message: 'Vui lòng nhập mật khẩu!' },
+							{ min: 8, message: 'Mật khẩu phải có ít nhất 8 ký tự!' }
 						]}
 					>
-						<Input placeholder="email@example.com" />
+						<Input.Password prefix={<Lock size={16} color="#A3865A" />} placeholder="Nhập mật khẩu an toàn..." />
 					</Form.Item>
-					<Form.Item
-						name="phone"
-						label="Số điện thoại"
-						rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
-					>
-						<Input placeholder="Ví dụ: +84 987 654 321" />
-					</Form.Item>
-					<Form.Item
-						name="status"
-						label="Trạng thái"
-						initialValue="Hoạt động"
-					>
-						<Select>
-							<Select.Option value="Hoạt động">Hoạt động</Select.Option>
-							<Select.Option value="Chờ duyệt">Chờ duyệt</Select.Option>
-							<Select.Option value="Đình chỉ">Đình chỉ</Select.Option>
-						</Select>
-					</Form.Item>
+
+					<div style={{ display: 'flex', gap: '16px' }}>
+						<Form.Item
+							name="role"
+							label="Loại tài khoản"
+							style={{ flex: 1 }}
+							rules={[{ required: true, message: 'Vui lòng chọn loại tài khoản!' }]}
+							initialValue="owner"
+						>
+							<Select>
+								<Select.Option value="owner">Chủ nuôi</Select.Option>
+								<Select.Option value="vet">Bác sĩ thú y</Select.Option>
+								<Select.Option value="admin">Nhân viên</Select.Option>
+							</Select>
+						</Form.Item>
+						<Form.Item
+							name="status"
+							label="Trạng thái"
+							style={{ flex: 1 }}
+							initialValue="Hoạt động"
+						>
+							<Select>
+								<Select.Option value="Hoạt động">Hoạt động</Select.Option>
+								<Select.Option value="Chờ duyệt">Chờ duyệt</Select.Option>
+								<Select.Option value="Đình chỉ">Đình chỉ</Select.Option>
+							</Select>
+						</Form.Item>
+					</div>
 				</Form>
 			</Modal>
 		</div>

@@ -58,6 +58,7 @@ async def register_user(data: RegisterRequest, db: AsyncSession) -> RegisterResp
         phone=data.phone,
         role=data.role,
         is_active=True,
+        avatar_url=data.avatar_url,
     )
     db.add(user)
     await db.commit()
@@ -174,6 +175,8 @@ async def update_user_profile(db: AsyncSession, user: User, data: UserUpdate) ->
         user.phone = data.phone
     if data.password is not None:
         user.password_hash = hash_password(data.password)
+    if data.avatar_url is not None:
+        user.avatar_url = data.avatar_url
 
     db.add(user)
     await db.commit()

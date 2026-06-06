@@ -33,6 +33,7 @@ class User(Base, TimestampMixin):
         nullable=False,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    avatar_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
     email_verified_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Relationships
