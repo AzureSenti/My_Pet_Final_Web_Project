@@ -2,7 +2,7 @@ import { MessageOutlined } from '@ant-design/icons';
 import { Button, Tag, Tabs, Typography, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
-import { getConversations, getUnreadCount } from '@/services/BacSi/doctorService';
+import { getConversations, getUnreadCount } from '@/services/messageService';
 import styles from './index.module.less';
 
 const { Title, Text } = Typography;

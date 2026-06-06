@@ -20,6 +20,7 @@ from app.api.v1 import doctor_stats as doctor_stats_router
 from app.api.v1 import owner as owner_router
 from app.api.v1 import upload as upload_router
 from app.api.v1 import notification as notification_router
+from app.api.v1 import messages as messages_router
 from app.models.user import User
 
 app = FastAPI(
@@ -68,6 +69,7 @@ app.include_router(doctor_stats_router.router, prefix="/api/v1")
 app.include_router(owner_router.router, prefix="/api/v1")
 app.include_router(upload_router.router, prefix="/api/v1")
 app.include_router(notification_router.router, prefix="/api/v1")
+app.include_router(messages_router.router, prefix="/api/v1")
 
 
 # ─────────────────────────── Health ───────────────────────────

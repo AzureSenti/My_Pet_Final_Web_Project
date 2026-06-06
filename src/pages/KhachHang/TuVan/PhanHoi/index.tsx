@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { history, Link, useLocation, useModel } from 'umi';
 import { Spin, message as antMessage } from 'antd';
-import { 
+import {
   ArrowLeftOutlined, EditOutlined,
   BoldOutlined, ItalicOutlined, UnorderedListOutlined,
   PaperClipOutlined, PictureOutlined, LinkOutlined,
@@ -12,7 +12,7 @@ import {
   getConversationMessages,
   sendMessage,
 } from '@/services/messageService';
-import styles from './index.module.less';
+import styles from './index.less';
 
 const PhanHoi: React.FC = () => {
   const location = useLocation();
@@ -56,20 +56,19 @@ const PhanHoi: React.FC = () => {
 
   const handleSend = async () => {
     if (!conversationId || !replyText.trim()) {
-      antMessage.warning('Vui lòng nhập nội dung phản hồi');
+      antMessage.warning('Vui lòng nhập nội dung tin nhắn');
       return;
     }
     try {
       setSending(true);
       await sendMessage(conversationId, replyText.trim());
-      antMessage.success('Đã gửi phản hồi thành công!');
       setReplyText('');
       // Reload messages
       const msgData = await getConversationMessages(conversationId, 1, 100);
       setMessages(msgData.items || []);
     } catch (error) {
-      console.error('Lỗi khi gửi phản hồi:', error);
-      antMessage.error('Lỗi khi gửi phản hồi');
+      console.error('Lỗi khi gửi tin nhắn:', error);
+      antMessage.error('Lỗi khi gửi tin nhắn');
     } finally {
       setSending(false);
     }
@@ -90,24 +89,18 @@ const PhanHoi: React.FC = () => {
 
   const other = getOtherParticipant();
 
-  // Tách tin nhắn: tin nhắn từ khách (không phải mình) vs tin nhắn mình gửi
-  const customerMessages = messages.filter((m) => m.sender?.id !== currentUserId);
-
-  // Lấy tin nhắn đầu tiên của khách làm "câu hỏi"
-  const firstQuestion = customerMessages.length > 0 ? customerMessages[0] : null;
-
   return (
     <div className={styles.page}>
       <div className={styles.breadcrumb}>
-        <Link to="/bac-si/tu-van">Tư vấn trực tuyến</Link> {'>'} Phản hồi tư vấn
+        <Link to="/khach-hang/tu-van">Tư vấn trực tuyến</Link> {'>'} Trò chuyện
       </div>
-      
+
       <div className={styles.pageHeader}>
-        <button className={styles.btnBack} onClick={() => history.push('/bac-si/tu-van')}>
+        <button className={styles.btnBack} onClick={() => history.push('/khach-hang/tu-van')}>
           <ArrowLeftOutlined />
         </button>
         <h1 className={styles.title}>
-          Cuộc trò chuyện với {other?.full_name || 'Người dùng'}
+          BS. {other?.full_name || 'Bác sĩ'}
         </h1>
       </div>
 
@@ -117,62 +110,50 @@ const PhanHoi: React.FC = () => {
           <div className={styles.card}>
             <div className={styles.patientHeader}>
               <div className={styles.patientInfo}>
-                <div className={styles.petIcon}>🐾</div>
+                <div className={styles.petIcon}>👨‍⚕️</div>
                 <div>
-                  <div className={styles.petName}>{other?.full_name || 'Người dùng'}</div>
+                  <div className={styles.petName}>BS. {other?.full_name || 'Bác sĩ'}</div>
                   <div className={styles.ownerName}>{other?.email}</div>
                 </div>
               </div>
-              {customerMessages.length > 0 && (
-                <div className={styles.tagNew}>
-                  {customerMessages.length} tin nhắn
-                </div>
-              )}
             </div>
 
-            {firstQuestion && (
-              <>
-                <div className={styles.timeInfo}>
-                  🕒 Gửi lúc: {new Date(firstQuestion.created_at).toLocaleString('vi-VN')}
-                </div>
-                <div className={styles.quoteBox}>
-                  {firstQuestion.content || '(Hình ảnh / tệp đính kèm)'}
-                </div>
-              </>
-            )}
-
             {/* All messages */}
-            {messages.length > 1 && (
-              <div style={{ marginTop: '16px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#706F6C', marginBottom: '8px', textTransform: 'uppercase' }}>
-                  Lịch sử tin nhắn ({messages.length})
-                </div>
-                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                  {messages.map((msg) => {
+            <div style={{ marginTop: '16px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#706F6C', marginBottom: '8px', textTransform: 'uppercase' }}>
+                Lịch sử tin nhắn ({messages.length})
+              </div>
+              <div style={{ height: '400px', overflowY: 'auto', paddingRight: '10px' }}>
+                {messages.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>Chưa có tin nhắn nào. Bắt đầu trò chuyện ngay!</div>
+                ) : (
+                  messages.map((msg) => {
                     const isMe = msg.sender?.id === currentUserId;
                     return (
                       <div
                         key={msg.id}
                         style={{
                           padding: '10px 14px',
-                          marginBottom: '8px',
+                          marginBottom: '12px',
                           borderRadius: '10px',
                           background: isMe ? '#E8F5E9' : '#F5F5F5',
                           borderLeft: isMe ? '3px solid #135D54' : '3px solid #706F6C',
+                          marginLeft: isMe ? '40px' : '0',
+                          marginRight: isMe ? '0' : '40px',
                         }}
                       >
                         <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>
-                          {msg.sender?.full_name} · {new Date(msg.created_at).toLocaleString('vi-VN')}
+                          {isMe ? 'Bạn' : msg.sender?.full_name} · {new Date(msg.created_at).toLocaleString('vi-VN')}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#333' }}>
+                        <div style={{ fontSize: '14px', color: '#333' }}>
                           {msg.content || (msg.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
                         </div>
                       </div>
                     );
-                  })}
-                </div>
+                  })
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -181,7 +162,7 @@ const PhanHoi: React.FC = () => {
           <div className={styles.editorHeader}>
             <h3>
               <div className={styles.icon}><EditOutlined /></div>
-              Soạn thảo phản hồi
+              Soạn thảo tin nhắn
             </h3>
           </div>
 
@@ -190,14 +171,13 @@ const PhanHoi: React.FC = () => {
               <button><BoldOutlined /></button>
               <button><ItalicOutlined /></button>
               <button><UnorderedListOutlined /></button>
-              <button><PaperClipOutlined /></button>
               <button><PictureOutlined /></button>
-              <button><LinkOutlined /></button>
+              <button><PaperClipOutlined /></button>
             </div>
             <textarea
               ref={textareaRef}
               className={styles.textarea}
-              placeholder="Nhập nội dung tư vấn chuyên môn tại đây..."
+              placeholder="Nhập nội dung tin nhắn gửi tới Bác sĩ..."
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
             />
@@ -207,18 +187,12 @@ const PhanHoi: React.FC = () => {
             <div className={styles.autoSave}></div>
             <div className={styles.actions}>
               <button
-                className={styles.btnDraft}
-                onClick={() => history.push('/bac-si/tu-van')}
-              >
-                Hủy
-              </button>
-              <button
                 className={styles.btnSend}
                 onClick={handleSend}
                 disabled={sending || !replyText.trim()}
                 style={{ opacity: sending || !replyText.trim() ? 0.6 : 1 }}
               >
-                <SendOutlined /> {sending ? 'Đang gửi...' : 'Gửi phản hồi'}
+                <SendOutlined /> {sending ? 'Đang gửi...' : 'Gửi tin nhắn'}
               </button>
             </div>
           </div>

@@ -156,6 +156,17 @@ export default [
 				path: '/khach-hang/benh-an',
 				component: './KhachHang/HoSoBenhAn',
 			},
+			{
+				name: 'Tư vấn trực tuyến',
+				path: '/khach-hang/tu-van',
+				component: './KhachHang/TuVan',
+			},
+			{
+				name: 'Chi tiết tư vấn',
+				path: '/khach-hang/tu-van/phan-hoi',
+				component: './KhachHang/TuVan/PhanHoi',
+				hideInMenu: true,
+			},
 		],
 	},
 
