@@ -17,6 +17,10 @@ export async function adminlogin(payload: { email?: string; password?: string })
 	return axios.post(`${ip3}api/v1/auth/login`.replace(/([^:]\/)\/+/g, "$1"), payload);
 }
 
+export async function registerUser(payload: { full_name?: string; email?: string; password?: string; role?: string }) {
+	return axios.post(`${ip3}api/v1/auth/register`.replace(/([^:]\/)\/+/g, "$1"), payload);
+}
+
 export async function refreshAccesssToken(payload: { refreshToken: string }) {
 	return axios.post(keycloakTokenEndpoint, { refresh_token: payload.refreshToken });
 }
