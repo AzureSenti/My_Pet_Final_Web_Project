@@ -1,11 +1,9 @@
-import { MessageOutlined } from '@ant-design/icons';
-import { Button, Tag, Tabs, Typography, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { Spin } from 'antd';
 import { history } from 'umi';
+import { PawPrint, Mail, Phone, MessageCircle, Eye } from 'lucide-react';
 import { getConversations, getUnreadCount } from '@/services/messageService';
 import styles from './index.module.less';
-
-const { Title, Text } = Typography;
 
 const TuVan: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('tat-ca');
@@ -39,7 +37,6 @@ const TuVan: React.FC = () => {
   });
 
   const getOtherParticipant = (conv: any) => {
-    // Lấy participant không phải mình (bác sĩ)
     const participants = conv.participants || [];
     const other = participants.find((p: any) => p.role !== 'vet') || participants[0];
     return other;
@@ -54,9 +51,9 @@ const TuVan: React.FC = () => {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 60) return `${minutes} phút trước`;
-    if (hours < 24) return `${hours} giờ trước`;
-    return `${days} ngày trước`;
+    if (minutes < 60) return `${Math.max(1, minutes)} PHÚT TRƯỚC`;
+    if (hours < 24) return `${hours} GIỜ TRƯỚC`;
+    return `${days} NGÀY TRƯỚC`;
   };
 
   return (
@@ -64,32 +61,43 @@ const TuVan: React.FC = () => {
       {/* Header */}
       <div className={styles.pageHeader}>
         <div>
-          <Title level={3} className={styles.title}>Tư vấn trực tuyến</Title>
-          <Text className={styles.subtitle}>
+          <h1 className={styles.title}>Tư vấn trực tuyến</h1>
+          <p className={styles.subtitle}>
             {totalUnread > 0 ? (
-              <>Bạn có <strong>{totalUnread} cuộc trò chuyện</strong> chưa đọc.</>
+              <>Bạn có <strong>{totalUnread} cuộc trò chuyện</strong> chờ phản hồi.</>
             ) : (
               'Tất cả cuộc trò chuyện đã được phản hồi.'
             )}
-          </Text>
+          </p>
         </div>
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          className={styles.filterTabs}
-        >
-          <Tabs.TabPane tab="Tất cả" key="tat-ca" />
-          <Tabs.TabPane tab="Chờ phản hồi" key="cho-phan-hoi" />
-          <Tabs.TabPane tab="Đã phản hồi" key="da-phan-hoi" />
-        </Tabs>
+        <div className={styles.filterTabs}>
+          <button 
+            className={`${styles.filterPill} ${activeTab === 'tat-ca' ? styles.active : ''}`}
+            onClick={() => setActiveTab('tat-ca')}
+          >
+            Tất cả
+          </button>
+          <button 
+            className={`${styles.filterPill} ${activeTab === 'cho-phan-hoi' ? styles.active : ''}`}
+            onClick={() => setActiveTab('cho-phan-hoi')}
+          >
+            Chờ phản hồi
+          </button>
+          <button 
+            className={`${styles.filterPill} ${activeTab === 'da-phan-hoi' ? styles.active : ''}`}
+            onClick={() => setActiveTab('da-phan-hoi')}
+          >
+            Đã phản hồi
+          </button>
+        </div>
       </div>
 
       {/* Conversation cards */}
       <Spin spinning={loading}>
         <div className={styles.cardList}>
           {filtered.length === 0 && !loading ? (
-            <div style={{ textAlign: 'center', padding: '48px', color: '#999' }}>
-              Không có cuộc trò chuyện nào
+            <div className={styles.emptyState}>
+              Không tìm thấy cuộc trò chuyện nào phù hợp.
             </div>
           ) : (
             filtered.map((conv) => {
@@ -98,63 +106,71 @@ const TuVan: React.FC = () => {
               const lastMsg = conv.last_message;
 
               return (
-                <div
-                  key={conv.id}
-                  className={`${styles.consultCard} ${isUnread ? styles.cardUrgent : styles.cardReplied}`}
-                >
+                <div key={conv.id} className={styles.consultCard}>
+                  
                   {/* Card header */}
-                  <div className={styles.cardHeader}>
+                  <div className={styles.cardTop}>
                     <div className={styles.cardLeft}>
-                      <div className={styles.petIconBg}>🐾</div>
-                      <div>
-                        <div className={styles.consultTitle}>
-                          {other?.full_name || 'Người dùng'}
+                      <div className={styles.avatar}>
+                        <PawPrint size={28} strokeWidth={2.5} />
+                      </div>
+                      <div className={styles.userInfo}>
+                        <div className={styles.userName}>
+                          {other?.full_name || 'Khách hàng'}
                         </div>
-                        <div className={styles.consultMeta}>
-                          <span>👤 {other?.email}</span>
-                          {other?.phone && <span>📞 {other?.phone}</span>}
+                        <div className={styles.contactInfo}>
+                          {other?.email && (
+                            <span><Mail size={14} /> {other.email}</span>
+                          )}
+                          {other?.phone && (
+                            <span><Phone size={14} /> {other.phone}</span>
+                          )}
                         </div>
                       </div>
                     </div>
+                    
                     <div className={styles.cardRight}>
-                      <div className={styles.badgeGroup}>
-                        <Tag
-                          className={`${styles.statusTag} ${isUnread ? styles.tagPending : styles.tagDone}`}
-                        >
-                          {isUnread ? `Chưa đọc (${conv.unread_count})` : 'Đã phản hồi'}
-                        </Tag>
-                      </div>
-                      <div className={styles.timeText}>
-                        THỜI GIAN<br />
-                        {lastMsg?.created_at ? formatTime(lastMsg.created_at) : formatTime(conv.updated_at)}
+                      {isUnread ? (
+                        <div className={`${styles.badge} ${styles.unread}`}>
+                          Chưa đọc ({conv.unread_count})
+                        </div>
+                      ) : (
+                        <div className={`${styles.badge} ${styles.read}`}>
+                          Đã phản hồi
+                        </div>
+                      )}
+                      <div className={styles.timeDisplay}>
+                        THỜI GIAN / {lastMsg?.created_at ? formatTime(lastMsg.created_at) : formatTime(conv.updated_at)}
                       </div>
                     </div>
                   </div>
 
-                  {/* Content */}
-                  {lastMsg && (
-                    <div className={styles.contentBox}>
-                      <div className={styles.contentLabel}>
-                        {lastMsg.sender_name ? `${lastMsg.sender_name}:` : 'Tin nhắn mới nhất:'}
+                  {/* Message Preview (Only for unread) */}
+                  {isUnread && lastMsg && (
+                    <div className={styles.previewBox}>
+                      <div className={styles.previewLabel}>
+                        {lastMsg.sender_name?.toUpperCase() || 'KHÁCH HÀNG'} ĐÃ GỬI:
                       </div>
-                      <div className={styles.contentText}>
-                        {lastMsg.content || (lastMsg.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
+                      <div className={styles.previewText}>
+                        "{lastMsg.content || (lastMsg.message_type === 'image' ? '📷 Đã gửi một hình ảnh' : '📎 Đã gửi một tệp đính kèm')}"
                       </div>
                     </div>
                   )}
 
                   {/* Actions */}
                   <div className={styles.cardActions}>
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<MessageOutlined />}
-                      className={styles.btnReply}
+                    <button
+                      className={isUnread ? styles.btnReply : styles.btnView}
                       onClick={() => history.push(`/bac-si/tu-van/phan-hoi?id=${conv.id}`)}
                     >
-                      {isUnread ? 'Phản hồi' : 'Xem cuộc trò chuyện'}
-                    </Button>
+                      {isUnread ? (
+                        <><MessageCircle size={16} /> Phản hồi</>
+                      ) : (
+                        <><Eye size={16} /> Xem cuộc trò chuyện</>
+                      )}
+                    </button>
                   </div>
+
                 </div>
               );
             })
