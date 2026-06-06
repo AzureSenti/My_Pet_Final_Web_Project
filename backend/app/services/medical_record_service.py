@@ -54,10 +54,16 @@ async def get_record_by_id(db: AsyncSession, record_id: uuid.UUID) -> MedicalRec
 async def list_records_by_owner(db: AsyncSession, owner_id: uuid.UUID) -> list[MedicalRecord]:
     """Lấy toàn bộ bệnh án thuộc về các pet của một owner"""
     from app.models.pet import Pet
+    from app.models.veterinarian import Veterinarian
+    from app.models.user import User
+    from sqlalchemy.orm import joinedload
     result = await db.execute(
         select(MedicalRecord)
         .join(Pet, MedicalRecord.pet_id == Pet.id)
+        .options(
+            joinedload(MedicalRecord.vet).joinedload(Veterinarian.user)
+        )
         .where(Pet.owner_id == owner_id)
         .order_by(MedicalRecord.recorded_at.desc())
     )
-    return list(result.scalars().all())
+    return list(result.scalars().unique().all())

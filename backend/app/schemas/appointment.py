@@ -49,9 +49,9 @@ class AppointmentServiceInfo(BaseModel):
 # ── Request schemas ──
 
 class AppointmentCreateRequest(BaseModel):
-    owner_id: uuid.UUID
+    owner_id: Optional[uuid.UUID] = None
     pet_id: uuid.UUID
-    vet_id: uuid.UUID
+    vet_id: Optional[uuid.UUID] = None
     service_id: uuid.UUID
     scheduled_at: datetime
     notes: Optional[str] = None

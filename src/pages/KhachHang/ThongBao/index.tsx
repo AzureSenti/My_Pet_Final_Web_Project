@@ -20,7 +20,7 @@ const ThongBao: React.FC = () => {
   const fetchNotifications = async (pageNum: number) => {
     try {
       setLoading(true);
-      const res = await getThongBao({ page: pageNum, limit: 10, condition: {}, sort: { createdAt: -1 } });
+      const res = await getThongBao({ page: pageNum, limit: 10 });
       const newItems = res?.data?.items || [];
       if (pageNum === 1) {
         setNotifications(newItems);
@@ -61,7 +61,7 @@ const ThongBao: React.FC = () => {
       <div className={styles.pageHeader}>
         <div className={styles.titleBox}>
           <h1 className={styles.title}>Thông báo</h1>
-          <p className={styles.subtitle}>Luôn cập nhật những thay đổi mới nhất trong phòng khám của bạn.</p>
+          <p className={styles.subtitle}>Luôn cập nhật những thông tin mới nhất về lịch hẹn và thú cưng của bạn.</p>
         </div>
         {/* <button className={styles.markReadBtn}>Đánh dấu tất cả là đã đọc</button> */}
       </div>
