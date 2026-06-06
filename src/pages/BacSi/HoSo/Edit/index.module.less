@@ -1,0 +1,242 @@
+@pc-bg: #F4EBD9;
+@pc-card: #FFFFFF;
+@pc-text: #2D2C28;
+@pc-text-secondary: #706F6C;
+@pc-text-muted: #A3A19C;
+@pc-border: #E0D6C8;
+@pc-primary: #7A631B;
+@pc-secondary: #135D54;
+@radius-lg: 16px;
+@radius-xl: 20px;
+@shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
+@transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+.page {
+  padding: 28px 32px 32px;
+  background: #FEFCF8;
+  min-height: 100vh;
+  font-family: 'Manrope', sans-serif;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.btnBack {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: @pc-text;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: @transition;
+
+  &:hover {
+    background: @pc-bg;
+  }
+}
+
+.title {
+  margin: 0 0 4px !important;
+  color: @pc-text !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: @pc-text-secondary;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
+
+.card {
+  background: @pc-card;
+  border-radius: @radius-xl;
+  padding: 24px;
+  box-shadow: @shadow-card;
+  margin-bottom: 24px;
+  border: 1px solid transparent;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: @pc-text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .icon {
+      color: @pc-primary;
+    }
+  }
+}
+
+.btnAdd {
+  background: transparent;
+  border: none;
+  color: @pc-primary;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Avatar Card
+.avatarCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .avatarBox {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 16px;
+    position: relative;
+    border: 4px solid @pc-bg;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .docName {
+    font-size: 20px;
+    font-weight: 800;
+    color: @pc-text;
+    margin: 0 0 4px;
+  }
+
+  .docRole {
+    font-size: 13px;
+    color: @pc-secondary;
+    font-weight: 700;
+    background: #E0F2F1;
+    padding: 4px 12px;
+    border-radius: 9999px;
+  }
+}
+
+// Status Card
+.statusItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid @pc-border;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .statusLabel {
+    font-size: 13px;
+    color: @pc-text-secondary;
+    font-weight: 600;
+  }
+
+  .statusVal {
+    font-size: 13px;
+    font-weight: 700;
+    color: @pc-text;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .checkIcon {
+      color: #389E0D;
+      font-size: 16px;
+    }
+  }
+}
+
+// Form Inputs
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &.full {
+    grid-column: 1 / -1;
+  }
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  color: @pc-text-secondary;
+}
+
+.input, .textarea {
+  background: #FEFCF8;
+  border: 1px solid @pc-border;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: @pc-text;
+  font-family: 'Manrope', sans-serif;
+  transition: @transition;
+  outline: none;
+
+  &:focus {
+    border-color: @pc-primary;
+    box-shadow: 0 0 0 3px rgba(122, 99, 27, 0.08);
+    background: #FFFFFF;
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// Experience Item form
+.expFormItem {
+  background: #FEFCF8;
+  border: 1px solid @pc-border;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}

@@ -1,0 +1,379 @@
+// ============================================
+// 🐾 VetLayout — Color Palette (Matching Admin)
+// ============================================
+
+@pc-bg: #FFF8F2; // Creamy Honey background
+@pc-card: #FFFFFF;
+@pc-text: #4A3F35; // Headings dark brown
+@pc-text-secondary: #7D6E5D; // Body text warm gray
+@pc-text-muted: #9E9385; // Muted text
+@pc-border: #E3D9CB; // Surface Dim
+@pc-primary: #D4A017; // Primary Honey Gold
+@pc-secondary: #135D54; // Secondary
+@sidebar-bg: #FFF8F2;
+@sidebar-width: 250px;
+@sidebar-collapsed: 64px;
+@header-h: 60px;
+@radius-lg: 16px;
+@shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
+@transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Manrope', sans-serif;
+  background: @pc-bg;
+}
+
+// ======= SIDEBAR =======
+.sidebar {
+  width: @sidebar-width;
+  background: @sidebar-bg;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.25s ease;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  border-right: 1px solid @pc-border;
+}
+
+.collapsed {
+  width: @sidebar-collapsed;
+
+  .brand {
+    padding: 20px 8px 16px;
+    align-items: center;
+  }
+
+  .nav {
+    padding: 8px 4px;
+
+    &::before {
+      height: 8px;
+    }
+  }
+
+  .navItem {
+    padding: 0 8px;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 8px;
+  }
+
+  .navIcon {
+    margin: 0;
+  }
+
+  .sidebarToggle {
+    padding: 12px 8px 20px;
+  }
+
+  .toggleBtn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// Brand
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 24px 24px;
+  cursor: pointer;
+  gap: 6px;
+  transition: @transition;
+
+  &.brandCollapsed {
+    padding: 20px 0;
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .collapsed & {
+    display: none;
+  }
+}
+
+.brandIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandName {
+  display: block;
+  color: @pc-primary;
+  font-size: 22px;
+  font-weight: 800;
+  white-space: nowrap;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.brandRole {
+  display: block;
+  color: @pc-text-secondary;
+  font-size: 13px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+// Nav
+.nav {
+  flex: 1;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+
+  &::before {
+    content: '';
+    display: block;
+    height: 16px;
+  }
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: @pc-text-secondary !important;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: @transition;
+  white-space: nowrap;
+  margin-bottom: 6px;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    color: @pc-primary !important;
+    background: rgba(212, 160, 23, 0.08);
+  }
+
+  &::after {
+    display: none !important;
+  }
+}
+
+.navActive {
+  background: #FCE38A !important;
+  color: #4A3F35 !important;
+  font-weight: 800 !important;
+  box-shadow: none;
+
+  &:hover {
+    background: darken(#FCE38A, 5%) !important;
+    color: #4A3F35 !important;
+  }
+}
+
+.navIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.navLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Add Appointment Button (from image)
+.btnAddAppointment {
+  margin: auto 16px 20px;
+  background: @pc-primary;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: @transition;
+  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2);
+
+  &:hover {
+    background: darken(@pc-primary, 5%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(212, 160, 23, 0.3);
+  }
+}
+
+// Sidebar toggle button
+.sidebarToggle {
+  padding: 12px 16px 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid @pc-border;
+  border-radius: 12px;
+  background: @pc-card;
+  color: @pc-primary;
+  cursor: pointer;
+  font-size: 18px;
+  transition: @transition;
+
+  &:hover {
+    background: @pc-primary;
+    color: @pc-card;
+    border-color: @pc-primary;
+  }
+}
+
+// ======= MAIN =======
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #FEFCF8; // Slightly lighter than sidebar for contrast
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.02);
+  margin: 12px 12px 12px 0;
+}
+
+// Header
+.header {
+  height: @header-h;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  flex-shrink: 0;
+  margin-top: 16px;
+}
+
+.headerSearch {
+  flex: 1;
+  max-width: 400px;
+  background: @pc-bg;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  transition: @transition;
+
+  &:focus-within {
+    border-color: @pc-primary;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(122, 99, 27, 0.08);
+  }
+
+  :global(.ant-input) {
+    background: transparent !important;
+    font-size: 14px;
+    color: @pc-text;
+    font-family: 'Manrope', sans-serif;
+
+    &::placeholder {
+      color: @pc-text-muted;
+    }
+  }
+}
+
+.searchInput {
+  background: transparent !important;
+  flex: 1;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: @pc-bg;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: @transition;
+  color: @pc-text-secondary;
+
+  &:hover {
+    background: @pc-primary;
+    color: #fff;
+  }
+}
+
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 9999px;
+  transition: @transition;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.userAvatar {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  margin-right: 8px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 700;
+  color: @pc-text;
+  line-height: 1.2;
+}
+
+// Content area
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 32px 32px;
+}

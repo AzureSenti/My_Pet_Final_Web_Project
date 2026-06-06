@@ -92,11 +92,23 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 		disableContentMargin: false,
 
 		onPageChange: () => {
-			// Redirect / về /dashboard nếu đã đăng nhập
+			const { location } = history;
+			// Redirect / về dashboard phù hợp nếu đã đăng nhập
 			if (initialState?.currentUser) {
-				const { location } = history;
 				if (location.pathname === '/') {
-					history.replace('/dashboard');
+					if (initialState.currentUser.role === 'vet') {
+						history.replace('/bac-si/dashboard');
+					} else {
+						history.replace('/dashboard');
+					}
+				}
+
+				// Chặn Vet truy cập vào Admin CMS
+				const isAdminRoute = !['/bac-si', '/user', '/profile', '/403', '/404', '/hold-on'].some(path =>
+					location.pathname.startsWith(path),
+				);
+				if (isAdminRoute && initialState.currentUser.role === 'vet') {
+					history.replace('/403');
 				}
 			}
 		},
