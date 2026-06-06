@@ -80,65 +80,47 @@ const MyAppointments: React.FC = () => {
 
             <div className={styles.layoutBody}>
                 <div className={styles.timelineSection}>
-                    {[
-                        {
-                            id: 1,
-                            petName: 'Mimi',
-                            petType: 'Mèo',
-                            service: 'Khám định kỳ',
-                            desc: 'Kiểm tra tổng quát',
-                            owner: 'Nguyễn Văn An',
-                            phone: '090xxxx123',
-                            time: '14:30',
-                            dateStr: 'Hôm nay, 24 Th05',
-                            status: 'Đã xác nhận',
-                            img: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150&h=150&fit=crop'
-                        },
-                        {
-                            id: 2,
-                            petName: 'Lucky',
-                            petType: 'Chó',
-                            service: 'Tiêm chủng',
-                            desc: 'Nhắc lịch tiêm 5 bệnh',
-                            owner: 'Trần Thị Mai',
-                            phone: '091xxxx456',
-                            time: '09:00',
-                            dateStr: 'Ngày mai, 25 Th05',
-                            status: 'Đang chờ',
-                            img: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'
-                        }
-                    ].map(app => (
-                        <div key={app.id} className={styles.horizontalCard}>
-                            <div className={styles.cardLeft}>
-                                <div className={styles.avatarWrap}>
-                                    <img src={app.img} alt={app.petName} />
-                                </div>
-                                <div className={styles.infoContent}>
-                                    <div className={styles.tagsRow}>
-                                        <span className={styles.tagMint}>{app.service}</span>
-                                        <span className={styles.tagYellow}>{app.petType}</span>
+                    {appointments.filter(a => a.status !== 'cancelled').length > 0 ? (
+                        appointments.filter(a => a.status !== 'cancelled').map(app => {
+                            const isConfirmed = app.status === 'confirmed';
+                            return (
+                                <div key={app.id} className={styles.horizontalCard}>
+                                    <div className={styles.cardLeft}>
+                                        <div className={styles.avatarWrap}>
+                                            <img src={app.pet?.avatar_url || (app.pet?.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150&h=150&fit=crop' : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop')} alt={app.pet?.name} />
+                                        </div>
+                                        <div className={styles.infoContent}>
+                                            <div className={styles.tagsRow}>
+                                                <span className={styles.tagMint}>{app.service?.name || 'Dịch vụ lẻ'}</span>
+                                                <span className={styles.tagYellow}>{app.pet?.species || 'Thú cưng'}</span>
+                                            </div>
+                                            <h3 className={styles.mainTitle}>{app.pet?.name} - {app.service?.name || 'Khám bệnh'}</h3>
+                                            <p className={styles.subText}>Bác sĩ phụ trách: BS. {app.vet?.user?.full_name || 'Đang điều phối'}</p>
+                                        </div>
                                     </div>
-                                    <h3 className={styles.mainTitle}>{app.petName} - {app.desc}</h3>
-                                    <p className={styles.subText}>Chủ nuôi: {app.owner} • {app.phone}</p>
-                                </div>
-                            </div>
-                            <div className={styles.cardRight}>
-                                <div className={styles.timeWrap}>
-                                    <span className={styles.timeTxt}>{app.time}</span>
-                                    <span className={styles.dateTxt}>{app.dateStr}</span>
-                                </div>
-                                {app.status === 'Đã xác nhận' ? (
-                                    <div className={`${styles.statusBadge} ${styles.confirmed}`}>
-                                        <div className={styles.iconCircle}>✓</div> Đã xác nhận
+                                    <div className={styles.cardRight}>
+                                        <div className={styles.timeWrap}>
+                                            <span className={styles.timeTxt}>{new Date(app.scheduled_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className={styles.dateTxt}>{new Date(app.scheduled_at).toLocaleDateString('vi-VN')}</span>
+                                        </div>
+                                        {isConfirmed ? (
+                                            <div className={`${styles.statusBadge} ${styles.confirmed}`}>
+                                                <div className={styles.iconCircle}>✓</div> Đã xác nhận
+                                            </div>
+                                        ) : (
+                                            <div className={`${styles.statusBadge} ${styles.pending}`}>
+                                                <div className={styles.iconCircle}>🕒</div> Đang chờ
+                                            </div>
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className={`${styles.statusBadge} ${styles.pending}`}>
-                                        <div className={styles.iconCircle}>🕒</div> Đang chờ
-                                    </div>
-                                )}
-                            </div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className={styles.horizontalCard} style={{ justifyContent: 'center', color: '#888' }}>
+                            Không có lịch hẹn nào sắp tới.
                         </div>
-                    ))}
+                    )}
                 </div>
 
                 <div className={styles.infoSection}>
