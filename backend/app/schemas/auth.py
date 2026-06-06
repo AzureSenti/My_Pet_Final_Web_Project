@@ -73,6 +73,13 @@ class LogoutRequest(BaseModel):
 
 # ─────────────────────────── Current User ───────────────────────────
 
+class VetProfileOut(BaseModel):
+    bio: Optional[str] = None
+    certificate_url: Optional[str] = None
+    specialization: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
 class UserOut(BaseModel):
     id: uuid.UUID
     full_name: str
@@ -81,6 +88,7 @@ class UserOut(BaseModel):
     role: UserRole
     is_active: bool
     created_at: datetime
+    vet_profile: Optional[VetProfileOut] = None
 
     model_config = {"from_attributes": True}
 
@@ -90,3 +98,5 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     password: Optional[str] = None
     avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    certificate_url: Optional[str] = None

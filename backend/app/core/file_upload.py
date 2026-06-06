@@ -10,8 +10,9 @@ from fastapi import HTTPException, UploadFile, status
 
 # ─────────────── Cấu hình ───────────────
 
+from app.core.config import UPLOAD_DIR as BASE_UPLOAD_DIR
 # Thư mục lưu file upload — tính từ root project (backend/app)
-UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploads" / "messages"
+UPLOAD_DIR = BASE_UPLOAD_DIR / "messages"
 
 # File types được chấp nhận
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}

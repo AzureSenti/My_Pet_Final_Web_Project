@@ -8,6 +8,7 @@ from app.models.vet_schedule import VetSchedule
 from app.models.appointment import Appointment, AppointmentStatus
 from app.models.medical_record import MedicalRecord
 from app.models.payment import Payment, PaymentMethod, PaymentStatus
+from app.models.notification import Notification, NotificationType
 
 __all__ = [
     "User", "UserRole",
@@ -19,4 +20,5 @@ __all__ = [
     "Appointment", "AppointmentStatus",
     "MedicalRecord",
     "Payment", "PaymentMethod", "PaymentStatus",
+    "Notification", "NotificationType",
 ]
