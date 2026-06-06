@@ -13,10 +13,6 @@ import {
     TrendingUp,
     Stethoscope,
     PawPrint,
-    Facebook,
-    Instagram,
-    Twitter,
-    Youtube,
     MapPin,
     Phone,
     Mail
@@ -310,12 +306,6 @@ const LandingPage: React.FC = () => {
                             <p className={styles.footerBrandDesc}>
                                 Nền tảng số hóa quản lý y khoa thú y hàng đầu, nâng tầm chất lượng cuộc sống cho thú cưng của bạn bằng công nghệ hiện đại.
                             </p>
-                            <div className={styles.socialLinks}>
-                                <a href="#" className={styles.socialBtn}><Facebook size={18} /></a>
-                                <a href="#" className={styles.socialBtn}><Instagram size={18} /></a>
-                                <a href="#" className={styles.socialBtn}><Twitter size={18} /></a>
-                                <a href="#" className={styles.socialBtn}><Youtube size={18} /></a>
-                            </div>
                         </div>
 
                         {/* Column 2: Dịch vụ */}
