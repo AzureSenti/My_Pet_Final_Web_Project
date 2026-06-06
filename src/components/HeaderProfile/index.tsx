@@ -1,7 +1,8 @@
 import React from 'react';
-import { Menu, Dropdown } from 'antd';
+import { Menu, Dropdown, Image } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { history, useModel } from 'umi';
+import { ip3 } from '@/utils/ip';
 
 const HeaderProfile: React.FC = () => {
 	const { initialState, setInitialState } = useModel('@@initialState');
@@ -35,7 +36,12 @@ const HeaderProfile: React.FC = () => {
 	};
 	const capitalizedRole = getRoleLabel(currentUser?.role);
 
-	const avatarUrl = currentUser?.picture || 'https://i.pravatar.cc/150?img=12';
+	const rawAvatar = currentUser?.avatar_url || currentUser?.picture || '';
+	const avatarUrl = rawAvatar
+		? rawAvatar.startsWith('http')
+			? rawAvatar
+			: `${ip3}${rawAvatar.replace(/^\//, '')}`
+		: 'https://i.pravatar.cc/150?img=12';
 
 	const menuItems = [
 		{
@@ -60,8 +66,16 @@ const HeaderProfile: React.FC = () => {
 	return (
 		<Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
 			<div className="pc-user-profile" style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-				<div className="pc-user-avatar" style={{ width: '44px', height: '44px', borderRadius: '50%', border: '2px solid #FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-					<img src={avatarUrl} alt="User Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+				<div className="pc-user-avatar" style={{ width: '44px', height: '44px', borderRadius: '50%', border: '2px solid #FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Image
+						src={avatarUrl}
+						alt="User Avatar"
+						width={44}
+						height={44}
+						style={{ objectFit: 'cover', borderRadius: '50%' }}
+						preview={false}
+						fallback="https://i.pravatar.cc/150?img=12"
+					/>
 				</div>
 				<div className="pc-user-info" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 					<span className="pc-user-name" style={{ fontSize: '14px', fontWeight: 700, color: '#1C1917', lineHeight: 1.2 }}>{name}</span>

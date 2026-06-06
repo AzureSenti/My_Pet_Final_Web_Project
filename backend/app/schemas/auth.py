@@ -15,6 +15,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(..., min_length=8, max_length=64, examples=["StrongPass@1"])
     phone: str | None = Field(default=None, max_length=20)
     role: UserRole = UserRole.owner
+    avatar_url: Optional[str] = None
 
     @field_validator("password")
     @classmethod
@@ -88,3 +89,4 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
     password: Optional[str] = None
+    avatar_url: Optional[str] = None

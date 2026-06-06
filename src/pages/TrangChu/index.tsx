@@ -6,9 +6,10 @@ import {
 	ExclamationCircleOutlined,
 	ArrowRightOutlined,
 } from '@ant-design/icons';
-import { Search, PawPrint, UserCheck, HeartPulse, CalendarDays, PhoneCall, Mail } from 'lucide-react';
+import { Search, PawPrint, UserCheck, HeartPulse, CalendarDays, PhoneCall, Mail, Download } from 'lucide-react';
 import CountUp from 'react-countup';
 import Chart from 'react-apexcharts';
+import * as XLSX from 'xlsx';
 import { Modal } from 'antd';
 import HeaderProfile from '@/components/HeaderProfile';
 import './components/style.less';
@@ -16,32 +17,7 @@ import './components/style.less';
 // ─── Metric Cards Data ────────────────────────
 
 // ─── Notifications Data ───────────────────────
-const NOTIFICATIONS = [
-	{
-		title: 'Cập nhật hệ thống thành công',
-		desc: 'Phiên bản 2.4.0 — Nâng cấp toàn bộ module',
-		time: '10 phút trước',
-		type: 'success',
-	},
-	{
-		title: 'Cảnh báo tồn kho thuốc',
-		desc: 'Thuốc Paracetamol cho chó dưới 10 đơn vị',
-		time: '1 giờ trước',
-		type: 'warning',
-	},
-	{
-		title: 'Bác sĩ mới gia nhập',
-		desc: 'BS. Nguyễn Văn Minh đã tham gia đội ngũ',
-		time: '3 giờ trước',
-		type: 'success',
-	},
-	{
-		title: 'Lịch hẹn quá hạn',
-		desc: 'Thú cưng "Buddy" bỏ lỡ lịch khám định kỳ',
-		time: '5 giờ trước',
-		type: 'warning',
-	},
-];
+// (Dữ liệu thực tế được lấy từ API trong useEffect)
 
 // ─── Appointment Line Chart ───────────────────
 const appointmentChartOptions: ApexCharts.ApexOptions = {
@@ -200,12 +176,10 @@ const growthChartOptions: ApexCharts.ApexOptions = {
 	},
 };
 
-const growthSeries = [
-	{ name: 'Khách hàng', data: [180, 220, 260, 310, 380, 420] },
-];
+// (Series data handled via getGrowthSeries)
 
 // ─── Sub Components ───────────────────────────
-const NotificationItem = ({ item }: { item: typeof NOTIFICATIONS[0] }) => (
+const NotificationItem = ({ item }: { item: any }) => (
 	<div className={`notif-item ${item.type}`}>
 		<div className="notif-icon-box">
 			{item.type === 'success' ? <SyncOutlined /> : <ExclamationCircleOutlined />}
@@ -241,21 +215,46 @@ const LegendItem = ({ color, label, count }: { color: string; label: string; cou
 	</div>
 );
 
-import { getDashboardStats } from '@/services/QuanLyPetStore';
+import { getDashboardStats, getAppointments } from '@/services/QuanLyPetStore';
+
+import { Skeleton } from 'antd';
 
 const TrangChu = () => {
 	const [filterPeriod, setFilterPeriod] = useState('7 days');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [stats, setStats] = useState<any>(null);
+	const [recentActivities, setRecentActivities] = useState<any[]>([]);
 	const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
 	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const fetchStats = async () => {
-			const data = await getDashboardStats();
-			setStats(data);
+		const fetchData = async () => {
+			setLoading(true);
+			try {
+				const [statsData, appData] = await Promise.all([
+					getDashboardStats(),
+					getAppointments({ limit: 5 })
+				]);
+				setStats(statsData);
+
+				// Chuyển đổi lịch hẹn mới nhất thành thông báo
+				if (appData && appData.items) {
+					const activities = appData.items.map((app: any) => ({
+						title: `Lịch hẹn mới: ${app.pet?.name || 'Thú cưng'}`,
+						desc: `${app.owner?.full_name || 'Khách hàng'} - ${app.service?.name || 'Dịch vụ'}`,
+						time: new Date(app.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+						type: app.status === 'pending' ? 'warning' : 'success',
+					}));
+					setRecentActivities(activities);
+				}
+			} catch (error) {
+				console.error('Error fetching dashboard data:', error);
+			} finally {
+				setLoading(false);
+			}
 		};
-		fetchStats();
+		fetchData();
 	}, []);
 
 	// Handle button clicks
@@ -272,22 +271,55 @@ const TrangChu = () => {
 		}
 	};
 
-	const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setFilterPeriod(e.target.value);
-		message.success(`Đã cập nhật dữ liệu biểu đồ theo: ${e.target.options[e.target.selectedIndex].text}`);
+	const handleExportGeneralReport = () => {
+		if (!stats) {
+			message.warning('Dữ liệu đang tải, vui lòng thử lại sau!');
+			return;
+		}
+
+		const summaryData = [
+			{ 'Chỉ số': 'Tổng thú cưng', 'Giá trị': stats.total_pets || 0, 'Đơn vị': 'Con' },
+			{ 'Chỉ số': 'Tổng khách hàng', 'Giá trị': stats.total_owners || 0, 'Đơn vị': 'Người' },
+			{ 'Chỉ số': 'Tổng bác sĩ', 'Giá trị': stats.total_vets || 0, 'Đơn vị': 'Người' },
+			{ 'Chỉ số': 'Tổng lịch hẹn', 'Giá trị': stats.total_appointments || 0, 'Đơn vị': 'Lượt' },
+			{ 'Chỉ số': 'Lịch hẹn hoàn thành', 'Giá trị': stats.appointments_completed || 0, 'Đơn vị': 'Lượt' },
+			{ 'Chỉ số': 'Lịch hẹn đang chờ', 'Giá trị': stats.appointments_pending || 0, 'Đơn vị': 'Lượt' },
+			{ 'Chỉ số': 'Lịch hẹn đã hủy', 'Giá trị': stats.appointments_cancelled || 0, 'Đơn vị': 'Lượt' },
+		];
+
+		const worksheet = XLSX.utils.json_to_sheet(summaryData);
+		const wscols = [{ wch: 25 }, { wch: 15 }, { wch: 10 }];
+		worksheet['!cols'] = wscols;
+
+		const workbook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workbook, worksheet, 'Thống kê tổng quan');
+
+		const fileName = `Bao_cao_tong_quan_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+		XLSX.writeFile(workbook, fileName);
+		message.success(`Đã xuất báo cáo tổng quan: ${fileName}`);
 	};
 
-	// Dynamic data derivations
-	const displayedNotifs = NOTIFICATIONS.filter(item =>
+	const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFilterPeriod(e.target.value);
+		// Note: Trong thực tế sẽ fetch lại data theo period, ở đây tạm set về 0 vì backend chưa hỗ trợ history
+	};
+
+	// ─── Real Data Logic ────────────────────────
+
+	// Thay vì mock data, chúng ta set về 0 nếu chưa có API history
+	const getAppointmentSeries = () => {
+		// Mock data has been removed. Returning 0s as requested if data is not available.
+		return [{ name: 'Lịch hẹn', data: [0, 0, 0, 0, 0, 0, 0] }];
+	};
+
+	const getGrowthSeries = () => {
+		return [{ name: 'Khách hàng', data: [0, 0, 0, 0, 0, 0] }];
+	};
+
+	const displayedNotifs = recentActivities.filter(item =>
 		item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 		item.desc.toLowerCase().includes(searchQuery.toLowerCase())
 	);
-
-	const getAppointmentSeries = () => {
-		if (filterPeriod === '30 days') return [{ name: 'Lịch hẹn', data: [45, 52, 38, 60, 48, 72, 65] }];
-		if (filterPeriod === '3 months') return [{ name: 'Lịch hẹn', data: [120, 145, 110, 180, 135, 210, 190] }];
-		return [{ name: 'Lịch hẹn', data: [18, 22, 15, 28, 20, 35, 24] }];
-	};
 
 	const dynamicChartOptions: ApexCharts.ApexOptions = {
 		...appointmentChartOptions,
@@ -299,41 +331,51 @@ const TrangChu = () => {
 		}
 	};
 
-	// Mapping dữ liệu từ API vào UI
 	const dynamicKPI = [
 		{
 			label: 'Tổng thú cưng',
-			value: stats?.total_pets || 4,
-			trend: '+12.5%',
+			value: stats?.total_pets || 0,
+			trend: 'Thực tế',
 			trendDir: 'up',
 			icon: <PawPrint size={24} strokeWidth={1.75} />,
 			color: 'pink',
 		},
 		{
 			label: 'Tổng khách hàng',
-			value: stats?.total_owners || 2,
-			trend: '+8.2%',
+			value: stats?.total_owners || 0,
+			trend: 'Thực tế',
 			trendDir: 'up',
 			icon: <UserCheck size={24} strokeWidth={1.75} />,
 			color: 'warm',
 		},
 		{
 			label: 'Tổng bác sĩ',
-			value: stats?.total_vets || 2,
-			trend: '+5.7%',
+			value: stats?.total_vets || 0,
+			trend: 'Thực tế',
 			trendDir: 'up',
 			icon: <HeartPulse size={24} strokeWidth={1.75} />,
 			color: 'mint',
 		},
 		{
 			label: 'Tổng lịch hẹn',
-			value: stats?.total_users || 6,
-			trend: '+2.1%',
+			value: stats?.total_appointments || 0,
+			trend: 'Thực tế',
 			trendDir: 'up',
 			icon: <CalendarDays size={24} strokeWidth={1.75} />,
 			color: 'peach',
 		},
 	];
+
+	if (loading) {
+		return (
+			<div className="petcare-dashboard" style={{ padding: '24px' }}>
+				<Skeleton active avatar paragraph={{ rows: 4 }} />
+				<div style={{ marginTop: '32px' }}>
+					<Skeleton active paragraph={{ rows: 8 }} />
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="petcare-dashboard">
@@ -352,7 +394,14 @@ const TrangChu = () => {
 						/>
 					</div>
 				</div>
-				<div className="pc-header-actions">
+				<div className="pc-header-actions" style={{ gap: '12px' }}>
+					<button
+						className="btn-export-premium"
+						onClick={handleExportGeneralReport}
+					>
+						<Download size={18} />
+						Xuất báo cáo
+					</button>
 					<HeaderProfile />
 				</div>
 			</div>
@@ -366,7 +415,6 @@ const TrangChu = () => {
 
 			{/* ── Row 1: Appointment Stats + Status ── */}
 			<div className="pc-charts-row">
-				{/* Appointment Line Chart */}
 				<div className="pc-card pc-chart-line">
 					<div className="pc-card-header">
 						<div>
@@ -388,7 +436,6 @@ const TrangChu = () => {
 					</div>
 				</div>
 
-				{/* Status Donut */}
 				<div className="pc-card pc-chart-donut">
 					<div className="pc-card-header">
 						<div>
@@ -410,7 +457,6 @@ const TrangChu = () => {
 
 			{/* ── Row 2: Growth + Notifications ── */}
 			<div className="pc-charts-row">
-				{/* Growth Chart */}
 				<div className="pc-card pc-chart-bar">
 					<div className="pc-card-header">
 						<div>
@@ -419,11 +465,10 @@ const TrangChu = () => {
 						</div>
 					</div>
 					<div className="pc-card-body">
-						<Chart options={growthChartOptions} series={growthSeries} type="bar" height={280} />
+						<Chart options={growthChartOptions} series={getGrowthSeries()} type="bar" height={280} />
 					</div>
 				</div>
 
-				{/* System Notifications */}
 				<div className="pc-card pc-notifications">
 					<div className="pc-card-header">
 						<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -483,25 +528,29 @@ const TrangChu = () => {
 
 			{/* Modal Xem Tất cả Thông báo */}
 			<Modal
-				title={<h3>Tất cả thông báo 🔔</h3>}
+				title={<h3>Danh sách hoạt động gần đây 🔔</h3>}
 				visible={isNotifModalOpen}
 				onCancel={() => setIsNotifModalOpen(false)}
 				footer={null}
 				width={600}
 			>
 				<div style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px 0' }}>
-					{NOTIFICATIONS.map((item, idx) => (
-						<div key={idx} style={{ padding: '12px 16px', borderBottom: '1px solid #E5E0D8', display: 'flex', gap: '16px', alignItems: 'center' }}>
-							<div style={{ color: item.type === 'success' ? '#0F5132' : '#842029', background: item.type === 'success' ? '#D1E7DD' : '#F8D7DA', padding: '12px', borderRadius: '50%' }}>
-								{item.type === 'success' ? <SyncOutlined style={{ fontSize: '18px' }} /> : <ExclamationCircleOutlined style={{ fontSize: '18px' }} />}
+					{recentActivities.length > 0 ? (
+						recentActivities.map((item, idx) => (
+							<div key={idx} style={{ padding: '12px 16px', borderBottom: '1px solid #E5E0D8', display: 'flex', gap: '16px', alignItems: 'center' }}>
+								<div style={{ color: item.type === 'success' ? '#0F5132' : '#842029', background: item.type === 'success' ? '#D1E7DD' : '#F8D7DA', padding: '12px', borderRadius: '50%' }}>
+									{item.type === 'success' ? <SyncOutlined style={{ fontSize: '18px' }} /> : <ExclamationCircleOutlined style={{ fontSize: '18px' }} />}
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontWeight: 600, color: '#4A3F35', fontSize: '15px' }}>{item.title}</div>
+									<div style={{ color: '#7D6E5D', fontSize: '13px', marginTop: '4px' }}>{item.desc}</div>
+								</div>
+								<div style={{ fontSize: '12px', color: '#B5AFA5' }}>{item.time}</div>
 							</div>
-							<div style={{ flex: 1 }}>
-								<div style={{ fontWeight: 600, color: '#4A3F35', fontSize: '15px' }}>{item.title}</div>
-								<div style={{ color: '#7D6E5D', fontSize: '13px', marginTop: '4px' }}>{item.desc}</div>
-							</div>
-							<div style={{ fontSize: '12px', color: '#B5AFA5' }}>{item.time}</div>
-						</div>
-					))}
+						))
+					) : (
+						<div style={{ textAlign: 'center', padding: '40px', color: '#7D6E5D' }}>Không có hoạt động nào gần đây.</div>
+					)}
 				</div>
 			</Modal>
 
@@ -514,7 +563,7 @@ const TrangChu = () => {
 			>
 				<div style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
 					<p style={{ color: '#7D6E5D', fontSize: '15px' }}>Đội ngũ y bác sĩ thú y của chúng tôi sẵn sàng hỗ trợ sức khỏe thú cưng của bạn 24/7. Vui lòng liên hệ qua các kênh dưới đây:</p>
-					
+
 					<div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: '#FFF8F2', padding: '16px', borderRadius: '12px' }}>
 						<div style={{ background: '#D4A017', color: '#FFF', padding: '12px', borderRadius: '50%' }}><PhoneCall size={24} /></div>
 						<div>
