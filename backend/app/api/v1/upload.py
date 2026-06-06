@@ -7,8 +7,10 @@ from pathlib import Path
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
-UPLOAD_AVATAR_DIR = Path(__file__).resolve().parent.parent.parent / "uploads" / "avatars"
-UPLOAD_FILE_DIR = Path(__file__).resolve().parent.parent.parent / "uploads" / "files"
+from app.core.config import UPLOAD_DIR
+
+UPLOAD_AVATAR_DIR = UPLOAD_DIR / "avatars"
+UPLOAD_FILE_DIR = UPLOAD_DIR / "files"
 
 @router.post("/avatar", dependencies=[Depends(admin_only)])
 async def upload_avatar(file: UploadFile = File(...)):

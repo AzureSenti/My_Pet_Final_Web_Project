@@ -17,6 +17,7 @@ const HoSoEdit: React.FC = () => {
 
   const [fullName, setFullName] = useState(currentUser?.full_name || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [bio, setBio] = useState(currentUser?.vet_profile?.bio || '');
   const [submitting, setSubmitting] = useState(false);
 
   const handleSave = async () => {
@@ -30,6 +31,7 @@ const HoSoEdit: React.FC = () => {
       const updatedUser = await updateProfile({
         full_name: fullName.trim(),
         phone: phone.trim() || undefined,
+        bio: bio.trim() || undefined,
       });
 
       // Cập nhật lại initialState để các trang khác cũng hiện dữ liệu mới
@@ -154,7 +156,8 @@ const HoSoEdit: React.FC = () => {
               {/* TODO: Thêm field bio vào backend UserUpdate schema nếu cần */}
               <textarea
                 className={styles.textarea}
-                defaultValue={`Bác sĩ ${fullName} chuyên sâu trong lĩnh vực thú y.`}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
                 placeholder="Mô tả tiểu sử chuyên môn của bạn..."
               />
             </div>

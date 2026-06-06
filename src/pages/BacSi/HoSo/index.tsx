@@ -52,8 +52,7 @@ const HoSo: React.FC = () => {
               <FileTextOutlined className={styles.icon} /> Giới thiệu bản thân
             </h3>
             <div className={styles.aboutText}>
-              {/* TODO: Thêm field bio/description vào backend schema nếu cần */}
-              Bác sĩ {fullName} chuyên sâu trong lĩnh vực thú y, luôn cập nhật các phương pháp điều trị tiên tiến nhất để mang lại sự an tâm cho chủ nuôi và sức khỏe tốt nhất cho thú cưng.
+              {currentUser?.vet_profile?.bio || `Bác sĩ ${fullName} chưa cập nhật tiểu sử chuyên môn.`}
             </div>
           </div>
 
