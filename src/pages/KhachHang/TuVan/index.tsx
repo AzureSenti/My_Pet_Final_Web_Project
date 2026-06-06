@@ -1,16 +1,16 @@
-import { MessageOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Tabs, Typography, Spin, Modal, Select, message, Avatar } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { Avatar, Spin, Modal, message, Typography } from 'antd';
+import { Search, Plus, Clock, ChevronRight, Video, CheckCircle2 } from 'lucide-react';
 import { history } from 'umi';
 import { getConversations, getUnreadCount, createConversation } from '@/services/messageService';
 import { getOwnerVets } from '@/services/QuanLyPetStore';
 import styles from './index.less';
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Text } = Typography;
 
 const TuVan: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('tat-ca');
+  const [activeFilter, setActiveFilter] = useState<string>('tat-ca');
+  const [searchQuery, setSearchQuery] = useState('');
   const [conversations, setConversations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalUnread, setTotalUnread] = useState(0);
@@ -19,6 +19,7 @@ const TuVan: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [vets, setVets] = useState<any[]>([]);
   const [selectedVet, setSelectedVet] = useState<string | null>(null);
+  const [modalSearch, setModalSearch] = useState('');
   const [creating, setCreating] = useState(false);
 
   const fetchData = async () => {
@@ -64,18 +65,25 @@ const TuVan: React.FC = () => {
     }
   };
 
-  const filtered = conversations.filter((c) => {
-    if (activeTab === 'chua-doc') return c.unread_count > 0;
-    if (activeTab === 'da-doc') return c.unread_count === 0;
-    return true;
-  });
-
   const getOtherParticipant = (conv: any) => {
     const participants = conv.participants || [];
-    // Tìm bác sĩ
-    const other = participants.find((p: any) => p.role === 'vet' || p.role === 'admin') || participants[0];
-    return other;
+    return participants.find((p: any) => p.role === 'vet' || p.role === 'admin') || participants[0];
   };
+
+  const filtered = conversations.filter((c) => {
+    const other = getOtherParticipant(c);
+    const vetName = (other?.full_name || '').toLowerCase();
+    
+    // Search query filter
+    if (searchQuery && !vetName.includes(searchQuery.toLowerCase())) {
+        return false;
+    }
+
+    // Tab filter
+    if (activeFilter === 'chua-doc') return c.unread_count > 0;
+    if (activeFilter === 'da-doc') return c.unread_count === 0;
+    return true;
+  });
 
   const formatTime = (dateStr: string) => {
     if (!dateStr) return '';
@@ -86,157 +94,227 @@ const TuVan: React.FC = () => {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 60) return `${minutes} phút trước`;
+    if (minutes < 60) return `${Math.max(1, minutes)} phút trước`;
     if (hours < 24) return `${hours} giờ trước`;
     return `${days} ngày trước`;
   };
 
+  const getSpecialtyBadgeClass = (specialty: string) => {
+      const sp = (specialty || '').toLowerCase();
+      if (sp.includes('mèo') || sp.includes('cat')) return styles.cat;
+      if (sp.includes('chó') || sp.includes('dog')) return styles.dog;
+      if (sp.includes('ngoại') || sp.includes('surgery')) return styles.surgery;
+      if (sp.includes('da') || sp.includes('derma')) return styles.derma;
+      return styles.general;
+  };
+
+  // Filter vets for Modal
+  const filteredVets = vets.filter(vet => 
+    vet.full_name?.toLowerCase().includes(modalSearch.toLowerCase()) || 
+    vet.specialization?.toLowerCase().includes(modalSearch.toLowerCase())
+  );
+
   return (
     <div className={styles.page}>
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div>
-          <Title level={3} className={styles.title}>Tư vấn trực tuyến</Title>
-          <Text className={styles.subtitle}>
-            {totalUnread > 0 ? (
-              <>Bạn có <strong>{totalUnread} tin nhắn</strong> chưa đọc từ Bác sĩ.</>
-            ) : (
-              'Bạn có thể nhắn tin trực tiếp với Bác sĩ thú y để nhận tư vấn.'
-            )}
-          </Text>
-        </div>
-        <div className={styles.headerActions}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setIsModalVisible(true)}
-            style={{ borderRadius: '8px', background: '#7A631B', borderColor: '#7A631B' }}
+      <div className={styles.mainContainer}>
+        {/* Header */}
+        <div className={styles.pageHeader}>
+          <div className={styles.titleSection}>
+            <h1 className={styles.title}>Tư vấn trực tuyến</h1>
+            <p className={styles.subtitle}>Quản lý các cuộc trò chuyện và tư vấn với bác sĩ thú y</p>
+          </div>
+          <button 
+            className={styles.btnNewChat} 
+            onClick={() => {
+                setModalSearch('');
+                setSelectedVet(null);
+                setIsModalVisible(true);
+            }}
           >
-            Bắt đầu trò chuyện mới
-          </Button>
+            <Plus size={18} strokeWidth={2.5} />
+            Tạo cuộc hội thoại mới
+          </button>
         </div>
-      </div>
 
-      <div style={{ marginBottom: 16 }}>
-        <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            className={styles.filterTabs}
-          >
-            <Tabs.TabPane tab="Tất cả" key="tat-ca" />
-            <Tabs.TabPane tab="Chưa đọc" key="chua-doc" />
-            <Tabs.TabPane tab="Đã đọc" key="da-doc" />
-        </Tabs>
-      </div>
-
-      {/* Conversation cards */}
-      <Spin spinning={loading}>
-        <div className={styles.cardList}>
-          {filtered.length === 0 && !loading ? (
-            <div style={{ textAlign: 'center', padding: '48px', color: '#999' }}>
-              Bạn chưa có cuộc trò chuyện nào. Hãy chọn Bắt đầu trò chuyện mới để liên hệ Bác sĩ.
-            </div>
-          ) : (
-            filtered.map((conv) => {
-              const other = getOtherParticipant(conv);
-              const isUnread = conv.unread_count > 0;
-              const lastMsg = conv.last_message;
-
-              return (
-                <div
-                  key={conv.id}
-                  className={`${styles.consultCard} ${isUnread ? styles.cardUrgent : styles.cardReplied}`}
+        {/* Toolbar: Filters & Search */}
+        <div className={styles.toolbar}>
+            <div className={styles.filters}>
+                <div 
+                    className={`${styles.filterPill} ${activeFilter === 'tat-ca' ? styles.active : ''}`}
+                    onClick={() => setActiveFilter('tat-ca')}
                 >
-                  <div className={styles.cardHeader}>
-                    <div className={styles.cardLeft}>
-                      <div className={styles.petIconBg}>👨‍⚕️</div>
-                      <div>
-                        <div className={styles.consultTitle}>
-                          BS. {other?.full_name || 'Bác sĩ'}
-                        </div>
-                        <div className={styles.consultMeta}>
-                          <span>Khoa/Chuyên khoa</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className={styles.cardRight}>
-                      <div className={styles.badgeGroup}>
-                        <Tag
-                          className={`${styles.statusTag} ${isUnread ? styles.tagPending : styles.tagDone}`}
-                        >
-                          {isUnread ? `Chưa đọc (${conv.unread_count})` : 'Đã đọc'}
-                        </Tag>
-                      </div>
-                      <div className={styles.timeText}>
-                        THỜI GIAN<br />
-                        {lastMsg?.created_at ? formatTime(lastMsg.created_at) : formatTime(conv.updated_at)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {lastMsg && (
-                    <div className={styles.contentBox}>
-                      <div className={styles.contentLabel}>
-                        {lastMsg.sender_name ? `${lastMsg.sender_name}:` : 'Tin nhắn mới nhất:'}
-                      </div>
-                      <div className={styles.contentText}>
-                        {lastMsg.content || (lastMsg.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className={styles.cardActions}>
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<MessageOutlined />}
-                      className={styles.btnReply}
-                      onClick={() => history.push(`/khach-hang/tu-van/phan-hoi?id=${conv.id}`)}
-                    >
-                      {isUnread ? 'Trả lời ngay' : 'Xem cuộc trò chuyện'}
-                    </Button>
-                  </div>
+                    Tất cả
                 </div>
-              );
-            })
-          )}
+                <div 
+                    className={`${styles.filterPill} ${activeFilter === 'chua-doc' ? styles.active : ''}`}
+                    onClick={() => setActiveFilter('chua-doc')}
+                >
+                    Chưa đọc {totalUnread > 0 ? `(${totalUnread})` : ''}
+                </div>
+                <div 
+                    className={`${styles.filterPill} ${activeFilter === 'da-doc' ? styles.active : ''}`}
+                    onClick={() => setActiveFilter('da-doc')}
+                >
+                    Đã đọc
+                </div>
+            </div>
+            <div className={styles.searchBox}>
+                <Search size={18} className={styles.icon} />
+                <input 
+                    type="text" 
+                    placeholder="Tìm kiếm bác sĩ..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
         </div>
-      </Spin>
 
-      {/* Modal Tạo Chat Mới */}
+        {/* Conversation cards */}
+        <Spin spinning={loading}>
+          <div className={styles.cardList}>
+            {filtered.length === 0 && !loading ? (
+              <div className={styles.emptyState}>
+                Không tìm thấy cuộc hội thoại nào.
+              </div>
+            ) : (
+              filtered.map((conv) => {
+                const other = getOtherParticipant(conv);
+                const isUnread = conv.unread_count > 0;
+                const lastMsg = conv.last_message;
+                const specialtyClass = getSpecialtyBadgeClass(other?.specialization || 'Đa khoa');
+
+                return (
+                  <div
+                    key={conv.id}
+                    className={`${styles.consultCard} ${isUnread ? styles.unreadCard : ''}`}
+                    onClick={() => history.push(`/khach-hang/tu-van/phan-hoi?id=${conv.id}`)}
+                  >
+                    {/* Left: Avatar */}
+                    <div className={styles.cardAvatar}>
+                        <Avatar src={other?.avatar_url || 'https://api.dicebear.com/7.x/notionists/svg?seed=Felix'} />
+                        <div className={styles.onlineDot}></div>
+                        {isUnread && <div className={styles.redDot}></div>}
+                    </div>
+
+                    {/* Middle: Info */}
+                    <div className={styles.cardInfo}>
+                        <div className={styles.topRow}>
+                            <span className={styles.vetName}>BS. {other?.full_name || 'Bác sĩ'}</span>
+                            <span className={`${styles.badgeSpecialty} ${specialtyClass}`}>
+                                {other?.specialization || 'Đa khoa'}
+                            </span>
+                        </div>
+                        <div className={styles.msgPreview}>
+                            {lastMsg?.sender_name ? `${lastMsg.sender_name}: ` : ''}
+                            {lastMsg?.content || (lastMsg?.message_type === 'image' ? '📷 Hình ảnh' : 'Chưa có tin nhắn')}
+                        </div>
+                        <div className={styles.timeRow}>
+                            <Clock size={14} />
+                            <span>{lastMsg?.created_at ? formatTime(lastMsg.created_at) : formatTime(conv.updated_at)}</span>
+                        </div>
+                    </div>
+
+                    {/* Right: Actions */}
+                    <div className={styles.cardAction}>
+                        {isUnread && (
+                            <span className={styles.unreadBadge}>{conv.unread_count} tin nhắn mới</span>
+                        )}
+                        <button className={`${styles.btnAction} ${isUnread ? styles.btnUnread : styles.btnRead}`}>
+                            {isUnread ? (
+                                <>Xem tin nhắn <ChevronRight size={16}/></>
+                            ) : (
+                                <>Xem lại <Clock size={16}/></>
+                            )}
+                        </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </Spin>
+      </div>
+
+      {/* Footer */}
+      <footer className={styles.customFooter}>
+        <div className={styles.fLogo}>PetCare</div>
+        <div className={styles.fLinks}>
+            <a href="#">Support</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </div>
+      </footer>
+
+      {/* Custom Modal Tạo Chat Mới */}
       <Modal
-        title={<b>Bắt đầu trò chuyện với Bác sĩ</b>}
+        title={null}
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        onOk={handleCreateConversation}
-        confirmLoading={creating}
-        okText="Bắt đầu nhắn tin"
-        cancelText="Hủy"
-        okButtonProps={{ style: { background: '#7A631B', borderColor: '#7A631B' } }}
+        footer={null}
+        width={560}
+        centered
+        className={styles.modernModal}
+        closeIcon={<span className={styles.closeIcon}>×</span>}
       >
-        <div style={{ marginBottom: 16 }}>
-          <Text type="secondary">Vui lòng chọn bác sĩ mà bạn muốn nhận tư vấn. Bạn có thể gửi câu hỏi và bác sĩ sẽ trả lời sớm nhất.</Text>
+        <div className={styles.modalHeader}>
+            <h2>Bắt đầu trò chuyện</h2>
+            <p>Chọn một bác sĩ thú y để nhận tư vấn chuyên môn</p>
         </div>
-        <Select
-          showSearch
-          placeholder="Chọn bác sĩ..."
-          style={{ width: '100%' }}
-          size="large"
-          value={selectedVet}
-          onChange={(val) => setSelectedVet(val)}
-          filterOption={(input, option) =>
-            (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-          }
-        >
-          {vets.map(vet => (
-            <Option key={vet.id} value={vet.id}>
-              <div className={styles.vetItem}>
-                <Avatar src={vet.avatar_url} size="small" />
-                <span style={{ marginLeft: 8 }}>BS. {vet.full_name} - {vet.specialization}</span>
-              </div>
-            </Option>
-          ))}
-        </Select>
+
+        <div className={styles.modalSearch}>
+            <Search size={18} className={styles.searchIcon} />
+            <input 
+                type="text" 
+                placeholder="Tìm kiếm theo tên hoặc chuyên khoa..." 
+                value={modalSearch}
+                onChange={(e) => setModalSearch(e.target.value)}
+            />
+        </div>
+
+        <div className={styles.doctorList}>
+            {filteredVets.length === 0 ? (
+                <div className={styles.emptyDoctor}>Không tìm thấy bác sĩ nào</div>
+            ) : (
+                filteredVets.map(vet => {
+                    const isSelected = selectedVet === vet.id;
+                    const specialtyClass = getSpecialtyBadgeClass(vet.specialization || 'Đa khoa');
+                    return (
+                        <div 
+                            key={vet.id} 
+                            className={`${styles.doctorCard} ${isSelected ? styles.selected : ''}`}
+                            onClick={() => setSelectedVet(vet.id)}
+                        >
+                            <div className={styles.docAvatar}>
+                                <Avatar size={48} src={vet.avatar_url || 'https://api.dicebear.com/7.x/notionists/svg?seed=Felix'} />
+                                <div className={styles.docOnline}></div>
+                            </div>
+                            <div className={styles.docInfo}>
+                                <h4>BS. {vet.full_name}</h4>
+                                <span className={`${styles.badgeSpecialty} ${specialtyClass}`}>
+                                    {vet.specialization || 'Đa khoa'}
+                                </span>
+                            </div>
+                            <div className={styles.docCheck}>
+                                {isSelected ? <CheckCircle2 size={24} color="#FFBA49" fill="#FFFBEB" /> : <div className={styles.circle}></div>}
+                            </div>
+                        </div>
+                    );
+                })
+            )}
+        </div>
+
+        <div className={styles.modalFooter}>
+            <button className={styles.btnCancel} onClick={() => setIsModalVisible(false)}>
+                Hủy bỏ
+            </button>
+            <button 
+                className={`${styles.btnConfirm} ${!selectedVet ? styles.disabled : ''}`} 
+                onClick={handleCreateConversation}
+                disabled={!selectedVet || creating}
+            >
+                {creating ? <Spin size="small" /> : 'Bắt đầu nhắn tin'}
+            </button>
+        </div>
       </Modal>
     </div>
   );
