@@ -9,7 +9,7 @@ const Settings: LayoutSettings & {
 	navTheme: 'light',
 	primaryColor: '#8B7355',
 	borderRadiusBase: '16px',
-	layout: 'side',
+	layout: 'top',
 	contentWidth: 'Fluid',
 	fixedHeader: true,
 	fixSiderbar: true,
@@ -19,7 +19,7 @@ const Settings: LayoutSettings & {
 	logo: 'https://cdn-icons-png.flaticon.com/512/3565/3565860.png',
 	iconfontUrl: '',
 	headerTheme: 'light',
-	headerHeight: 0,
+	headerHeight: 72,
 	siderWidth: 240,
 };
 

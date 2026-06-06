@@ -1,6 +1,7 @@
 import React from 'react';
 import { history, useLocation } from 'umi';
-import { Heart, Home, PawPrint, Calendar, ClipboardList } from 'lucide-react';
+import { Home, PawPrint, Calendar, ClipboardList, Bell } from 'lucide-react';
+import { Badge, Button } from 'antd';
 import HeaderProfile from '@/components/HeaderProfile';
 import styles from './style.less';
 
@@ -19,8 +20,8 @@ const UserLayout: React.FC = ({ children }) => {
         <div className={styles.userLayout}>
             <nav className={styles.navContainer}>
                 <div className={styles.logoWrap} onClick={() => history.push('/')}>
-                    <div className={styles.logoIcon}><Heart size={20} fill="#D4A017" stroke="#D4A017" /></div>
-                    <span>MyPet 4.0</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/3565/3565860.png" alt="PetCare Logo" className={styles.logoImage} />
+                    <span>PetCare</span>
                 </div>
 
                 <div className={styles.mainMenu}>
@@ -36,6 +37,9 @@ const UserLayout: React.FC = ({ children }) => {
                 </div>
 
                 <div className={styles.rightActions}>
+                    <Badge count={2} size="small" style={{ backgroundColor: '#D4A017' }}>
+                        <Button type="text" icon={<Bell size={20} />} className={styles.bellBtn} />
+                    </Badge>
                     <HeaderProfile />
                 </div>
             </nav>

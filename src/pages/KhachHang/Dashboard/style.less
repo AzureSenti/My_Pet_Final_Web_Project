@@ -44,18 +44,23 @@
             }
 
             .btnPrimary {
-                background: @primary;
+                background: #D4A017;
                 border: none;
                 height: 44px;
                 padding: 0 28px;
-                border-radius: 12px;
+                border-radius: 16px;
                 font-weight: 700;
                 color: white;
                 box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 &:hover {
                     background: #B88A12;
                     transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.3);
                 }
             }
         }
@@ -70,11 +75,18 @@
         .metricCard {
             background: white;
             padding: 24px;
-            border-radius: 20px;
-            border: 1px solid @border-soft;
+            border-radius: 24px;
+            border: 1px solid rgba(212, 160, 23, 0.1);
+            box-shadow: 0 4px 20px rgba(212, 160, 23, 0.03);
             display: flex;
             align-items: center;
             gap: 20px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 25px rgba(212, 160, 23, 0.08);
+            }
 
             .iconBox {
                 width: 60px;
@@ -121,8 +133,9 @@
     .mainCard {
         background: white;
         padding: 32px;
-        border-radius: 24px;
-        border: 1px solid @border-soft;
+        border-radius: 28px;
+        border: 1px solid rgba(212, 160, 23, 0.1);
+        box-shadow: 0 4px 24px rgba(212, 160, 23, 0.04);
 
         .cardHeader {
             display: flex;
@@ -138,8 +151,24 @@
             }
 
             .viewAll {
-                color: @primary;
+                color: #D4A017;
                 font-weight: 700;
+            }
+
+            .btnOutlineSmall {
+                border: 1px solid #D4A017;
+                color: #D4A017;
+                font-weight: 700;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                &:hover {
+                    background: rgba(212, 160, 23, 0.05);
+                    border-color: #D4A017;
+                    color: #D4A017;
+                }
             }
         }
 
@@ -274,15 +303,18 @@
             }
 
             .btnSecondary {
-                background: @primary;
+                background: #D4A017;
                 border: none;
                 color: white;
                 font-weight: 800;
                 height: 44px;
-                border-radius: 12px;
+                border-radius: 16px;
+                transition: all 0.3s ease;
 
                 &:hover {
                     background: #B88A12;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.3);
                 }
             }
         }
