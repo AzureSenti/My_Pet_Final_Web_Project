@@ -178,6 +178,23 @@ async def update_user_profile(db: AsyncSession, user: User, data: UserUpdate) ->
     if data.avatar_url is not None:
         user.avatar_url = data.avatar_url
 
+    if user.role.value == "vet" and (data.bio is not None or data.certificate_url is not None):
+        if hasattr(user, "vet_profile") and user.vet_profile:
+            if data.bio is not None:
+                user.vet_profile.bio = data.bio
+            if data.certificate_url is not None:
+                user.vet_profile.certificate_url = data.certificate_url
+        else:
+            from app.models.veterinarian import Veterinarian
+            new_vet = Veterinarian(
+                user_id=user.id,
+                specialization="Thú y",
+                bio=data.bio,
+                certificate_url=data.certificate_url
+            )
+            db.add(new_vet)
+            user.vet_profile = new_vet
+
     db.add(user)
     await db.commit()
     await db.refresh(user)
