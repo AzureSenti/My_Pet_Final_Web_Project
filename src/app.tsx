@@ -98,6 +98,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
 				if (location.pathname === '/') {
 					if (initialState.currentUser.role === 'vet') {
 						history.replace('/bac-si/dashboard');
+					} else if (initialState.currentUser.role === 'owner') {
+						history.replace('/khach-hang/dashboard');
 					} else {
 						history.replace('/dashboard');
 					}

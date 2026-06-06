@@ -125,9 +125,44 @@ export default [
 		hideInMenu: true,
 	},
 
+	///////////////////////////////////
+	// KHÁCH HÀNG — USER PORTAL
+	{
+		path: '/khach-hang',
+		layout: false,
+		component: '@/layouts/UserLayout',
+		routes: [
+			{
+				path: '/khach-hang',
+				redirect: '/khach-hang/dashboard',
+			},
+			{
+				name: 'Dashboard',
+				path: '/khach-hang/dashboard',
+				component: './KhachHang/Dashboard',
+			},
+			{
+				name: 'Thú cưng của tôi',
+				path: '/khach-hang/thu-cung',
+				component: './KhachHang/ThuCung',
+			},
+			{
+				name: 'Lịch hẹn cá nhân',
+				path: '/khach-hang/lich-hen',
+				component: './KhachHang/LichHen',
+			},
+			{
+				name: 'Hồ sơ bệnh án',
+				path: '/khach-hang/benh-an',
+				component: './KhachHang/HoSoBenhAn',
+			},
+		],
+	},
+
 	{
 		path: '/',
-		redirect: '/dashboard',
+		layout: false,
+		component: './LandingPage',
 	},
 	{
 		path: '/403',

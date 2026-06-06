@@ -1,17 +1,19 @@
-@import '~antd/es/style/themes/default.less';
+@import '../../styles/theme.less';
 
 // ─── Design Tokens ───
-@pc-bg: #F5F2EC;
-@pc-card: #FEFDFB;
-@pc-text: #000000;               // Absolute black
-@pc-text-secondary: #1A1715;     // Nearly black
-@pc-border: rgba(0, 0, 0, 0.12); // Stronger borders
-@pc-gold: #5C4425;               // Deep rich gold
-@pc-gold-light: #E8DFD0;         // Warmer contrast background gold
-@radius-xl: 20px;
+@pc-bg: @bg-page;
+@pc-card: @bg-card;
+@pc-text: @text-main; // Unified charcoal
+@pc-text-secondary: @text-secondary;
+@pc-border: @border-soft;
+@pc-gold: @primary;
+@pc-gold-light: @primary-light;
+
+// Radius & Transitions
+@radius-xl: @radius-card;
 @radius-full: 9999px;
-@shadow-card: 0 2px 16px rgba(0, 0, 0, 0.03);
-@transition-base: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+@shadow-card: @shadow-sm;
+@transition-base: @transition-smooth;
 
 .profile-page-wrapper {
 	padding: 8px 0 32px;
@@ -83,6 +85,7 @@
 					img {
 						transform: scale(1.05);
 					}
+
 					.avatar-overlay {
 						opacity: 1;
 					}
@@ -206,7 +209,7 @@
 		.profile-form-inner {
 			margin-top: 8px;
 
-			.ant-form-item-label > label {
+			.ant-form-item-label>label {
 				font-size: 13px;
 				font-weight: 600;
 				color: @pc-text;
@@ -271,7 +274,8 @@
 					border-color: @pc-gold;
 					transition: @transition-base;
 
-					&:hover, &:focus {
+					&:hover,
+					&:focus {
 						background: #6B4E28;
 						border-color: #6B4E28;
 						transform: translateY(-1px);
