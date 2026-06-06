@@ -2,6 +2,7 @@ import { User, Mail, Lock } from 'lucide-react';
 import { Button, Form, Input, message } from 'antd';
 import React, { useState } from 'react';
 import { history } from 'umi';
+import { registerUser } from '@/services/base/api';
 
 const RegisterForm: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
@@ -10,26 +11,23 @@ const RegisterForm: React.FC = () => {
     const handleSubmit = async (values: any) => {
         setSubmitting(true);
         try {
-            const response = await fetch(`${process.env.UMI_APP_API_URL || 'http://localhost:8001'}/api/v1/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    full_name: values.username,
-                    email: values.email,
-                    password: values.password,
-                    role: 'owner'
-                })
+            const response = await registerUser({
+                full_name: values.username,
+                email: values.email,
+                password: values.password,
+                role: 'owner'
             });
 
-            if (response.ok) {
+            if (response.status === 200 || response.status === 201) {
                 message.success('Đăng ký thành công! Vui lòng đăng nhập.');
                 history.push('/user/login');
             } else {
-                const err = await response.json();
-                message.error(err.detail || 'Đăng ký thất bại!');
+                message.error('Đăng ký thất bại!');
             }
-        } catch (error) {
-            message.error('Lỗi kết nối máy chủ!');
+        } catch (error: any) {
+            console.error('Register error:', error);
+            const errorMsg = error?.response?.data?.detail || 'Đăng ký thất bại, vui lòng thử lại!';
+            message.error(errorMsg);
         } finally {
             setSubmitting(false);
         }

@@ -87,6 +87,7 @@ class UserOut(BaseModel):
     phone: str | None
     role: UserRole
     is_active: bool
+    avatar_url: Optional[str] = None
     created_at: datetime
     vet_profile: Optional[VetProfileOut] = None
 
