@@ -48,10 +48,10 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'area',
 		toolbar: { show: false },
-		fontFamily: 'Quicksand, sans-serif',
+		fontFamily: 'Inter, sans-serif',
 		zoom: { enabled: false },
 	},
-	colors: ['#D4A017'], // Honey Gold
+	colors: ['#8A9A5B'], // Soft moss green / Earthy yellow
 	fill: {
 		type: 'gradient',
 		gradient: {
@@ -105,10 +105,10 @@ const appointmentChartOptions: ApexCharts.ApexOptions = {
 const statusDonutOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'donut',
-		fontFamily: 'Quicksand, sans-serif',
+		fontFamily: 'Inter, sans-serif',
 	},
 	labels: ['Đã khám', 'Chờ khám', 'Hủy lịch', 'Khẩn cấp'],
-	colors: ['#D4A017', '#E8C547', '#E5E0D8', '#B88A12'], // Honey Gold palette
+	colors: ['#2A3D33', '#1F5A3E', '#E0E0E0', '#6E3542'], // Dark moss green, dark turquoise, light gray, dark red
 	stroke: { width: 6, colors: ['#FFFFFF'] },
 	plotOptions: {
 		pie: {
@@ -170,9 +170,9 @@ const growthChartOptions: ApexCharts.ApexOptions = {
 	chart: {
 		type: 'bar',
 		toolbar: { show: false },
-		fontFamily: 'Quicksand, sans-serif',
+		fontFamily: 'Inter, sans-serif',
 	},
-	colors: ['#D4A017'],
+	colors: ['#C9A96E'],
 	plotOptions: {
 		bar: {
 			borderRadius: 8,
@@ -337,6 +337,25 @@ const TrangChu = () => {
 
 	return (
 		<div className="petcare-dashboard">
+			<div className="pc-header">
+				<div className="pc-header-left">
+					{/* Empty spacer */}
+				</div>
+				<div className="pc-header-center">
+					<div className="pc-header-search">
+						<Search size={18} strokeWidth={1.75} className="search-icon" />
+						<input
+							type="text"
+							placeholder="Tìm kiếm thông báo..."
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
+					</div>
+				</div>
+				<div className="pc-header-actions">
+					<HeaderProfile />
+				</div>
+			</div>
 
 			{/* ── KPI Cards ───────────────────── */}
 			<div className="pc-metrics-grid">
@@ -380,17 +399,17 @@ const TrangChu = () => {
 					<div className="pc-card-body donut-body">
 						<Chart options={getDynamicDonutOptions(stats)} series={statusDonutSeriesData(stats)} type="donut" height={260} />
 						<div className="donut-legends">
-							<LegendItem color="#D4A017" label="Đã khám" count={stats?.appointments_completed || 0} />
-							<LegendItem color="#E8C547" label="Chờ khám" count={stats?.appointments_pending || 0} />
-							<LegendItem color="#E5E0D8" label="Hủy lịch" count={stats?.appointments_cancelled || 0} />
-							<LegendItem color="#B88A12" label="Khẩn cấp" count={stats?.appointments_confirmed || 0} />
+							<LegendItem color="#2A3D33" label="Đã khám" count={stats?.appointments_completed || 0} />
+							<LegendItem color="#1F5A3E" label="Chờ khám" count={stats?.appointments_pending || 0} />
+							<LegendItem color="#D6D0C4" label="Hủy lịch" count={stats?.appointments_cancelled || 0} />
+							<LegendItem color="#6E3542" label="Khẩn cấp" count={stats?.appointments_confirmed || 0} />
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* ── Row 2: Growth Chart (Full Width) ── */}
-			<div className="pc-full-row">
+			{/* ── Row 2: Growth + Notifications ── */}
+			<div className="pc-charts-row">
 				{/* Growth Chart */}
 				<div className="pc-card pc-chart-bar">
 					<div className="pc-card-header">
@@ -401,6 +420,30 @@ const TrangChu = () => {
 					</div>
 					<div className="pc-card-body">
 						<Chart options={growthChartOptions} series={growthSeries} type="bar" height={280} />
+					</div>
+				</div>
+
+				{/* System Notifications */}
+				<div className="pc-card pc-notifications">
+					<div className="pc-card-header">
+						<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+							<h3>Thông báo hệ thống</h3>
+							<span className="notif-badge-new">Mới</span>
+						</div>
+						<a className="pc-view-all" onClick={handleViewAllNotifs}>
+							Xem tất cả <ArrowRightOutlined />
+						</a>
+					</div>
+					<div className="pc-card-body notif-body">
+						{displayedNotifs.length > 0 ? (
+							displayedNotifs.map((item, idx) => (
+								<NotificationItem key={idx} item={item} />
+							))
+						) : (
+							<div style={{ textAlign: 'center', padding: '20px', color: '#6B6560' }}>
+								Không tìm thấy thông báo nào.
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

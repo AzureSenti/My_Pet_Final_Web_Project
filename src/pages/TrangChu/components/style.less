@@ -7,12 +7,12 @@
 @import '../../../styles/theme.less';
 
 // ─── Design Tokens ────────────────────────────
-@pc-bg: #FFF8F2; // Kem ấm
-@pc-card: #FFFFFF;
-@pc-text: #3D2E1C; // Nâu trầm ấm
-@pc-text-secondary: #7D6E5D;
-@pc-text-muted: #B5A48F;
-@pc-border: rgba(212, 160, 23, 0.08);
+@pc-bg: @bg-page;
+@pc-card: @bg-card;
+@pc-text: @text-main; // Unified charcoal
+@pc-text-secondary: @text-secondary;
+@pc-text-muted: @text-muted;
+@pc-border: @border-soft;
 
 // PetCare Brand Colors
 @pc-olive: @primary;
@@ -32,17 +32,16 @@
 
 // Transitions
 @transition-base: @transition-smooth;
-@shadow-card: 0 4px 24px rgba(212, 160, 23, 0.05);
-@shadow-card-hover: 0 16px 40px rgba(212, 160, 23, 0.12);
-@radius-2xl: 28px;
+@shadow-card: @shadow-sm;
+@shadow-card-hover: @shadow-md;
+@radius-2xl: @radius-card;
 @radius-full: 9999px;
 
 // ─── Base Dashboard ───────────────────────────
 .petcare-dashboard {
 	font-family: 'Quicksand', sans-serif;
 	color: @pc-text;
-	padding: 24px 0 32px;
-	background-color: @pc-bg;
+	padding: 8px 0 32px;
 
 	* {
 		box-sizing: border-box;
@@ -264,18 +263,17 @@
 
 .pc-metric-card {
 	background: @pc-card;
-	border-radius: 24px;
+	border-radius: 20px;
 	padding: 24px;
 	display: flex;
 	align-items: center;
 	gap: 16px;
-	border: 1px solid @pc-border;
+	border: 1px solid rgba(0, 0, 0, 0.04);
 	box-shadow: @shadow-card;
 	transition: @transition-base;
 
 	&:hover {
 		box-shadow: @shadow-card-hover;
-		transform: translateY(-2px);
 	}
 
 	.metric-icon-box {
@@ -394,26 +392,14 @@
 	}
 }
 
-.pc-full-row {
-	display: block;
-	width: 100%;
-	margin-bottom: 24px;
-}
-
 .pc-card {
 	background: #FFFFFF;
-	border-radius: @radius-2xl;
+	border-radius: 16px;
 	border: 1px solid @pc-border;
 	box-shadow: @shadow-card;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	transition: @transition-base;
-
-	&:hover {
-		box-shadow: @shadow-card-hover;
-		transform: translateY(-2px);
-	}
 }
 
 .pc-card-header {

@@ -46,9 +46,12 @@ const KhachHangDashboard: React.FC = () => {
 
     return (
         <div className={styles.saasDashboard}>
+            <div className={styles.organicBlob1} />
+            <div className={styles.organicBlob2} />
+            <div className={styles.contentWrapper}>
             <header className={styles.welcomeSection}>
                 <div className={styles.welcomeText}>
-                    <h1>Hôm nay thế nào,{currentUser?.full_name?.split(' ').pop()}? 👋</h1>
+                    <h1>Hôm nay thế nào, <span>{currentUser?.full_name?.split(' ').pop()}</span>? 👋</h1>
                     <p>Cùng theo dõi sức khỏe và lịch trình của các thành viên bốn chân nhé.</p>
                 </div>
                 <div className={styles.headerActions}>
@@ -169,6 +172,7 @@ const KhachHangDashboard: React.FC = () => {
                     </div>
                 </Col>
             </Row>
+            </div>
         </div>
     );
 };
