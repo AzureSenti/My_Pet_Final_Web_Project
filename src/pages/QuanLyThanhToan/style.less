@@ -1,0 +1,242 @@
+@import '~antd/es/style/themes/default.less';
+
+// ─── Variables (Đồng bộ với hệ thống MyPet) ────────────────
+@bg-color: #F5F2EC;
+@card-bg: #FEFDFB;
+@text-primary: #000000;
+@text-secondary: #1A1715;
+@border-color: rgba(0, 0, 0, 0.12);
+@olive-green: #2A2520;
+@mustard-yellow: #5C4425;
+
+.payment-management-container {
+    padding: 0;
+    background: @bg-color;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.pm-page-content {
+    padding: 0;
+}
+
+.pm-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+
+    .pm-title-section {
+        display: flex;
+        gap: 16px;
+
+        .pm-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #FEF3C7, rgba(201, 168, 76, 0.22));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #C9A84C;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(212, 160, 23, 0.18);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: @text-primary;
+            margin: 0;
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 14px;
+            color: @text-secondary;
+            margin: 4px 0 0 0;
+            font-weight: 400;
+        }
+    }
+}
+
+.pm-filter-bar {
+    background: @card-bg;
+    border: 1px solid @border-color;
+    padding: 12px 24px;
+    border-radius: 16px;
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    .filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: @text-secondary;
+        font-weight: 500;
+        font-size: 14px;
+
+        .ant-select {
+            min-width: 160px;
+        }
+    }
+}
+
+.pm-table-card {
+    background: @card-bg;
+    border: 1px solid @border-color;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    .ant-table-thead>tr>th {
+        background: #F9F6F0;
+        color: #5A5550;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        padding: 20px 24px;
+        border-bottom: 1px solid @border-color;
+    }
+
+    .ant-table-tbody>tr>td {
+        padding: 20px 24px;
+        border-bottom: 1px solid @border-color;
+    }
+
+    .ant-table-tbody>tr:hover>td {
+        background: #FBF9F5;
+    }
+}
+
+.cell-order-info {
+    .order-id {
+        font-weight: 700;
+        color: @text-primary;
+        display: block;
+        font-size: 15px;
+    }
+
+    .order-date {
+        font-size: 12px;
+        color: @text-secondary;
+        margin-top: 2px;
+        opacity: 0.7;
+    }
+}
+
+.cell-customer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #F3F0E9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: @mustard-yellow;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .name {
+        font-weight: 700;
+        color: @text-primary;
+        display: block;
+    }
+}
+
+.cell-amount {
+    font-weight: 800;
+    color: #059669; // Green for money
+    font-size: 15px;
+}
+
+.status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    &.pending {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    &.paid {
+        background: #D1E7DD;
+        color: #0F5132;
+    }
+
+    &.refunded {
+        background: #F3F4F6;
+        color: #374151;
+    }
+}
+
+.payment-method {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: @text-secondary;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.btn-confirm {
+    background: @olive-green;
+    color: #FFF;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &:hover {
+        background: #000;
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        background: #E5E7EB;
+        color: #9CA3AF;
+        cursor: not-allowed;
+    }
+}
+
+.pm-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: @text-secondary;
+
+    &:hover {
+        background: #F3F0E9;
+        color: @text-primary;
+    }
+}
+
+.payment-detail-content {
+    padding: 8px;
+}

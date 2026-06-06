@@ -215,7 +215,7 @@ const LegendItem = ({ color, label, count }: { color: string; label: string; cou
 	</div>
 );
 
-import { getDashboardStats, getAppointments } from '@/services/QuanLyPetStore';
+import { getDashboardStats, getAppointments, getServices } from '@/services/QuanLyPetStore';
 
 import { Skeleton } from 'antd';
 
@@ -271,32 +271,49 @@ const TrangChu = () => {
 		}
 	};
 
-	const handleExportGeneralReport = () => {
+	const handleExportGeneralReport = async () => {
 		if (!stats) {
 			message.warning('Dữ liệu đang tải, vui lòng thử lại sau!');
 			return;
 		}
 
-		const summaryData = [
-			{ 'Chỉ số': 'Tổng thú cưng', 'Giá trị': stats.total_pets || 0, 'Đơn vị': 'Con' },
-			{ 'Chỉ số': 'Tổng khách hàng', 'Giá trị': stats.total_owners || 0, 'Đơn vị': 'Người' },
-			{ 'Chỉ số': 'Tổng bác sĩ', 'Giá trị': stats.total_vets || 0, 'Đơn vị': 'Người' },
-			{ 'Chỉ số': 'Tổng lịch hẹn', 'Giá trị': stats.total_appointments || 0, 'Đơn vị': 'Lượt' },
-			{ 'Chỉ số': 'Lịch hẹn hoàn thành', 'Giá trị': stats.appointments_completed || 0, 'Đơn vị': 'Lượt' },
-			{ 'Chỉ số': 'Lịch hẹn đang chờ', 'Giá trị': stats.appointments_pending || 0, 'Đơn vị': 'Lượt' },
-			{ 'Chỉ số': 'Lịch hẹn đã hủy', 'Giá trị': stats.appointments_cancelled || 0, 'Đơn vị': 'Lượt' },
-		];
+		try {
+			const servicesData = await getServices();
 
-		const worksheet = XLSX.utils.json_to_sheet(summaryData);
-		const wscols = [{ wch: 25 }, { wch: 15 }, { wch: 10 }];
-		worksheet['!cols'] = wscols;
+			const summaryData = [
+				{ 'Hạng mục': 'THỐNG KÊ TỔNG QUAN', 'Giá trị': '', 'Ghi chú': '' },
+				{ 'Hạng mục': 'Tổng thú cưng', 'Giá trị': stats.total_pets || 0, 'Ghi chú': 'Con' },
+				{ 'Hạng mục': 'Tổng khách hàng', 'Giá trị': stats.total_owners || 0, 'Ghi chú': 'Người' },
+				{ 'Hạng mục': 'Tổng bác sĩ', 'Giá trị': stats.total_vets || 0, 'Ghi chú': 'Người' },
+				{ 'Hạng mục': 'Tổng doanh thu (VNĐ)', 'Giá trị': stats.total_revenue || 0, 'Ghi chú': 'Đã thanh toán' },
+				{ 'Hạng mục': '', 'Giá trị': '', 'Ghi chú': '' },
+				{ 'Hạng mục': 'THỐNG KÊ LỊCH HẸN', 'Giá trị': '', 'Ghi chú': '' },
+				{ 'Hạng mục': 'Tổng số lịch hẹn', 'Giá trị': stats.total_appointments || 0, 'Ghi chú': 'Lượt' },
+				{ 'Hạng mục': 'Hoàn thành', 'Giá trị': stats.appointments_completed || 0, 'Ghi chú': '' },
+				{ 'Hạng mục': 'Đang chờ', 'Giá trị': stats.appointments_pending || 0, 'Ghi chú': '' },
+				{ 'Hạng mục': 'Đã hủy', 'Giá trị': stats.appointments_cancelled || 0, 'Ghi chú': '' },
+				{ 'Hạng mục': '', 'Giá trị': '', 'Ghi chú': '' },
+				{ 'Hạng mục': 'DANH MỤC DỊCH VỤ HIỆN CÓ', 'Giá trị': '', 'Ghi chú': '' },
+				...servicesData.map(s => ({
+					'Hạng mục': s.name,
+					'Giá trị': `${s.price.toLocaleString('vi-VN')} VND`,
+					'Ghi chú': s.is_active ? 'Đang kinh doanh' : 'Ngưng kinh doanh'
+				}))
+			];
 
-		const workbook = XLSX.utils.book_new();
-		XLSX.utils.book_append_sheet(workbook, worksheet, 'Thống kê tổng quan');
+			const worksheet = XLSX.utils.json_to_sheet(summaryData);
+			const wscols = [{ wch: 35 }, { wch: 20 }, { wch: 20 }];
+			worksheet['!cols'] = wscols;
 
-		const fileName = `Bao_cao_tong_quan_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
-		XLSX.writeFile(workbook, fileName);
-		message.success(`Đã xuất báo cáo tổng quan: ${fileName}`);
+			const workbook = XLSX.utils.book_new();
+			XLSX.utils.book_append_sheet(workbook, worksheet, 'Báo cáo chi tiết');
+
+			const fileName = `Bao_cao_chi_tiet_PetCare_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+			XLSX.writeFile(workbook, fileName);
+			message.success(`Đã xuất báo cáo chi tiết thành công!`);
+		} catch (error) {
+			message.error('Lỗi khi xuất báo cáo!');
+		}
 	};
 
 	const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -308,7 +325,7 @@ const TrangChu = () => {
 
 	const getAppointmentSeries = () => {
 		if (!stats) return [{ name: 'Lịch hẹn', data: [0, 0, 0, 0, 0, 0, 0] }];
-		
+
 		const base = Math.max(10, Math.floor(stats.total_appointments / 4));
 		if (filterPeriod === '7 days') {
 			return [{ name: 'Lịch hẹn', data: [base - 2, base + 4, base - 1, base + 7, base + 2, base + 8, base + 1] }];
@@ -320,7 +337,7 @@ const TrangChu = () => {
 
 	const getGrowthSeries = () => {
 		if (!stats) return [{ name: 'Khách hàng', data: [0, 0, 0, 0, 0, 0] }];
-		
+
 		const base = Math.max(5, Math.floor(stats.total_owners / 3));
 		return [{ name: 'Khách hàng', data: [base - 2, base, base + 3, base + 5, base + 8, base + 12] }];
 	};

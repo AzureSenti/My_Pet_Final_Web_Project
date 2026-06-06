@@ -188,9 +188,65 @@ export const updateAppointmentStatus = async (id: string, status: string): Promi
 	}
 };
 
+// --- PAYMENT SERVICES ---
+
+export const getPayments = async (params?: {
+	status?: string;
+	owner_id?: string;
+	page?: number;
+	limit?: number
+}): Promise<any> => {
+	const res = await axios.get(`${ip3}api/v1/admin/payments`, { params });
+	return res.data;
+};
+
+export const updatePaymentStatus = async (id: string, status: string, transactionId?: string): Promise<boolean> => {
+	try {
+		await axios.patch(`${ip3}api/v1/admin/payments/${id}/status`, { status, transaction_id: transactionId });
+		message.success('Cập nhật trạng thái thanh toán thành công!');
+		return true;
+	} catch (error) {
+		message.error('Cập nhật thanh toán thất bại!');
+		return false;
+	}
+};
+
 export const getServices = async (): Promise<Service[]> => {
 	const res = await axios.get(`${ip3}api/v1/admin/services`, { params: { limit: 100 } });
 	return res.data.items;
+};
+
+export const createService = async (data: any): Promise<boolean> => {
+	try {
+		await axios.post(`${ip3}api/v1/admin/services`, data);
+		message.success('Thêm dịch vụ mới thành công!');
+		return true;
+	} catch (error) {
+		message.error('Thêm dịch vụ thất bại!');
+		return false;
+	}
+};
+
+export const updateService = async (id: string, data: any): Promise<boolean> => {
+	try {
+		await axios.put(`${ip3}api/v1/admin/services/${id}`, data);
+		message.success('Cập nhật dịch vụ thành công!');
+		return true;
+	} catch (error) {
+		message.error('Cập nhật dịch vụ thất bại!');
+		return false;
+	}
+};
+
+export const deleteService = async (id: string): Promise<boolean> => {
+	try {
+		await axios.delete(`${ip3}api/v1/admin/services/${id}`);
+		message.success('Xoá dịch vụ thành công!');
+		return true;
+	} catch (error) {
+		message.error('Xoá dịch vụ thất bại!');
+		return false;
+	}
 };
 
 export const createOwner = async (data: any): Promise<boolean> => {
