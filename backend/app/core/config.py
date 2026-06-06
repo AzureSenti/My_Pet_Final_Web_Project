@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8",extra="ignore")
 
     # App
     APP_ENV: str = "development"
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "mypet_user"
     POSTGRES_PASSWORD: str = "mypet_password"
     POSTGRES_DB: str = "mypet_db"
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_HOST: str = "127.0.0.1"
     POSTGRES_PORT: int = 5432
 
     # CORS
@@ -22,16 +22,18 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self) -> str:
+        from urllib.parse import quote_plus
         return (
-            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"postgresql+asyncpg://{self.POSTGRES_USER}:{quote_plus(self.POSTGRES_PASSWORD)}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
     @property
     def DATABASE_URL_SYNC(self) -> str:
         """Dùng cho alembic migrations (sync driver)"""
+        from urllib.parse import quote_plus
         return (
-            f"postgresql+psycopg2://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"postgresql+psycopg2://{self.POSTGRES_USER}:{quote_plus(self.POSTGRES_PASSWORD)}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
