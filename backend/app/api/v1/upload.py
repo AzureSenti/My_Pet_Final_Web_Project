@@ -8,6 +8,7 @@ from pathlib import Path
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
 UPLOAD_AVATAR_DIR = Path(__file__).resolve().parent.parent.parent / "uploads" / "avatars"
+UPLOAD_FILE_DIR = Path(__file__).resolve().parent.parent.parent / "uploads" / "files"
 
 @router.post("/avatar", dependencies=[Depends(admin_only)])
 async def upload_avatar(file: UploadFile = File(...)):
@@ -28,3 +29,20 @@ async def upload_avatar(file: UploadFile = File(...)):
         f.write(content)
         
     return {"url": f"/uploads/avatars/{unique_name}"}
+
+@router.post("/file")
+async def upload_general_file(file: UploadFile = File(...)):
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="Kích thước file vượt quá 10MB")
+
+    ext = Path(file.filename).suffix if file.filename else ""
+    unique_name = f"{uuid.uuid4().hex}{ext}"
+    
+    os.makedirs(UPLOAD_FILE_DIR, exist_ok=True)
+    
+    file_path = UPLOAD_FILE_DIR / unique_name
+    with open(file_path, "wb") as f:
+        f.write(content)
+        
+    return {"data": {"url": f"/uploads/files/{unique_name}"}}
