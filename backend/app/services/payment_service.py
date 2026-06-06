@@ -28,6 +28,7 @@ async def list_payments(
         .options(
             joinedload(Payment.owner),
             joinedload(Payment.appointment).joinedload(Appointment.pet),
+            joinedload(Payment.appointment).joinedload(Appointment.vet),
             joinedload(Payment.appointment).joinedload(Appointment.service),
         )
     )
@@ -45,7 +46,7 @@ async def list_payments(
     pages = math.ceil(total / limit) if total > 0 else 1
 
     result = await db.execute(
-        query.order_by(Payment.paid_at.desc().nullslast(), Payment.id.desc())
+        query.order_by(Payment.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
     )

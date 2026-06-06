@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { message, Modal, Button, Tag, Space, Tooltip } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { message, Modal, Button, Tag } from 'antd';
+import { useReactToPrint } from 'react-to-print';
 import {
     Search,
     Download,
@@ -11,8 +12,10 @@ import {
     MoreHorizontal,
     Filter,
     Clock,
-    AlertTriangle
+    AlertTriangle,
+    Printer
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import HeaderProfile from '@/components/HeaderProfile';
 import { getPayments, updatePaymentStatus } from '@/services/QuanLyPetStore';
 import './style.less';
@@ -38,6 +41,34 @@ const QuanLyThanhToan: React.FC = () => {
         }
     };
 
+    const handleExportExcel = () => {
+        try {
+            const dataToExport = filteredData.map((item, index) => ({
+                'STT': index + 1,
+                'Số Hóa Đơn': item.displayId || `#INV-${item.id.substring(0, 6).toUpperCase()}`,
+                'Khách Hàng': item.owner?.full_name || 'Khách vãng lai',
+                'Dịch Vụ': item.appointment?.service?.name || 'Dịch vụ lẻ',
+                'Số Tiền': parseFloat(item.amount),
+                'Phương Thức': item.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản',
+                'Trạng Thái': item.status === 'paid' ? 'Đã thu' : (item.status === 'pending' ? 'Chờ thu' : 'Quá hạn'),
+                'Ngày Lập': new Date(item.created_at).toLocaleString('vi-VN'),
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'KetQuaSX');
+            XLSX.writeFile(wb, `Bao_Cao_Thanh_Toan_${new Date().getTime()}.xlsx`);
+            message.success('Đã xuất báo cáo Excel thành công!');
+        } catch (error) {
+            message.error('Lỗi khi xuất file Excel');
+        }
+    };
+
+    const invoiceRef = useRef<HTMLDivElement>(null);
+    const handlePrint = useReactToPrint({
+        content: () => invoiceRef.current,
+    });
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -50,13 +81,7 @@ const QuanLyThanhToan: React.FC = () => {
         }
     };
 
-    const mockData = [
-        { id: 'mock-1', displayId: '#INV-2023-001', owner: { full_name: 'Alex Johnson' }, appointment: { service: { name: 'Grooming Spa' } }, amount: 450000, method: 'transfer', status: 'paid', created_at: new Date().toISOString() },
-        { id: 'mock-2', displayId: '#INV-2023-002', owner: { full_name: 'Sarah Parker' }, appointment: { service: { name: 'Vaccination' } }, amount: 250000, method: 'cash', status: 'pending', created_at: new Date().toISOString() },
-        { id: 'mock-3', displayId: '#INV-2023-003', owner: { full_name: 'Mike Davis' }, appointment: { service: { name: 'Surgery Check' } }, amount: 1200000, method: 'transfer', status: 'overdue', created_at: new Date().toISOString() },
-    ];
-
-    const displayData = payments.length > 0 ? payments : mockData;
+    const displayData = payments || [];
 
     const filteredData = displayData.filter(p =>
         (p.owner?.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -69,7 +94,7 @@ const QuanLyThanhToan: React.FC = () => {
     // Calculate Stats
     const totalInvoices = displayData.length;
     const paidCount = displayData.filter(p => p.status === 'paid').length;
-    
+
     const calculateAvgValue = () => {
         if (displayData.length === 0) return '0 VND';
         let total = 0;
@@ -124,7 +149,7 @@ const QuanLyThanhToan: React.FC = () => {
                         <h1>Quản lý Hóa đơn</h1>
                         <p>Xem và quản lý tất cả các bản ghi thanh toán và hóa đơn.</p>
                     </div>
-                    <button className="bm-export-btn" onClick={() => message.success('Đang xuất báo cáo...')}>
+                    <button className="bm-export-btn" onClick={handleExportExcel}>
                         Xuất báo cáo <Download size={16} strokeWidth={2.5} />
                     </button>
                 </div>
@@ -240,14 +265,14 @@ const QuanLyThanhToan: React.FC = () => {
                             Hiển thị {(currentPage - 1) * itemsPerPage + 1} đến {Math.min(currentPage * itemsPerPage, filteredData.length)} trong tổng số {filteredData.length} mục
                         </div>
                         <div className="page-controls">
-                            <button 
-                                className="text-btn" 
+                            <button
+                                className="text-btn"
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                             >
                                 Trước
                             </button>
-                            <button 
+                            <button
                                 className="text-btn"
                                 disabled={currentPage === totalPages || totalPages === 0}
                                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
@@ -299,20 +324,79 @@ const QuanLyThanhToan: React.FC = () => {
                             </div>
                         </div>
 
-                        {selectedPayment.status !== 'paid' && !selectedPayment.id.startsWith('mock-') && (
-                            <Button 
-                                type="primary" 
-                                block 
-                                size="large" 
-                                style={{ marginTop: 24, borderRadius: 8, background: '#F5C842', borderColor: '#F5C842', color: 'black', fontWeight: 600 }}
-                                onClick={() => handleConfirmPayment(selectedPayment.id)}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 24 }}>
+                            <Button
+                                icon={<Printer size={16} />}
+                                onClick={handlePrint}
+                                style={{ borderRadius: 8 }}
                             >
-                                Xác nhận đã thu tiền
+                                In hóa đơn
                             </Button>
-                        )}
+                            {selectedPayment.status !== 'paid' && (
+                                <Button
+                                    type="primary"
+                                    onClick={() => handleConfirmPayment(selectedPayment.id)}
+                                    style={{ borderRadius: 8, background: '#F5C842', borderColor: '#F5C842', color: 'black', fontWeight: 600 }}
+                                >
+                                    Xác nhận thu
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 )}
             </Modal>
+
+            {/* Hidden Print Template */}
+            <div style={{ display: 'none' }}>
+                <div ref={invoiceRef} className="print-invoice-template" style={{ padding: '40px', color: '#000' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 30 }}>
+                        <h1 style={{ margin: 0, fontSize: 28 }}>MY PET CLINIC</h1>
+                        <p style={{ margin: 5 }}>Địa chỉ: 123 Đường Thú Y, Hà Nội</p>
+                        <p style={{ margin: 5 }}>Hotline: 1900 1088</p>
+                        <h2 style={{ marginTop: 30, textDecoration: 'underline' }}>HÓA ĐƠN THANH TOÁN</h2>
+                    </div>
+
+                    {selectedPayment && (
+                        <>
+                            <div style={{ marginBottom: 20 }}>
+                                <p><strong>Mã hóa đơn:</strong> {selectedPayment.displayId || `#INV-${selectedPayment.id.substring(0, 6).toUpperCase()}`}</p>
+                                <p><strong>Ngày lập:</strong> {new Date(selectedPayment.created_at).toLocaleString('vi-VN')}</p>
+                                <p><strong>Khách hàng:</strong> {selectedPayment.owner?.full_name}</p>
+                            </div>
+
+                            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 30 }}>
+                                <thead>
+                                    <tr style={{ borderBottom: '2px solid #000' }}>
+                                        <th style={{ textAlign: 'left', padding: '10px' }}>NỘI DUNG DỊCH VỤ</th>
+                                        <th style={{ textAlign: 'right', padding: '10px' }}>THÀNH TIỀN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style={{ padding: '10px' }}>{selectedPayment.appointment?.service?.name || 'Dịch vụ khám điều trị'}</td>
+                                        <td style={{ textAlign: 'right', padding: '10px' }}>{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div style={{ textAlign: 'right', fontSize: 18 }}>
+                                <strong>TỔNG CỘNG: {parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</strong>
+                            </div>
+
+                            <div style={{ marginTop: 60, display: 'flex', justifyContent: 'space-between' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p>Khách hàng</p>
+                                    <div style={{ marginTop: 60 }}>(Ký và ghi rõ họ tên)</div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p>Người lập phiếu</p>
+                                    <div style={{ marginTop: 60 }}>(Ký và ghi rõ họ tên)</div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
