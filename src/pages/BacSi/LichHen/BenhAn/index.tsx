@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { history, Link, useLocation } from 'umi';
 import { Spin, message } from 'antd';
-import { 
-  PrinterOutlined, EditOutlined, PlusOutlined, 
+import {
+  PrinterOutlined, EditOutlined, PlusOutlined,
   CalendarOutlined, MedicineBoxOutlined, WarningOutlined,
   HistoryOutlined, MessageOutlined
 } from '@ant-design/icons';
 import { getAppointmentDetail, getPetMedicalHistory } from '@/services/BacSi/doctorService';
-import { createConversation } from '@/services/messageService';
+import { createConversation } from '@/services/messageService/index';
 import styles from './index.module.less';
 
 const BenhAn: React.FC = () => {
@@ -78,13 +78,13 @@ const BenhAn: React.FC = () => {
       <div className={styles.breadcrumb}>
         <Link to="/bac-si/lich-hen">Bệnh án</Link> / {pet?.name} ({pet?.breed || pet?.species})
       </div>
-      
+
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>Bệnh án chi tiết</h1>
         <div className={styles.headerActions}>
           <button className={styles.btnAction}><PrinterOutlined /> In Bệnh Án</button>
           <button className={styles.btnAction}><EditOutlined /> Chỉnh Sửa</button>
-          <button 
+          <button
             className={styles.btnAction}
             onClick={async () => {
               try {
@@ -101,7 +101,7 @@ const BenhAn: React.FC = () => {
           >
             <MessageOutlined /> Nhắn Khách
           </button>
-          <button 
+          <button
             className={`${styles.btnAction} ${styles.primary}`}
             onClick={() => history.push(`/bac-si/lich-hen/kham-moi?id=${appointmentId}`)}
           >
@@ -186,7 +186,7 @@ const BenhAn: React.FC = () => {
           <div className={styles.cardHeader}>
             <h3><HistoryOutlined className={styles.icon} /> Lịch Sử Khám Bệnh</h3>
           </div>
-          
+
           {records.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '24px', color: '#999' }}>
               Chưa có lịch sử khám bệnh

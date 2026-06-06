@@ -121,13 +121,13 @@ export default [
 	{
 		path: '/quan-ly-dich-vu',
 		name: 'Quản lý dịch vụ',
-		component: './QuanLyDichVu',
+		component: '@/pages/QuanLyDichVu/index',
 		icon: 'AppstoreOutlined',
 	},
 	{
 		path: '/quan-ly-thanh-toan',
 		name: 'Quản lý thanh toán',
-		component: './QuanLyThanhToan',
+		component: '@/pages/QuanLyThanhToan/index',
 		icon: 'CreditCardOutlined',
 	},
 	{
@@ -171,12 +171,12 @@ export default [
 			{
 				name: 'Tư vấn trực tuyến',
 				path: '/khach-hang/tu-van',
-				component: './KhachHang/TuVan',
+				component: '@/pages/KhachHang/TuVan/index',
 			},
 			{
 				name: 'Chi tiết tư vấn',
 				path: '/khach-hang/tu-van/phan-hoi',
-				component: './KhachHang/TuVan/PhanHoi',
+				component: '@/pages/KhachHang/TuVan/PhanHoi/index',
 				hideInMenu: true,
 			},
 		],
@@ -201,3 +201,5 @@ export default [
 		component: './exception/404',
 	},
 ];
+// trigger rebuild
+

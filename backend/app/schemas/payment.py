@@ -19,6 +19,8 @@ class PaymentUpdateStatusRequest(BaseModel):
     transaction_id: Optional[str] = None
 
 
+from app.schemas.appointment import AppointmentOwnerInfo, AppointmentResponse
+
 class PaymentResponse(BaseModel):
     id: uuid.UUID
     appointment_id: Optional[uuid.UUID]
@@ -31,8 +33,8 @@ class PaymentResponse(BaseModel):
     created_at: Optional[datetime] = None
     
     # Rich info
-    owner: Optional[Any] = None
-    appointment: Optional[Any] = None
+    owner: Optional[AppointmentOwnerInfo] = None
+    appointment: Optional[AppointmentResponse] = None
 
     class Config:
         from_attributes = True
