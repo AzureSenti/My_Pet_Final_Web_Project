@@ -368,9 +368,42 @@ export const createMyPet = async (data: any): Promise<boolean> => {
 	}
 };
 
+export const updateMyPet = async (id: string, data: any): Promise<boolean> => {
+	try {
+		await axios.put(`${ip3}api/v1/owner/pets/${id}`, data);
+		message.success('Cập nhật thông tin bé thành công! ✨');
+		return true;
+	} catch (error) {
+		message.error('Cập nhật thất bại!');
+		return false;
+	}
+};
+
+export const deleteMyPet = async (id: string): Promise<boolean> => {
+	try {
+		await axios.delete(`${ip3}api/v1/owner/pets/${id}`);
+		message.success('Đã xóa hồ sơ bé khỏi hệ thống! 👋');
+		return true;
+	} catch (error) {
+		message.error('Xoá thất bại!');
+		return false;
+	}
+};
+
 export const getMyAppointments = async (): Promise<Appointment[]> => {
 	const res = await axios.get(`${ip3}api/v1/owner/appointments`);
 	return res.data;
+};
+
+export const cancelMyAppointment = async (id: string): Promise<boolean> => {
+	try {
+		await axios.delete(`${ip3}api/v1/owner/appointments/${id}`);
+		message.success('Đã hủy lịch hẹn thành công!');
+		return true;
+	} catch (error) {
+		message.error('Hủy lịch hẹn thất bại!');
+		return false;
+	}
 };
 
 export const bookAppointment = async (data: any): Promise<boolean> => {
@@ -408,4 +441,18 @@ export const getOwnerVets = async (): Promise<any[]> => {
 		certificate_url: v.certificate_url,
 		is_active: v.is_active
 	}));
+};
+
+export const uploadFile = async (file: File): Promise<string | null> => {
+	const formData = new FormData();
+	formData.append('file', file);
+	try {
+		const res = await axios.post(`${ip3}api/v1/upload/file`, formData, {
+			headers: { 'Content-Type': 'multipart/form-data' }
+		});
+		return res.data.data.url;
+	} catch (error) {
+		message.error('Tải ảnh lên thất bại!');
+		return null;
+	}
 };

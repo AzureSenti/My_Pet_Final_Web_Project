@@ -3,23 +3,29 @@
 @bg-surface: #FFF8F2;
 
 .saasAppointmentsPage {
+    background: #FDF6EE;
+    min-height: 100vh;
+    padding: 0;
+
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 40px;
+        gap: 24px;
+        margin-bottom: 32px;
 
         .headerLeft {
             h1 {
-                font-size: 34px;
+                font-size: 32px;
                 font-weight: 800;
-                color: @text-main;
-                letter-spacing: -1.2px;
+                color: #1A1A1A;
+                margin: 0;
             }
 
             p {
-                font-size: 16px;
-                color: #71717A;
+                font-size: 15px;
+                color: #6B6B6B;
+                margin: 4px 0 0;
             }
         }
 
@@ -27,266 +33,300 @@
             background: #D4A017;
             border: none;
             height: 48px;
-            padding: 0 32px;
-            border-radius: 16px;
+            padding: 0 24px;
+            border-radius: 999px;
             font-weight: 700;
             color: white;
-            box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2);
+            transition: all 0.3s ease;
 
             &:hover {
                 background: #B88A12;
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(212, 160, 23, 0.3);
+                box-shadow: 0 6px 16px rgba(212, 160, 23, 0.3);
             }
         }
     }
 
     .layoutBody {
         display: grid;
-        grid-template-columns: 1.6fr 1fr;
-        gap: 40px;
+        grid-template-columns: 60% 40%;
+        gap: 24px;
+        align-items: start;
     }
 
     .timelineSection {
-        .timelineHeader {
-            margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
 
-            h3 {
-                font-size: 20px;
-                font-weight: 800;
-                color: @text-main;
-            }
-        }
-
-        .appCardSaaS {
-            background: white;
-            border-radius: 32px;
-            border: none;
-            box-shadow: 0 10px 40px rgba(212, 160, 23, 0.06);
-            margin-bottom: 24px;
+        .horizontalCard {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 24px;
-            padding: 24px 32px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
 
             &:hover {
-                transform: translateY(-6px);
-                box-shadow: 0 16px 50px rgba(212, 160, 23, 0.12);
-
-                .btnArrow {
-                    background: #D4A017;
-                    color: white;
-                    transform: scale(1.1);
-                }
+                box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             }
 
-            .timeLabel {
-                width: 100px;
-                text-align: center;
-                background: #FFF8F2;
-                padding: 20px 16px;
-                border-radius: 24px;
+            .cardLeft {
                 display: flex;
-                flex-direction: column;
                 align-items: center;
-                justify-content: center;
+                gap: 16px;
 
-                .day {
-                    font-size: 30px;
-                    font-weight: 900;
-                    color: @text-main;
-                    line-height: 1;
+                .avatarWrap {
+                    width: 64px;
+                    height: 64px;
+                    flex-shrink: 0;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 16px;
+                        object-fit: cover;
+                    }
                 }
 
-                .month {
-                    font-size: 12px;
-                    font-weight: 800;
-                    color: @primary;
-                    text-transform: uppercase;
-                    margin-bottom: 8px;
-                }
+                .infoContent {
+                    .tagsRow {
+                        display: flex;
+                        gap: 8px;
+                        margin-bottom: 8px;
 
-                .exactTime {
-                    font-size: 13px;
-                    font-weight: 800;
-                    color: white;
-                    background: @text-main;
-                    border-radius: 8px;
-                    padding: 4px 0;
-                }
-            }
-
-            .cardInfo {
-                flex: 1;
-
-                .badgeRow {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 12px;
-
-                    .statusBadge {
-                        border: none;
-                        font-weight: 800;
-                        border-radius: 20px;
-                        padding: 6px 16px;
-
-                        &.confirmed {
-                            background: #FEF3C7;
-                            color: #D4A017;
+                        .tagMint {
+                            background: #D1FAE5;
+                            color: #065F46;
+                            padding: 4px 12px;
+                            border-radius: 999px;
+                            font-size: 12px;
+                            font-weight: 700;
                         }
 
-                        &.pending {
-                            background: #F3F4F6;
-                            color: #6B7280;
+                        .tagYellow {
+                            background: #FEF3C7;
+                            color: #92400E;
+                            padding: 4px 12px;
+                            border-radius: 999px;
+                            font-size: 12px;
+                            font-weight: 700;
                         }
                     }
 
-                    .svcName {
+                    .mainTitle {
+                        font-size: 18px;
+                        font-weight: 800;
+                        color: #1A1A1A;
+                        margin: 0 0 4px;
+                    }
+
+                    .subText {
                         font-size: 13px;
-                        font-weight: 700;
-                        color: #71717A;
+                        color: #6B6B6B;
+                        margin: 0;
+                    }
+                }
+            }
+
+            .cardRight {
+                text-align: right;
+
+                .timeWrap {
+                    margin-bottom: 8px;
+
+                    .timeTxt {
+                        display: block;
+                        font-size: 20px;
+                        font-weight: 800;
+                        color: #1A1A1A;
+                        line-height: 1.2;
+                    }
+
+                    .dateTxt {
+                        display: block;
+                        font-size: 13px;
+                        color: #6B6B6B;
+                    }
+                }
+
+                .statusBadge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 13px;
+                    font-weight: 700;
+
+                    .iconCircle {
                         display: flex;
                         align-items: center;
-                        gap: 6px;
+                        justify-content: center;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        font-size: 11px;
+                        color: white;
+                    }
+
+                    &.confirmed {
+                        color: #10B981;
+                        .iconCircle {
+                            background: #10B981;
+                        }
+                    }
+
+                    &.pending {
+                        color: #F59E0B;
+                        .iconCircle {
+                            background: #F59E0B;
+                        }
                     }
                 }
-
-                .mainTitle {
-                    font-size: 20px;
-                    font-weight: 800;
-                    color: @text-main;
-                    margin-bottom: 16px;
-
-                    strong {
-                        color: @primary;
-                    }
-                }
-
-                .doctorInfo {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    font-size: 14px;
-                    color: #71717A;
-
-                    strong {
-                        color: @text-main;
-                    }
-                }
-            }
-
-            .btnArrow {
-                width: 44px;
-                height: 44px;
-                border-radius: 12px;
-                background: @bg-container;
-                border: none;
-                color: #BCB8B1;
-                transition: all 0.3s;
             }
         }
     }
 
     .infoSection {
-        .clinicDetails {
-            background: white;
-            border-radius: 32px;
-            border: none;
-            box-shadow: 0 10px 40px rgba(212, 160, 23, 0.06);
-            padding: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
 
-            h3 {
-                font-size: 22px;
-                font-weight: 800;
-                color: @text-main;
-                margin-bottom: 32px;
+        .infoBox {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+
+            .boxHeader {
+                margin-bottom: 20px;
+
+                .boxTitle {
+                    font-size: 18px;
+                    font-weight: 800;
+                    color: #1A1A1A;
+                    margin: 0;
+                }
+
+                .boxSub {
+                    font-size: 14px;
+                    color: #6B6B6B;
+                    margin: 4px 0 0;
+                }
             }
 
-            .infoList {
+            .boxTitle {
+                font-size: 18px;
+                font-weight: 800;
+                color: #1A1A1A;
+                margin: 0 0 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .checkIcon {
+                    font-size: 18px;
+                }
+            }
+
+            .contactList {
                 display: flex;
                 flex-direction: column;
-                gap: 28px;
-                margin-bottom: 40px;
+                gap: 20px;
 
-                .infoItem {
+                .contactItem {
                     display: flex;
-                    gap: 16px;
+                    align-items: flex-start;
+                    gap: 12px;
 
-                    .iconBox {
-                        width: 44px;
-                        height: 44px;
-                        border-radius: 12px;
-                        background: @bg-container;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: @primary;
+                    .iconPin, .iconPhone {
+                        font-size: 20px;
+                        margin-top: 2px;
                     }
 
-                    .text {
-                        strong {
-                            font-size: 16px;
-                            color: @text-main;
-                            display: block;
-                            margin-bottom: 4px;
-                        }
+                    strong {
+                        display: block;
+                        color: #1A1A1A;
+                        font-size: 15px;
+                        margin-bottom: 4px;
+                    }
 
-                        p {
-                            font-size: 14px;
-                            color: #71717A;
-                            margin: 0;
-                        }
+                    span {
+                        display: block;
+                        color: #6B6B6B;
+                        font-size: 13px;
                     }
                 }
             }
 
-            .reminderBox {
-                background: #FFF8F2;
-                padding: 28px;
-                border-radius: 24px;
-                border: none;
+            .checkList {
+                list-style: none;
+                padding: 0;
+                margin: 0;
 
-                h4 {
-                    color: @primary;
-                    font-weight: 800;
+                li {
+                    position: relative;
+                    padding-left: 16px;
                     margin-bottom: 12px;
-                }
+                    font-size: 14px;
+                    color: #6B6B6B;
+                    line-height: 1.5;
 
-                ul {
-                    padding-left: 20px;
-                    margin: 0;
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
 
-                    li {
-                        font-size: 14px;
-                        color: #71717A;
-                        font-weight: 600;
-                        margin-bottom: 8px;
+                    &::before {
+                        content: '•';
+                        position: absolute;
+                        left: 0;
+                        color: #D4A017;
+                        font-weight: bold;
                     }
                 }
             }
         }
-    }
 
-    .emptyCard {
-        text-align: center;
-        padding: 80px 40px;
-        background: white;
-        border-radius: 32px;
-        border: none;
-        box-shadow: 0 10px 40px rgba(212, 160, 23, 0.06);
+        .promoBanner {
+            background: #4A4A2A;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
 
-        svg {
-            color: @border-soft;
-            margin-bottom: 16px;
-        }
+            h3 {
+                font-size: 24px;
+                font-weight: 800;
+                color: white;
+                margin: 0 0 8px;
+            }
 
-        p {
-            font-size: 16px;
-            color: #71717A;
-            font-weight: 600;
+            p {
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.8);
+                margin: 0 0 24px;
+            }
+
+            .btnBanner {
+                background: white;
+                border: none;
+                height: 40px;
+                padding: 0 24px;
+                border-radius: 999px;
+                color: #1A1A1A;
+                font-weight: 700;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background: #FEF3C7;
+                    color: #D4A017;
+                }
+            }
         }
     }
 }

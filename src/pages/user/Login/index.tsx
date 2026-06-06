@@ -100,7 +100,7 @@ const Login: React.FC = () => {
 						<img src="https://i.pravatar.cc/150?img=32" className={styles.userAvatar} alt="User" />
 						<div className={styles.reviewContent}>
 							<p>"Dịch vụ tuyệt vời, giao diện rất dễ dùng và bác sĩ cực kỳ tận tâm!"</p>
-							<div className={styles.author}>Chị Minh Anh - Shiba Owner</div>
+							<div className={styles.author}>Chị Nam Khánh - Shiba Owner</div>
 						</div>
 					</motion.div>
 				</div>

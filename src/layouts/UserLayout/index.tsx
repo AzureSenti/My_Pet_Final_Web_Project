@@ -1,7 +1,5 @@
-import React from 'react';
 import { history, useLocation } from 'umi';
-import { Home, PawPrint, Calendar, ClipboardList, Bell } from 'lucide-react';
-import { Badge, Button } from 'antd';
+import { Home, PawPrint, Calendar, ClipboardList } from 'lucide-react';
 import HeaderProfile from '@/components/HeaderProfile';
 import styles from './style.less';
 
@@ -19,8 +17,10 @@ const UserLayout: React.FC = ({ children }) => {
     return (
         <div className={styles.userLayout}>
             <nav className={styles.navContainer}>
-                <div className={styles.logoWrap} onClick={() => history.push('/')}>
-                    <img src="https://cdn-icons-png.flaticon.com/512/3565/3565860.png" alt="PetCare Logo" className={styles.logoImage} />
+                <div className={styles.logoWrap} onClick={() => history.push('/khach-hang/dashboard')}>
+                    <div className={styles.logoIconWrapper}>
+                        <PawPrint size={24} strokeWidth={2.5} />
+                    </div>
                     <span>PetCare</span>
                 </div>
 
@@ -37,9 +37,6 @@ const UserLayout: React.FC = ({ children }) => {
                 </div>
 
                 <div className={styles.rightActions}>
-                    <Badge count={2} size="small" style={{ backgroundColor: '#D4A017' }}>
-                        <Button type="text" icon={<Bell size={20} />} className={styles.bellBtn} />
-                    </Badge>
                     <HeaderProfile />
                 </div>
             </nav>
