@@ -81,14 +81,16 @@
     .recordCard {
         background: white;
         padding: 32px;
-        border-radius: @radius-card;
-        border: 1px solid @border-soft;
+        border-radius: 28px;
+        border: 1px solid rgba(212, 160, 23, 0.1);
+        box-shadow: 0 4px 24px rgba(212, 160, 23, 0.04);
         margin-bottom: 24px;
         transition: all 0.3s ease;
 
         &:hover {
-            box-shadow: @shadow-lg;
-            border-color: @primary;
+            box-shadow: 0 8px 25px rgba(212, 160, 23, 0.08);
+            border-color: #D4A017;
+            transform: translateY(-4px);
         }
 
         .cardTop {
@@ -226,15 +228,18 @@
             }
 
             .btnChat {
-                background: @primary;
+                background: #D4A017;
                 border: none;
                 color: white;
                 height: 48px;
                 font-weight: 800;
-                border-radius: 12px;
+                border-radius: 16px;
+                transition: all 0.3s ease;
 
                 &:hover {
-                    background: @primary-hover;
+                    background: #B88A12;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.3);
                 }
             }
         }
@@ -242,9 +247,10 @@
 
     .infoBox {
         background: white;
-        border: 1px solid @border-soft;
+        border: 1px solid rgba(212, 160, 23, 0.1);
+        box-shadow: 0 4px 20px rgba(212, 160, 23, 0.03);
         padding: 24px;
-        border-radius: 20px;
+        border-radius: 24px;
 
         h4 {
             display: flex;

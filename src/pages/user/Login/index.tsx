@@ -2,7 +2,7 @@ import { Tabs } from 'antd';
 import React from 'react';
 import { history, useLocation } from 'umi';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Sparkles } from 'lucide-react';
+import { ArrowLeft, PawPrint, Sparkles } from 'lucide-react';
 import LoginWithCredentials from './KeycloakLogin';
 import RegisterForm from './RegisterForm';
 import styles from './index.less';
@@ -34,8 +34,8 @@ const Login: React.FC = () => {
 						animate={{ opacity: 1, scale: 1 }}
 						className={styles.logoBox}
 					>
-						<div className={styles.icon}><Heart size={24} fill="white" /></div>
-						<span>MyPet 4.0</span>
+						<div className={styles.icon}><PawPrint size={24} fill="white" /></div>
+						<span>PetCare</span>
 					</motion.div>
 
 					<motion.div
