@@ -7,7 +7,8 @@ import {
     Stethoscope,
     FileText,
     Calendar,
-    HeartPulse
+    HeartPulse,
+    MessageCircle
 } from 'lucide-react';
 import { getMyMedicalRecords, Pet, getMyPets } from '@/services/QuanLyPetStore';
 import styles from './style.less';
@@ -73,47 +74,47 @@ const UserHoSoBenhAn: React.FC = () => {
                 </div>
             </header>
 
-            <Row gutter={32}>
-                <Col xs={24} lg={16}>
-                    <div className={styles.timelineContainer}>
+            <Row gutter={[24, 24]}>
+                <Col xs={{ span: 24, order: 2 }} lg={{ span: 16, order: 1 }}>
+                    <div className={styles.recordList}>
                         {filteredRecords.length > 0 ? (
-                            <Timeline mode="left" className={styles.medicalTimeline}>
+                            <>
                                 {filteredRecords.map(record => (
-                                    <Timeline.Item
-                                        key={record.id}
-                                        label={<span className={styles.timeLabel}>{new Date(record.recorded_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>}
-                                        dot={<div className={styles.activeDot} />}
-                                    >
-                                        <Card className={styles.recordCard} bordered={false}>
-                                            <div className={styles.cardTop}>
-                                                <div className={styles.dateInfo}>
-                                                    <Calendar size={14} />
-                                                    {new Date(record.recorded_at).toLocaleDateString('vi-VN')}
-                                                </div>
-                                                <Tag color="#D4A017" className={styles.diagTag}>CHẨN ĐOÁN</Tag>
+                                    <div key={record.id} className={styles.recordCard}>
+                                        <div className={styles.cardHeader}>
+                                            <div className={styles.dateInfo}>
+                                                <Calendar size={14} />
+                                                <span>{new Date(record.recorded_at).toLocaleDateString('vi-VN')} - {new Date(record.recorded_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
-                                            <h3>{record.diagnosis}</h3>
-                                            <div className={styles.doctorInfo}>
-                                                <Stethoscope size={16} />
-                                                <span>BS. <strong>{record.vet?.user?.full_name || 'Hệ thống'}</strong></span>
+                                            <div className={styles.diagBadge}>Khám định kỳ</div>
+                                        </div>
+                                        <h3 className={styles.diagnosisTitle}>{record.diagnosis}</h3>
+                                        <div className={styles.doctorInfo}>
+                                            <Stethoscope size={14} />
+                                            <span>BS. {record.vet?.user?.full_name || 'Hệ thống'}</span>
+                                        </div>
+                                        <div className={styles.treatmentBox}>
+                                            <div className={styles.treatmentLabel}>
+                                                <FileText size={14} />
+                                                <strong>Điều trị:</strong>
                                             </div>
-                                            <div className={styles.treatment}>
-                                                <FileText size={16} />
-                                                <p><strong>Điều trị:</strong> {record.treatment}</p>
+                                            <p className={styles.treatmentText}>{record.treatment}</p>
+                                        </div>
+                                        {record.notes && (
+                                            <div className={styles.notesBox}>
+                                                {record.notes}
                                             </div>
-                                            {record.notes && (
-                                                <div className={styles.notes}>
-                                                    <p>{record.notes}</p>
-                                                </div>
-                                            )}
-                                        </Card>
-                                    </Timeline.Item>
+                                        )}
+                                    </div>
                                 ))}
-                            </Timeline>
+                                <div className={styles.loadMoreWrap}>
+                                    <Button type="text" className={styles.btnLoadMore}>Tải thêm lịch sử...</Button>
+                                </div>
+                            </>
                         ) : (
                             <div className={styles.emptyState}>
                                 <Empty
-                                    image={<ClipboardList size={64} style={{ color: '#DBDAD9' }} />}
+                                    image={<ClipboardList size={48} style={{ color: '#d1c7bd' }} />}
                                     description="Chưa có dữ liệu y khoa nào được ghi nhận."
                                 />
                             </div>
@@ -121,31 +122,30 @@ const UserHoSoBenhAn: React.FC = () => {
                     </div>
                 </Col>
 
-                <Col xs={24} lg={8}>
-                    <Card className={styles.summaryCard} bordered={false}>
+                <Col xs={{ span: 24, order: 1 }} lg={{ span: 8, order: 2 }}>
+                    <div className={styles.summaryCard}>
                         <div className={styles.summaryHeader}>
-                            <HeartPulse size={24} color="#D4A017" />
+                            <HeartPulse size={20} color="#c8960c" />
                             <h3>Chỉ số tổng quát</h3>
                         </div>
                         <div className={styles.metricList}>
-                            <div className={styles.metric}>
-                                <span>Số lần thăm khám</span>
-                                <strong>{filteredRecords.length}</strong>
+                            <div className={styles.metricItem}>
+                                <span className={styles.metricLabel}>Số lần thăm khám</span>
+                                <span className={styles.metricValue}>{filteredRecords.length}</span>
                             </div>
-                            <div className={styles.metric}>
-                                <span>Lần cuối khám</span>
-                                <strong>{filteredRecords[0] ? new Date(filteredRecords[0].recorded_at).toLocaleDateString('vi-VN') : 'N/A'}</strong>
+                            <div className={styles.metricSeparator} />
+                            <div className={styles.metricItem}>
+                                <span className={styles.metricLabel}>Lần cuối khám</span>
+                                <span className={styles.metricValue}>{filteredRecords[0] ? new Date(filteredRecords[0].recorded_at).toLocaleDateString('vi-VN') : 'N/A'}</span>
                             </div>
                         </div>
-                        <div className={styles.actionBox}>
+                        <div className={styles.ctaBox}>
                             <p>Cần tư vấn thêm về kết quả chẩn đoán?</p>
-                            <Button block className={styles.btnChat} onClick={() => setIsConsultModalOpen(true)}>Trò chuyện với bác sĩ</Button>
+                            <Button block className={styles.btnChat} onClick={() => setIsConsultModalOpen(true)}>
+                                <MessageCircle size={16} style={{ marginRight: 6 }} />
+                                Trò chuyện với bác sĩ
+                            </Button>
                         </div>
-                    </Card>
-
-                    <div className={styles.infoBox} style={{ marginTop: 24 }}>
-                        <h4><Activity size={18} /> Lưu ý sức khỏe</h4>
-                        <p>Theo dõi sát sao cân nặng và chế độ dinh dưỡng sau khi điều trị.</p>
                     </div>
                 </Col>
             </Row>
