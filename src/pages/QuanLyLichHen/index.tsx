@@ -91,6 +91,13 @@ const QuanLyLichHen: React.FC = () => {
 		});
 	};
 
+	const handleCompleteAppointment = (id: string) => {
+		updateAppointmentStatus(id, 'completed').then(() => {
+			message.success('Đã hoàn thành lịch hẹn và tạo hóa đơn!');
+			fetchData();
+		});
+	};
+
 	const handleCancelAppointment = (id: string) => {
 		updateAppointmentStatus(id, 'cancelled').then(() => {
 			message.success('Đã hủy lịch hẹn!');
@@ -351,7 +358,10 @@ const QuanLyLichHen: React.FC = () => {
 															<>
 																<button className="btn-action btn-text" onClick={() => { setSelectedAppointment(item); setDetailModalOpen(true); }}>Chi tiết</button>
 																{item.status === 'confirmed' && (
-																	<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
+																	<>
+																		<button className="btn-action btn-confirm" style={{ backgroundColor: '#10B981' }} onClick={() => handleCompleteAppointment(item.id)}>Hoàn thành</button>
+																		<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
+																	</>
 																)}
 															</>
 														)}

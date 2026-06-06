@@ -216,6 +216,27 @@ async def update_appointment_status(
         )
 
     appt.status = data.status
+    
+    # --- TỰ ĐỘNG TẠO HÓA ĐƠN KHI HOÀN THÀNH ---
+    if data.status == AppointmentStatus.completed:
+        # Kiểm tra xem đã có payment chưa để tránh tạo trùng
+        from app.models.payment import Payment, PaymentMethod
+        from app.services.payment_service import create_payment
+        from app.schemas.payment import PaymentCreateRequest
+
+        stmt = select(Payment).where(Payment.appointment_id == appointment_id)
+        res_pay = await db.execute(stmt)
+        existing_payment = res_pay.scalar_one_or_none()
+
+        if not existing_payment and appt.service:
+            payment_data = PaymentCreateRequest(
+                appointment_id=appt.id,
+                owner_id=appt.owner_id,
+                amount=appt.service.price,
+                method=PaymentMethod.cash
+            )
+            await create_payment(db, payment_data)
+
     await db.commit()
 
     # Reload đầy đủ relationships
