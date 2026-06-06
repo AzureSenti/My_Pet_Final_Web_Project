@@ -4,9 +4,10 @@ import { Spin, message } from 'antd';
 import { 
   PrinterOutlined, EditOutlined, PlusOutlined, 
   CalendarOutlined, MedicineBoxOutlined, WarningOutlined,
-  HistoryOutlined
+  HistoryOutlined, MessageOutlined
 } from '@ant-design/icons';
 import { getAppointmentDetail, getPetMedicalHistory } from '@/services/BacSi/doctorService';
+import { createConversation } from '@/services/messageService';
 import styles from './index.module.less';
 
 const BenhAn: React.FC = () => {
@@ -83,6 +84,23 @@ const BenhAn: React.FC = () => {
         <div className={styles.headerActions}>
           <button className={styles.btnAction}><PrinterOutlined /> In Bệnh Án</button>
           <button className={styles.btnAction}><EditOutlined /> Chỉnh Sửa</button>
+          <button 
+            className={styles.btnAction}
+            onClick={async () => {
+              try {
+                if (!owner?.id) {
+                  message.error('Không tìm thấy thông tin khách hàng');
+                  return;
+                }
+                const res = await createConversation({ participant_ids: [owner.id] });
+                history.push(`/bac-si/tu-van/phan-hoi?id=${res.id}`);
+              } catch (e) {
+                message.error('Lỗi tạo cuộc trò chuyện');
+              }
+            }}
+          >
+            <MessageOutlined /> Nhắn Khách
+          </button>
           <button 
             className={`${styles.btnAction} ${styles.primary}`}
             onClick={() => history.push(`/bac-si/lich-hen/kham-moi?id=${appointmentId}`)}
