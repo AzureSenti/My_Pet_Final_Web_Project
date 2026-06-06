@@ -119,6 +119,18 @@ export default [
 		icon: 'CalendarOutlined',
 	},
 	{
+		path: '/quan-ly-dich-vu',
+		name: 'Quản lý dịch vụ',
+		component: './QuanLyDichVu',
+		icon: 'SettingOutlined',
+	},
+	{
+		path: '/quan-ly-thanh-toan',
+		name: 'Quản lý thanh toán',
+		component: './QuanLyThanhToan',
+		icon: 'DollarOutlined',
+	},
+	{
 		path: '/profile',
 		name: 'Hồ sơ cá nhân',
 		component: './HoSo',
