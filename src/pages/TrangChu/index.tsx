@@ -524,7 +524,7 @@ const TrangChu = () => {
 				<div className="pc-banner banner-spa">
 					<div className="banner-overlay" />
 					<img
-						src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=600"
+						src="/assets/images/banner_spa.png"
 						alt="Dog spa"
 					/>
 					<div className="banner-content">
@@ -539,7 +539,7 @@ const TrangChu = () => {
 				<div className="pc-banner banner-health">
 					<div className="banner-overlay" />
 					<img
-						src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=600"
+						src="/assets/images/banner_health.png"
 						alt="Cat health"
 					/>
 					<div className="banner-content">
