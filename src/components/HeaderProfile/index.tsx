@@ -49,7 +49,11 @@ const HeaderProfile: React.FC = () => {
 			icon: <UserOutlined />,
 			label: 'Hồ sơ',
 			onClick: () => {
-				history.push('/profile');
+				if (currentUser?.role === 'owner') {
+					history.push('/khach-hang/ho-so');
+				} else {
+					history.push('/profile');
+				}
 			},
 		},
 		{

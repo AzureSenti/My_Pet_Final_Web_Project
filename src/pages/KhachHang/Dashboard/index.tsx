@@ -54,132 +54,138 @@ const KhachHangDashboard: React.FC = () => {
 
     return (
         <div className={styles.saasDashboard}>
-            <div className={styles.organicBlob1} />
-            <div className={styles.organicBlob2} />
-            <div className={styles.contentWrapper}>
-            <header className={styles.welcomeSection}>
-                <div className={styles.welcomeText}>
-                    <h1>Hôm nay thế nào, <span>{currentUser?.full_name?.split(' ').pop()}</span>? 👋</h1>
-                    <p>Cùng theo dõi sức khỏe và lịch trình của các thành viên bốn chân nhé.</p>
-                </div>
-                <div className={styles.headerActions}>
-                    <Button type="primary" className={styles.btnPrimary} onClick={() => history.push('/khach-hang/lich-hen')}>
-                        <Plus size={18} style={{ marginRight: 8 }} /> Đặt lịch mới
+            <div className={styles.container}>
+                <header className={styles.welcomeSection}>
+                    <div className={styles.welcomeText}>
+                        <h1>Hôm nay thế nào, <span>{currentUser?.full_name?.split(' ').pop()}</span>? 👋</h1>
+                        <p>Cùng theo dõi sức khỏe và lịch trình của các thành viên bốn chân nhé.</p>
+                    </div>
+                    <Button className={styles.btnOutlineNew} onClick={() => history.push('/khach-hang/lich-hen')}>
+                        + Đặt lịch mới
                     </Button>
-                </div>
-            </header>
+                </header>
 
-            <div className={styles.metricGrid}>
-                <div className={styles.metricCard}>
-                    <div className={`${styles.iconBox} ${styles.green}`}><PawPrint size={24} /></div>
-                    <div className={styles.info}>
-                        <span className={styles.label}>Thú cưng</span>
-                        <div className={styles.value}>{data.pets.length}</div>
-                    </div>
-                </div>
-                <div className={styles.metricCard}>
-                    <div className={`${styles.iconBox} ${styles.gold}`}><Calendar size={24} /></div>
-                    <div className={styles.info}>
-                        <span className={styles.label}>Lịch hẹn</span>
-                        <div className={styles.value}>{data.appointments.filter(a => a.status === 'confirmed').length}</div>
-                    </div>
-                </div>
-                <div className={styles.metricCard}>
-                    <div className={`${styles.iconBox} ${styles.blue}`}><Zap size={24} /></div>
-                    <div className={styles.info}>
-                        <span className={styles.label}>Đã hoàn thành</span>
-                        <div className={styles.value}>{data.appointments.filter(a => a.status === 'completed').length}</div>
-                    </div>
-                </div>
-            </div>
-
-            <Row gutter={[32, 32]}>
-                <Col xs={24} lg={16}>
-                    <div className={styles.mainCard}>
-                        <div className={styles.cardHeader}>
-                            <h3>Lịch trình y khoa</h3>
-                            <Button type="link" className={styles.viewAll} onClick={() => history.push('/khach-hang/lich-hen')}>Xem tất cả</Button>
-                        </div>
-                        {upcomingApp ? (
-                            <div className={styles.highlightBooking}>
-                                <div className={styles.bookingInfo}>
-                                    <Tag color="#8A9A5B" className={styles.statusTag}>SẮP DIỄN RA</Tag>
-                                    <h2>{upcomingApp.service_name}</h2>
-                                    <div className={styles.meta}>
-                                        <span><Calendar size={14} /> {new Date(upcomingApp.scheduled_at).toLocaleDateString('vi-VN')}</span>
-                                        <span><Clock size={14} /> {new Date(upcomingApp.scheduled_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-                                </div>
-                                <div className={styles.petMini}>
-                                    <Avatar size={48} src={data.pets.find(p => p.id === upcomingApp.pet_id)?.avatar_url} />
-                                    <div className={styles.name}>
-                                        <strong>{upcomingApp.pet_name}</strong>
-                                        <span>Bệnh nhân</span>
-                                    </div>
+                <div className={styles.twoColumnLayout}>
+                    <div className={styles.leftColumn}>
+                        <div className={styles.statsRow}>
+                            <div className={styles.statCard}>
+                                <div className={styles.statIconBrown}><PawPrint size={20} /></div>
+                                <div className={styles.statInfo}>
+                                    <span className={styles.statValue}>{data.pets.length}</span>
+                                    <span className={styles.statLabel}>Thú cưng</span>
                                 </div>
                             </div>
-                        ) : (
-                            <div className={styles.emptyState}>
-                                <Empty description="Ghi danh bé yêu vào lịch khám ngay hôm nay" />
-                                <Button className={styles.btnOutline} onClick={() => history.push('/khach-hang/lich-hen')}>Đặt lịch ngay</Button>
+                            <div className={styles.statCard}>
+                                <div className={styles.statIconYellow}><Calendar size={20} /></div>
+                                <div className={styles.statInfo}>
+                                    <span className={styles.statValue}>{data.appointments.filter(a => a.status === 'confirmed').length}</span>
+                                    <span className={styles.statLabel}>Lịch hẹn</span>
+                                </div>
                             </div>
-                        )}
-                    </div>
-
-                    <div className={styles.mainCard} style={{ marginTop: 32 }}>
-                        <div className={styles.cardHeader}>
-                            <h3>Bạn nhỏ của tôi</h3>
-                            <div style={{ display: 'flex', gap: '12px' }}>
-                                <Button type="link" className={styles.viewAll} onClick={() => history.push('/khach-hang/thu-cung')}>Quản lý</Button>
-                                <Button className={styles.btnOutlineSmall} onClick={() => history.push('/khach-hang/thu-cung')} icon={<Plus size={14} />}>Thêm mới</Button>
+                            <div className={styles.statCard}>
+                                <div className={styles.statIconBlue}><Zap size={20} /></div>
+                                <div className={styles.statInfo}>
+                                    <span className={styles.statValue}>{data.appointments.filter(a => a.status === 'completed').length}</span>
+                                    <span className={styles.statLabel}>Đã hoàn thành</span>
+                                </div>
                             </div>
                         </div>
-                        <div className={styles.petRow}>
-                            {data.pets.slice(0, 3).map(pet => (
-                                <div key={pet.id} className={styles.petSmallCard}>
-                                    <img src={pet.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100'} alt={pet.name} />
-                                    <div className={styles.info}>
-                                        <h4>{pet.name}</h4>
-                                        <span style={{ fontSize: '12px', color: '#7A6B5D' }}>{pet.species}{pet.breed ? ` • ${pet.breed}` : ''}</span>
+
+                        <div className={styles.contentCard}>
+                            <div className={styles.cardHeader}>
+                                <h3>Lịch trình y khoa</h3>
+                                <a onClick={() => history.push('/khach-hang/lich-hen')} className={styles.linkMuted}>Xem tất cả</a>
+                            </div>
+                            {upcomingApp ? (
+                                <div className={styles.appointmentItem}>
+                                    <div className={styles.appLeft}>
+                                        <div className={styles.badgeGreen}>SẮP DIỄN RA</div>
+                                        <h4>{upcomingApp.service_name}</h4>
+                                        <div className={styles.appTime}>
+                                            {new Date(upcomingApp.scheduled_at).toLocaleDateString('vi-VN')} • {new Date(upcomingApp.scheduled_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                    </div>
+                                    <div className={styles.appRight}>
+                                        <Avatar size={48} src={data.pets.find(p => p.id === upcomingApp.pet_id)?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100'} />
+                                        <div className={styles.petName}>
+                                            <strong>{upcomingApp.pet_name}</strong>
+                                            <span>Bệnh nhân</span>
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                            {data.pets.length > 3 && (
-                                <div className={styles.morePets} onClick={() => history.push('/khach-hang/thu-cung')}>
-                                    +{data.pets.length - 3}
-                                </div>
+                            ) : (
+                                <Empty description="Chưa có lịch trình sắp tới" />
                             )}
                         </div>
-                    </div>
-                </Col>
 
-                <Col xs={24} lg={8}>
-                    <div className={styles.sideCard}>
-                        <h3>Góc tư vấn chuyên gia</h3>
-                        <div className={styles.tipList}>
+                        <div className={styles.contentCard}>
+                            <div className={styles.cardHeader}>
+                                <h3>Bạn nhỏ của tôi</h3>
+                                <div className={styles.cardHeaderActions}>
+                                    <a onClick={() => history.push('/khach-hang/thu-cung')} className={styles.linkMuted}>Quản lý</a>
+                                    <Button size="small" type="link" className={styles.btnAddSmall} onClick={() => history.push('/khach-hang/thu-cung')}>+ Thêm mới</Button>
+                                </div>
+                            </div>
+                            <div className={styles.petList}>
+                                {data.pets.slice(0, 2).map(pet => (
+                                    <div key={pet.id} className={styles.petListItem}>
+                                        <Avatar size={48} src={pet.avatar_url || (pet.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100' : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100')} />
+                                        <div className={styles.petInfo}>
+                                            <strong>{pet.name}</strong>
+                                            <span>{pet.species} • {pet.gender === 'female' ? 'cái' : 'đực'}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {data.pets.length === 0 && <Empty description="Chưa có bạn nhỏ nào" />}
+                                {data.pets.length > 2 && (
+                                    <div className={styles.morePetsLink} onClick={() => history.push('/khach-hang/thu-cung')}>
+                                        +{data.pets.length - 2} Xem thêm bạn nhỏ
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.rightColumn}>
+                        <div className={styles.sidebarCard}>
+                            <div className={styles.sidebarHeader}>
+                                <span className={styles.pinIcon}>📌</span>
+                                <h3>Góc tư vấn chuyên gia</h3>
+                            </div>
                             <div className={styles.tipItem}>
-                                <div className={styles.tipDot} />
-                                <div className={styles.content}>
+                                <div className={styles.tipDot}></div>
+                                <div className={styles.tipText}>
                                     <strong>Tiêm chủng định kỳ</strong>
                                     <p>Đừng quên lịch tiêm phòng dại mỗi năm một lần cho bé.</p>
                                 </div>
                             </div>
                             <div className={styles.tipItem}>
-                                <div className={styles.tipDot} style={{ background: '#C9A96E' }} />
-                                <div className={styles.content}>
+                                <div className={styles.tipDot}></div>
+                                <div className={styles.tipText}>
                                     <strong>Chăm sóc lông</strong>
                                     <p>Chải lông thường xuyên giúp bé giảm stress và mượt mà hơn.</p>
                                 </div>
                             </div>
-                        </div>
-                        <div className={styles.promoBox}>
-                            <h4>Ưu đãi VIP</h4>
-                            <p>Giảm 15% cho dịch vụ Spa vào các ngày trong tuần.</p>
-                            <Button block className={styles.btnSecondary}>Sử dụng ngay</Button>
+                            
+                            <div className={styles.divider}></div>
+
+                            <div className={styles.vipBox}>
+                                <div className={styles.vipHeader}>
+                                    ⭐ Ưu đãi VIP
+                                </div>
+                                <p>Giảm 15% cho dịch vụ Spa vào các ngày trong tuần.</p>
+                                <Button className={styles.btnGoldFull}>Sử dụng ngay</Button>
+                            </div>
                         </div>
                     </div>
-                </Col>
-            </Row>
+                </div>
+
+                <footer className={styles.footer}>
+                    <p>© 2024 PetCare Admin. All rights reserved.</p>
+                    <div className={styles.footerLinks}>
+                        <a>Support</a> · <a>Privacy Policy</a> · <a>Terms of Service</a>
+                    </div>
+                </footer>
             </div>
         </div>
     );
