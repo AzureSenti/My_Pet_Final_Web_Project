@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, message, Empty, Tag, Card, Row, Col } from 'antd';
 import { history } from 'umi';
-import { Plus, Camera, Heart, ChevronRight, MoreHorizontal, Activity, Upload as UploadIcon, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Heart, ChevronRight, MoreHorizontal, Activity, Pencil, Trash2 } from 'lucide-react';
 import { Upload, Menu, Dropdown as AntDropdown, Modal as AntModal } from 'antd';
 import { getMyPets, createMyPet, Pet, uploadFile, updateMyPet, deleteMyPet } from '@/services/QuanLyPetStore';
 import { ip3 } from '@/utils/ip';

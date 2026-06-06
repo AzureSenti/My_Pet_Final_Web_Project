@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form, DatePicker, Select, Input, message, Avatar, Tag, Card } from 'antd';
+import { Button, Modal, Form, DatePicker, Select, Input, message, Avatar } from 'antd';
 import {
-    MapPin,
-    User,
-    ChevronRight,
     Plus,
-    Stethoscope,
-    AlertCircle,
     MoreHorizontal,
     Trash2
 } from 'lucide-react';
