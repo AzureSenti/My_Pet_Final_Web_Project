@@ -1,6 +1,6 @@
 @import '../../../styles/theme.less';
 
-@bg-surface: @bg-page;
+@bg-surface: #FFF8F2;
 
 .saasPetsPage {
     .pageHeader {
@@ -24,18 +24,20 @@
         }
 
         .btnPrimary {
-            background: @primary;
+            background: #D4A017;
             border: none;
             height: 48px;
             padding: 0 32px;
-            border-radius: 12px;
+            border-radius: 16px;
             font-weight: 700;
             color: white;
             box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
             &:hover {
                 background: #B88A12;
                 transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(212, 160, 23, 0.3);
             }
         }
     }
@@ -49,13 +51,14 @@
     .petSaaSCard {
         background: white;
         border-radius: 28px;
-        border: 1px solid @border-soft;
+        border: 1px solid rgba(212, 160, 23, 0.1);
+        box-shadow: 0 4px 24px rgba(212, 160, 23, 0.04);
         transition: all 0.3s ease;
 
         &:hover {
-            border-color: @primary;
+            border-color: #D4A017;
             transform: translateY(-8px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 40px -10px rgba(212, 160, 23, 0.15);
         }
 
         .cardTop {
@@ -274,7 +277,7 @@
                 }
 
                 &.ant-btn-primary {
-                    background: @primary;
+                    background: #D4A017;
                     border: none;
                     color: white;
                     box-shadow: 0 10px 20px rgba(212, 160, 23, 0.2);

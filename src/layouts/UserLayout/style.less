@@ -2,8 +2,8 @@
 
 .userLayout {
     min-height: 100vh;
-    background-color: @bg-page;
-    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #FFF8F2; // Creamy background
+    font-family: 'Quicksand', -apple-system, sans-serif;
     color: @text-main;
 
     .navContainer {
@@ -12,9 +12,9 @@
         z-index: 1000;
         height: 80px;
         padding: 0 40px;
-        background: rgba(251, 249, 249, 0.85);
+        background: rgba(255, 248, 242, 0.85);
         backdrop-filter: blur(20px);
-        border-bottom: 1px solid @border-soft;
+        border-bottom: 1px solid rgba(212, 160, 23, 0.1);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -25,52 +25,56 @@
             gap: 12px;
             cursor: pointer;
 
-            .logoIcon {
+            .logoImage {
                 width: 44px;
                 height: 44px;
-                background: @text-main;
-                color: white;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 8px 16px rgba(29, 27, 26, 0.1);
+                object-fit: contain;
+                filter: drop-shadow(0 4px 6px rgba(212, 160, 23, 0.15));
+                transition: transform 0.3s ease;
+            }
+
+            &:hover .logoImage {
+                transform: scale(1.05);
             }
 
             span {
                 font-weight: 800;
                 font-size: 22px;
                 color: @text-main;
-                letter-spacing: -1px;
+                letter-spacing: -0.5px;
             }
         }
 
         .mainMenu {
             display: flex;
-            gap: 12px;
-            background: @bg-container;
+            gap: 8px;
+            background: white;
             padding: 6px;
-            border-radius: 14px;
-            border: 1px solid @border-soft;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 160, 23, 0.1);
+            box-shadow: 0 4px 15px rgba(212, 160, 23, 0.05);
 
             .menuItem {
-                padding: 8px 24px;
-                border-radius: 10px;
-                color: @text-secondary;
-                font-weight: 600;
-                font-size: 14px;
+                padding: 10px 24px;
+                border-radius: 16px;
+                color: #71717A;
+                font-weight: 700;
+                font-size: 15px;
                 cursor: pointer;
-                transition: @transition-smooth;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex;
+                align-items: center;
+                gap: 8px;
 
                 &:hover {
-                    color: @primary;
-                    background: white;
+                    color: #D4A017;
+                    background: #FEF3C7;
                 }
 
                 &.active {
                     color: white;
-                    background: @primary;
-                    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+                    background: #D4A017;
+                    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.3);
                 }
             }
         }
@@ -79,6 +83,25 @@
             display: flex;
             align-items: center;
             gap: 20px;
+
+            .bellBtn {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                border: 1px solid rgba(212, 160, 23, 0.1);
+                background: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #71717A;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    color: #D4A017;
+                    border-color: #D4A017;
+                    background: #FEF3C7;
+                }
+            }
         }
     }
 

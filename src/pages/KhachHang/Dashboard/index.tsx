@@ -46,16 +46,17 @@ const KhachHangDashboard: React.FC = () => {
 
     return (
         <div className={styles.saasDashboard}>
+            <div className={styles.organicBlob1} />
+            <div className={styles.organicBlob2} />
+            <div className={styles.contentWrapper}>
             <header className={styles.welcomeSection}>
                 <div className={styles.welcomeText}>
-                    <h1>Hôm nay thế nào, {currentUser?.full_name?.split(' ').pop()}? 👋</h1>
+                    <h1>Hôm nay thế nào, <span>{currentUser?.full_name?.split(' ').pop()}</span>? 👋</h1>
                     <p>Cùng theo dõi sức khỏe và lịch trình của các thành viên bốn chân nhé.</p>
                 </div>
                 <div className={styles.headerActions}>
-                    <Button icon={<Search size={18} />} className={styles.iconBtn} />
-                    <Button icon={<Bell size={18} />} className={styles.iconBtn} />
-                    <Button type="primary" icon={<Plus size={18} />} className={styles.btnPrimary} onClick={() => history.push('/khach-hang/lich-hen')}>
-                        Đặt lịch mới
+                    <Button type="primary" className={styles.btnPrimary} onClick={() => history.push('/khach-hang/lich-hen')}>
+                        <Plus size={18} style={{ marginRight: 8 }} /> Đặt lịch mới
                     </Button>
                 </div>
             </header>
@@ -120,7 +121,10 @@ const KhachHangDashboard: React.FC = () => {
                     <div className={styles.mainCard} style={{ marginTop: 32 }}>
                         <div className={styles.cardHeader}>
                             <h3>Bạn nhỏ của tôi</h3>
-                            <Button type="link" className={styles.viewAll} onClick={() => history.push('/khach-hang/thu-cung')}>Quản lý</Button>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <Button type="link" className={styles.viewAll} onClick={() => history.push('/khach-hang/thu-cung')}>Quản lý</Button>
+                                <Button className={styles.btnOutlineSmall} onClick={() => history.push('/khach-hang/thu-cung')} icon={<Plus size={14} />}>Thêm mới</Button>
+                            </div>
                         </div>
                         <div className={styles.petRow}>
                             {data.pets.slice(0, 3).map(pet => (
@@ -168,6 +172,7 @@ const KhachHangDashboard: React.FC = () => {
                     </div>
                 </Col>
             </Row>
+            </div>
         </div>
     );
 };
