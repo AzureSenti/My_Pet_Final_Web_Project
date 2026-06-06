@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { history, Link, useLocation, useModel } from 'umi';
 import { Spin, message as antMessage } from 'antd';
-import { 
+import {
   ArrowLeftOutlined, EditOutlined,
   BoldOutlined, ItalicOutlined, UnorderedListOutlined,
   PaperClipOutlined, PictureOutlined, LinkOutlined,
@@ -11,7 +11,7 @@ import {
   getConversationDetail,
   getConversationMessages,
   sendMessage,
-} from '@/services/messageService';
+} from '@/services/messageService/index';
 import styles from './index.module.less';
 
 const PhanHoi: React.FC = () => {
@@ -101,7 +101,7 @@ const PhanHoi: React.FC = () => {
       <div className={styles.breadcrumb}>
         <Link to="/bac-si/tu-van">Tư vấn trực tuyến</Link> {'>'} Phản hồi tư vấn
       </div>
-      
+
       <div className={styles.pageHeader}>
         <button className={styles.btnBack} onClick={() => history.push('/bac-si/tu-van')}>
           <ArrowLeftOutlined />
