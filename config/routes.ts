@@ -156,6 +156,11 @@ export default [
 				path: '/khach-hang/benh-an',
 				component: './KhachHang/HoSoBenhAn',
 			},
+			{
+				name: 'Hồ sơ cá nhân',
+				path: '/khach-hang/ho-so',
+				component: './KhachHang/HoSoCaNhan',
+			},
 		],
 	},
 

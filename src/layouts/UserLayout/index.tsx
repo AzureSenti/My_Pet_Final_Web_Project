@@ -1,7 +1,7 @@
 import React from 'react';
 import { history, useLocation } from 'umi';
-import { Home, PawPrint, Calendar, ClipboardList, Bell } from 'lucide-react';
-import { Badge, Button } from 'antd';
+import { Home, PawPrint, Calendar, ClipboardList, Bell, CheckCircle } from 'lucide-react';
+import { Badge, Button, Dropdown, Menu, List, Avatar } from 'antd';
 import HeaderProfile from '@/components/HeaderProfile';
 import styles from './style.less';
 
@@ -19,8 +19,10 @@ const UserLayout: React.FC = ({ children }) => {
     return (
         <div className={styles.userLayout}>
             <nav className={styles.navContainer}>
-                <div className={styles.logoWrap} onClick={() => history.push('/')}>
-                    <img src="https://cdn-icons-png.flaticon.com/512/3565/3565860.png" alt="PetCare Logo" className={styles.logoImage} />
+                <div className={styles.logoWrap} onClick={() => history.push('/khach-hang/dashboard')}>
+                    <div className={styles.logoIconWrapper}>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3565/3565860.png" alt="PetCare Logo" className={styles.logoImage} />
+                    </div>
                     <span>PetCare</span>
                 </div>
 
@@ -37,9 +39,44 @@ const UserLayout: React.FC = ({ children }) => {
                 </div>
 
                 <div className={styles.rightActions}>
-                    <Badge count={2} size="small" style={{ backgroundColor: '#D4A017' }}>
-                        <Button type="text" icon={<Bell size={20} />} className={styles.bellBtn} />
-                    </Badge>
+                    <Dropdown 
+                        overlay={
+                            <div className={styles.notificationDropdown}>
+                                <div className={styles.notiHeader}>
+                                    <h4>Thông báo</h4>
+                                    <span className={styles.markRead}>Đánh dấu đã đọc</span>
+                                </div>
+                                <List
+                                    itemLayout="horizontal"
+                                    dataSource={[
+                                        { title: 'Lịch hẹn sắp tới', desc: 'Lịch khám bé Miu vào 14:00 ngày mai.', time: '10 phút trước', read: false },
+                                        { title: 'Kết quả xét nghiệm', desc: 'Đã có kết quả máu của bé Cún.', time: '2 giờ trước', read: true }
+                                    ]}
+                                    renderItem={item => (
+                                        <List.Item className={`${styles.notiItem} ${!item.read ? styles.unread : ''}`}>
+                                            <List.Item.Meta
+                                                avatar={<div className={styles.notiIcon}><Bell size={16} /></div>}
+                                                title={<span>{item.title}</span>}
+                                                description={
+                                                    <div>
+                                                        <p>{item.desc}</p>
+                                                        <span className={styles.notiTime}>{item.time}</span>
+                                                    </div>
+                                                }
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                                <div className={styles.notiFooter}>Xem tất cả thông báo</div>
+                            </div>
+                        } 
+                        trigger={['click']} 
+                        placement="bottomRight"
+                    >
+                        <Badge count={2} size="small" style={{ backgroundColor: '#D4A017' }}>
+                            <Button type="text" icon={<Bell size={20} />} className={styles.bellBtn} />
+                        </Badge>
+                    </Dropdown>
                     <HeaderProfile />
                 </div>
             </nav>

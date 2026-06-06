@@ -25,15 +25,25 @@
             gap: 12px;
             cursor: pointer;
 
-            .logoImage {
+            .logoIconWrapper {
                 width: 44px;
                 height: 44px;
-                object-fit: contain;
-                filter: drop-shadow(0 4px 6px rgba(212, 160, 23, 0.15));
+                border-radius: 50%;
+                background: #FEF9E7;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 transition: transform 0.3s ease;
             }
 
-            &:hover .logoImage {
+            .logoImage {
+                width: 28px;
+                height: 28px;
+                object-fit: contain;
+                filter: drop-shadow(0 2px 4px rgba(212, 160, 23, 0.15));
+            }
+
+            &:hover .logoIconWrapper {
                 transform: scale(1.05);
             }
 
@@ -101,6 +111,97 @@
                     border-color: #D4A017;
                     background: #FEF3C7;
                 }
+            }
+        }
+    }
+
+    .notificationDropdown {
+        width: 380px;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(212, 160, 23, 0.15);
+        overflow: hidden;
+        margin-top: 10px;
+
+        .notiHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(212, 160, 23, 0.1);
+
+            h4 {
+                margin: 0;
+                font-weight: 800;
+                font-size: 18px;
+                color: @text-main;
+            }
+
+            .markRead {
+                font-size: 13px;
+                color: #D4A017;
+                cursor: pointer;
+                font-weight: 600;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        :global {
+            .ant-list-item {
+                padding: 16px 24px;
+                border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+                transition: all 0.2s;
+                cursor: pointer;
+
+                &:hover {
+                    background: #FFFBEB;
+                }
+            }
+        }
+
+        .notiItem {
+            &.unread {
+                background: #FFF8F2;
+            }
+
+            .notiIcon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #FEF3C7;
+                color: #D4A017;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            p {
+                margin: 0 0 4px 0;
+                color: #71717A;
+                font-size: 13px;
+            }
+
+            .notiTime {
+                font-size: 11px;
+                color: #A1A1AA;
+                font-weight: 500;
+            }
+        }
+
+        .notiFooter {
+            text-align: center;
+            padding: 16px;
+            font-weight: 700;
+            color: #D4A017;
+            cursor: pointer;
+            border-top: 1px solid rgba(212, 160, 23, 0.1);
+            transition: all 0.2s;
+
+            &:hover {
+                background: #FEF3C7;
             }
         }
     }
