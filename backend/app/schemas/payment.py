@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional
+from typing import List, Optional, Any
 from pydantic import BaseModel
 
 from app.models.payment import PaymentMethod, PaymentStatus
@@ -21,13 +21,18 @@ class PaymentUpdateStatusRequest(BaseModel):
 
 class PaymentResponse(BaseModel):
     id: uuid.UUID
-    appointment_id: uuid.UUID
+    appointment_id: Optional[uuid.UUID]
     owner_id: uuid.UUID
     amount: Decimal
     method: PaymentMethod
     status: PaymentStatus
     transaction_id: Optional[str]
     paid_at: Optional[datetime]
+    created_at: Optional[datetime] = None
+    
+    # Rich info
+    owner: Optional[Any] = None
+    appointment: Optional[Any] = None
 
     class Config:
         from_attributes = True
