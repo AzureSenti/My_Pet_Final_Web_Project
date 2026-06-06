@@ -17,6 +17,9 @@ from app.schemas.appointment import (
     AppointmentUpdateStatusRequest,
     AppointmentListResponse,
 )
+from app.services.payment_service import create_payment
+from app.schemas.payment import PaymentCreateRequest
+from app.models.payment import Payment
 
 
 def _base_query():
@@ -113,13 +116,29 @@ async def update_appointment_status(
     appointment_id: uuid.UUID,
     data: AppointmentUpdateStatusRequest,
 ) -> Appointment:
-    result = await db.execute(
-        select(Appointment).where(Appointment.id == appointment_id)
-    )
-    appointment = result.scalar_one_or_none()
+    appointment = await get_appointment_by_id(db, appointment_id)
     if not appointment:
         raise HTTPException(status_code=404, detail="Lịch hẹn không tồn tại")
+    
+    old_status = appointment.status
     appointment.status = data.status
+    
+    # Nếu chuyển sang 'completed' và chưa có payment thì tạo
+    if data.status == AppointmentStatus.completed and old_status != AppointmentStatus.completed:
+        # Kiểm tra xem đã có payment chưa
+        stmt = select(Payment).where(Payment.appointment_id == appointment_id)
+        result = await db.execute(stmt)
+        existing_payment = result.scalar_one_or_none()
+        
+        if not existing_payment and appointment.service:
+            payment_data = PaymentCreateRequest(
+                appointment_id=appointment.id,
+                owner_id=appointment.owner_id,
+                amount=appointment.service.price,
+                method="cash" # Mặc định là tiền mặt, có thể đổi sau
+            )
+            await create_payment(db, payment_data)
+            
     await db.flush()
     return await get_appointment_by_id(db, appointment_id)
 

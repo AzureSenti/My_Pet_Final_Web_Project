@@ -1,7 +1,7 @@
 import uuid
 import enum
 
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Numeric, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Numeric, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -45,6 +45,7 @@ class Payment(Base):
     )
     transaction_id = Column(String(255))
     paid_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     appointment = relationship("Appointment", backref="payment")
