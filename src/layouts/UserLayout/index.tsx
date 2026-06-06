@@ -21,7 +21,7 @@ const UserLayout: React.FC = ({ children }) => {
             <nav className={styles.navContainer}>
                 <div className={styles.logoWrap} onClick={() => history.push('/khach-hang/dashboard')}>
                     <div className={styles.logoIconWrapper}>
-                        <img src="https://cdn-icons-png.flaticon.com/512/3565/3565860.png" alt="PetCare Logo" className={styles.logoImage} />
+                        <PawPrint size={24} strokeWidth={2.5} />
                     </div>
                     <span>PetCare</span>
                 </div>
