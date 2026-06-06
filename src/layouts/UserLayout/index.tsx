@@ -1,4 +1,4 @@
-import { useModel, history, useLocation } from 'umi';
+import { history, useLocation } from 'umi';
 import { Home, PawPrint, Calendar, ClipboardList } from 'lucide-react';
 import HeaderProfile from '@/components/HeaderProfile';
 import styles from './style.less';

@@ -55,6 +55,21 @@ async def book_appointment(
     data.owner_id = current_user.id
     return await appointment_service.create_appointment(db, data)
 
+@router.delete("/appointments/{appointment_id}")
+async def cancel_my_appointment(
+    appointment_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Hủy lịch hẹn của tôi"""
+    app = await appointment_service.get_appointment(db, appointment_id)
+    if not app or str(app.owner_id) != str(current_user.id):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Bạn không có quyền hủy lịch hẹn này")
+    
+    await appointment_service.delete_appointment(db, appointment_id)
+    return {"detail": "Hủy lịch hẹn thành công"}
+
 @router.get("/medical-records", response_model=List[MedicalRecordResponse])
 async def get_my_pets_medical_records(
     current_user: User = Depends(get_current_user),
@@ -91,3 +106,37 @@ async def get_available_vets(
 ):
     """Danh sách bác sĩ thú y"""
     return await vet_service.list_vets(db, page, limit)
+
+@router.put("/pets/{pet_id}", response_model=PetAdminResponse)
+async def update_my_pet(
+    pet_id: uuid.UUID,
+    data: PetCreateRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Cập nhật thông tin thú cưng của tôi"""
+    # Kiểm tra quyền sở hữu
+    pet = await pet_admin_service.get_pet_detail(db, pet_id)
+    if not pet or str(pet.owner_id) != str(current_user.id):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Bạn không có quyền chỉnh sửa thú cưng này")
+    
+    # Đảm bảo vẫn giữ nguyên chủ sở hữu
+    data.owner_id = current_user.id
+    return await pet_admin_service.update_pet(db, pet_id, data)
+
+@router.delete("/pets/{pet_id}")
+async def delete_my_pet(
+    pet_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Xoá thú cưng của tôi"""
+    # Kiểm tra quyền sở hữu
+    pet = await pet_admin_service.get_pet_detail(db, pet_id)
+    if not pet or str(pet.owner_id) != str(current_user.id):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Bạn không có quyền xoá thú cưng này")
+    
+    await pet_admin_service.delete_pet(db, pet_id)
+    return {"detail": "Xoá thú cưng thành công"}

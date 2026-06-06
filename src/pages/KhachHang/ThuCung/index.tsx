@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, message, Empty, Tag, Card, Row, Col } from 'antd';
 import { history } from 'umi';
-import { Plus, Camera, Heart, ChevronRight, MoreHorizontal, Activity } from 'lucide-react';
-import { getMyPets, createMyPet, Pet } from '@/services/QuanLyPetStore';
+import { Plus, Camera, Heart, ChevronRight, MoreHorizontal, Activity, Upload as UploadIcon, Pencil, Trash2 } from 'lucide-react';
+import { Upload, Menu, Dropdown as AntDropdown, Modal as AntModal } from 'antd';
+import { getMyPets, createMyPet, Pet, uploadFile, updateMyPet, deleteMyPet } from '@/services/QuanLyPetStore';
+import { ip3 } from '@/utils/ip';
 import styles from './style.less';
 
 const MyPets: React.FC = () => {
     const [pets, setPets] = useState<Pet[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingPet, setEditingPet] = useState<Pet | null>(null);
+    const [imageUrl, setImageUrl] = useState<string>('');
+    const [uploading, setUploading] = useState(false);
     const [form] = Form.useForm();
 
     const fetchData = async () => {
@@ -24,12 +29,50 @@ const MyPets: React.FC = () => {
     }, []);
 
     const handleAddPet = async (values: any) => {
-        const success = await createMyPet({ ...values, avatar_url: values.imageUrl || '' });
+        const payload = { ...values, avatar_url: imageUrl || '' };
+        const success = editingPet
+            ? await updateMyPet(editingPet.id, payload)
+            : await createMyPet(payload);
+
         if (success) {
             setIsModalOpen(false);
+            setEditingPet(null);
+            setImageUrl('');
             form.resetFields();
             fetchData();
         }
+    };
+
+    const handleEdit = (pet: Pet) => {
+        setEditingPet(pet);
+        setImageUrl(pet.avatar_url || '');
+        form.setFieldsValue(pet);
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = (id: string) => {
+        AntModal.confirm({
+            title: 'Xác nhận xóa hồ sơ?',
+            content: 'Dữ liệu y khoa và lịch trình của bé cũng sẽ bị ảnh hưởng. Bạn chắc chắn chứ?',
+            okText: 'Xóa ngay',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                const res = await deleteMyPet(id);
+                if (res) fetchData();
+            }
+        });
+    };
+
+    const handleUpload = async (file: any) => {
+        setUploading(true);
+        const url = await uploadFile(file);
+        if (url) {
+            setImageUrl(url);
+            message.success('Tải ảnh thành công!');
+        }
+        setUploading(false);
+        return false; // Prevent default upload behavior
     };
 
     return (
@@ -59,12 +102,19 @@ const MyPets: React.FC = () => {
                                         <Tag className={`${styles.typeBadge} ${pet.species.toLowerCase() === 'chó' ? styles.dog : styles.cat}`}>
                                             {pet.species}
                                         </Tag>
-                                        <Button type="text" icon={<MoreHorizontal size={18} />} className={styles.moreBtn} />
+                                        <AntDropdown overlay={
+                                            <Menu>
+                                                <Menu.Item key="edit" onClick={() => handleEdit(pet)} icon={<Pencil size={14} />}>Chỉnh sửa</Menu.Item>
+                                                <Menu.Item key="delete" danger onClick={() => handleDelete(pet.id)} icon={<Trash2 size={14} />}>Xoá hồ sơ</Menu.Item>
+                                            </Menu>
+                                        } trigger={['click']}>
+                                            <Button type="text" icon={<MoreHorizontal size={18} />} className={styles.moreBtn} />
+                                        </AntDropdown>
                                     </div>
 
                                     <div className={styles.cardMain}>
                                         <div className={styles.avatarBox}>
-                                            <img src={pet.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400'} alt={pet.name} />
+                                            <img src={pet.avatar_url ? (pet.avatar_url.startsWith('http') ? pet.avatar_url : `${ip3}${pet.avatar_url.startsWith('/') ? pet.avatar_url.slice(1) : pet.avatar_url}`) : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400'} alt={pet.name} />
                                             <div className={styles.genderIcon}>
                                                 {pet.gender === 'male' ? '♂' : '♀'}
                                             </div>
@@ -136,9 +186,14 @@ const MyPets: React.FC = () => {
             </div>
 
             <Modal
-                title={<h3>Đăng ký thành viên mới 🐶🐱</h3>}
+                title={<h3>{editingPet ? 'Cập nhật thông tin bé 🔄' : 'Đăng ký thành viên mới 🐶🐱'}</h3>}
                 visible={isModalOpen}
-                onCancel={() => setIsModalOpen(false)}
+                onCancel={() => {
+                    setIsModalOpen(false);
+                    setEditingPet(null);
+                    setImageUrl('');
+                    form.resetFields();
+                }}
                 onOk={() => form.submit()}
                 className={styles.saasModal}
                 okText="Lưu hồ sơ"
@@ -171,8 +226,24 @@ const MyPets: React.FC = () => {
                     <Form.Item name="breed" label="Giống loài">
                         <Input size="large" placeholder="Poodle, Golden, Mèo Anh..." />
                     </Form.Item>
-                    <Form.Item name="imageUrl" label="Ảnh đại diện (URL)">
-                        <Input size="large" prefix={<Camera size={14} />} placeholder="Dán link ảnh tại đây..." />
+
+                    <Form.Item label="Ảnh đại diện">
+                        <Upload
+                            name="avatar"
+                            listType="picture-card"
+                            className={styles.avatarUploader}
+                            showUploadList={false}
+                            beforeUpload={handleUpload}
+                        >
+                            {imageUrl ? (
+                                <img src={imageUrl.startsWith('http') ? imageUrl : `${ip3}${imageUrl.startsWith('/') ? imageUrl.slice(1) : imageUrl}`} alt="avatar" style={{ width: '100%', borderRadius: '8px' }} />
+                            ) : (
+                                <div className={styles.uploadPlaceholder}>
+                                    {uploading ? <Activity className={styles.spin} /> : <Plus />}
+                                    <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+                                </div>
+                            )}
+                        </Upload>
                     </Form.Item>
                 </Form>
             </Modal>

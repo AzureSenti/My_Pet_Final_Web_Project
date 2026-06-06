@@ -6,17 +6,22 @@ import {
     ChevronRight,
     Plus,
     Stethoscope,
-    AlertCircle
+    AlertCircle,
+    MoreHorizontal,
+    Trash2
 } from 'lucide-react';
+import { Dropdown, Menu, Modal as AntModal } from 'antd';
 import {
     getMyAppointments,
     bookAppointment,
     getMyPets,
     getOwnerVets,
     getOwnerServices,
+    cancelMyAppointment,
     Pet,
     Service
 } from '@/services/QuanLyPetStore';
+import { ip3 } from '@/utils/ip';
 import styles from './style.less';
 
 const MyAppointments: React.FC = () => {
@@ -61,6 +66,20 @@ const MyAppointments: React.FC = () => {
         }
     };
 
+    const handleCancel = (id: string) => {
+        AntModal.confirm({
+            title: 'Xác nhận hủy lịch hẹn?',
+            content: 'Bạn có chắc chắn muốn hủy cuộc hẹn này không?',
+            okText: 'Xác nhận hủy',
+            okType: 'danger',
+            cancelText: 'Quay lại',
+            onOk: async () => {
+                const res = await cancelMyAppointment(id);
+                if (res) fetchData();
+            }
+        });
+    };
+
     return (
         <div className={styles.saasAppointmentsPage}>
             <header className={styles.header}>
@@ -87,7 +106,7 @@ const MyAppointments: React.FC = () => {
                                 <div key={app.id} className={styles.horizontalCard}>
                                     <div className={styles.cardLeft}>
                                         <div className={styles.avatarWrap}>
-                                            <img src={app.pet?.avatar_url || (app.pet?.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150&h=150&fit=crop' : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop')} alt={app.pet?.name} />
+                                            <img src={app.pet?.avatar_url ? (app.pet.avatar_url.startsWith('http') ? app.pet.avatar_url : `${ip3}${app.pet.avatar_url.startsWith('/') ? app.pet.avatar_url.slice(1) : app.pet.avatar_url}`) : (app.pet?.species === 'Mèo' ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150&h=150&fit=crop' : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop')} alt={app.pet?.name} />
                                         </div>
                                         <div className={styles.infoContent}>
                                             <div className={styles.tagsRow}>
@@ -112,6 +131,15 @@ const MyAppointments: React.FC = () => {
                                                 <div className={styles.iconCircle}>🕒</div> Đang chờ
                                             </div>
                                         )}
+                                        <Dropdown overlay={
+                                            <Menu>
+                                                <Menu.Item key="cancel" danger icon={<Trash2 size={14} />} onClick={() => handleCancel(app.id)}>
+                                                    Hủy lịch hẹn
+                                                </Menu.Item>
+                                            </Menu>
+                                        } trigger={['click']}>
+                                            <Button type="text" icon={<MoreHorizontal size={18} />} className={styles.moreBtn} />
+                                        </Dropdown>
                                     </div>
                                 </div>
                             );
@@ -181,7 +209,7 @@ const MyAppointments: React.FC = () => {
                             {pets.map(pet => (
                                 <Select.Option key={pet.id} value={pet.id}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <Avatar size="small" src={pet.avatar_url} /> {pet.name}
+                                        <Avatar size="small" src={pet.avatar_url ? (pet.avatar_url.startsWith('http') ? pet.avatar_url : `${ip3}${pet.avatar_url.startsWith('/') ? pet.avatar_url.slice(1) : pet.avatar_url}`) : undefined} /> {pet.name}
                                     </div>
                                 </Select.Option>
                             ))}
