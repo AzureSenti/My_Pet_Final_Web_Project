@@ -25,7 +25,7 @@ class Settings(BaseSettings):
         from urllib.parse import quote_plus
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USER}:{quote_plus(self.POSTGRES_PASSWORD)}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}?prepared_statement_cache_size=0"
         )
 
     @property
