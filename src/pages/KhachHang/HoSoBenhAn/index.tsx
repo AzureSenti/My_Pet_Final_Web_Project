@@ -11,6 +11,7 @@ import {
     MessageCircle
 } from 'lucide-react';
 import { getMyMedicalRecords, Pet, getMyPets } from '@/services/QuanLyPetStore';
+import { ip3 } from '@/utils/ip';
 import styles from './style.less';
 
 const UserHoSoBenhAn: React.FC = () => {
@@ -60,7 +61,7 @@ const UserHoSoBenhAn: React.FC = () => {
                         {pets.map(pet => (
                             <Select.Option key={pet.id} value={pet.id}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <Avatar size="small" src={pet.avatar_url} /> {pet.name}
+                                    <Avatar size="small" src={pet.avatar_url ? (pet.avatar_url.startsWith('http') ? pet.avatar_url : `${ip3}${pet.avatar_url.startsWith('/') ? pet.avatar_url.slice(1) : pet.avatar_url}`) : undefined} /> {pet.name}
                                 </div>
                             </Select.Option>
                         ))}
@@ -165,23 +166,23 @@ const UserHoSoBenhAn: React.FC = () => {
                         Vui lòng nhập câu hỏi hoặc thắc mắc của bạn về bệnh án. Bác sĩ phụ trách sẽ xem xét và phản hồi cho bạn qua Số điện thoại hoặc Email trong thời gian sớm nhất.
                     </p>
                 </div>
-                <Form 
-                    form={form} 
-                    layout="vertical" 
+                <Form
+                    form={form}
+                    layout="vertical"
                     onFinish={() => {
                         setIsConsultModalOpen(false);
                         form.resetFields();
                         message.success('Yêu cầu tư vấn đã được gửi thành công! Bác sĩ sẽ sớm liên hệ với bạn.');
                     }}
                 >
-                    <Form.Item 
-                        name="question" 
-                        label="Câu hỏi của bạn" 
+                    <Form.Item
+                        name="question"
+                        label="Câu hỏi của bạn"
                         rules={[{ required: true, message: 'Vui lòng nhập câu hỏi!' }]}
                     >
-                        <Input.TextArea 
-                            rows={4} 
-                            placeholder="Ví dụ: Bác sĩ cho em hỏi thức ăn nào tốt cho bé sau khi mổ ạ?" 
+                        <Input.TextArea
+                            rows={4}
+                            placeholder="Ví dụ: Bác sĩ cho em hỏi thức ăn nào tốt cho bé sau khi mổ ạ?"
                             size="large"
                         />
                     </Form.Item>

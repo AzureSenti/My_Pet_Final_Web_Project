@@ -452,3 +452,46 @@
         }
     }
 }
+.avatarUploader {
+    :global {
+        .ant-upload.ant-upload-select-picture-card {
+            width: 140px;
+            height: 140px;
+            border-radius: 24px;
+            background: white !important;
+            border: 2px dashed rgba(212, 160, 23, 0.2) !important;
+            margin: 0 auto;
+            overflow: hidden;
+            transition: all 0.3s;
+
+            &:hover {
+                border-color: #D4A017 !important;
+                background: #FFF8F2 !important;
+            }
+        }
+    }
+}
+
+.uploadPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: @text-body;
+    font-weight: 700;
+    font-size: 13px;
+
+    svg {
+        margin-bottom: 8px;
+        color: #D4A017;
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
