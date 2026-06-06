@@ -20,7 +20,7 @@ class PetCreateRequest(BaseModel):
     date_of_birth: Optional[date] = None
     gender: str
     avatar_url: Optional[str] = None
-    owner_id: uuid.UUID
+    owner_id: Optional[uuid.UUID] = None
 
 # Schema chi tiết thú cưng
 class PetAdminResponse(BaseModel):

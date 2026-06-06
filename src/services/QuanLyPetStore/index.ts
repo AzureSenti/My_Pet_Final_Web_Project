@@ -387,3 +387,25 @@ export const getMyMedicalRecords = async (): Promise<any[]> => {
 	const res = await axios.get(`${ip3}api/v1/owner/medical-records`);
 	return res.data;
 };
+
+export const getMyPayments = async (): Promise<Payment[]> => {
+	const res = await axios.get(`${ip3}api/v1/owner/payments`);
+	return res.data;
+};
+
+export const getOwnerServices = async (): Promise<Service[]> => {
+	const res = await axios.get(`${ip3}api/v1/owner/services`, { params: { limit: 100 } });
+	return res.data.items;
+};
+
+export const getOwnerVets = async (): Promise<any[]> => {
+	const res = await axios.get(`${ip3}api/v1/owner/vets`, { params: { limit: 100 } });
+	return res.data.items.map((v: any) => ({
+		...v.user,
+		vet_id: v.id,
+		specialization: v.specialization,
+		bio: v.bio,
+		certificate_url: v.certificate_url,
+		is_active: v.is_active
+	}));
+};

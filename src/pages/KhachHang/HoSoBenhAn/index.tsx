@@ -81,21 +81,21 @@ const UserHoSoBenhAn: React.FC = () => {
                                 {filteredRecords.map(record => (
                                     <Timeline.Item
                                         key={record.id}
-                                        label={<span className={styles.timeLabel}>{new Date(record.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>}
+                                        label={<span className={styles.timeLabel}>{new Date(record.recorded_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>}
                                         dot={<div className={styles.activeDot} />}
                                     >
                                         <Card className={styles.recordCard} bordered={false}>
                                             <div className={styles.cardTop}>
                                                 <div className={styles.dateInfo}>
                                                     <Calendar size={14} />
-                                                    {new Date(record.created_at).toLocaleDateString('vi-VN')}
+                                                    {new Date(record.recorded_at).toLocaleDateString('vi-VN')}
                                                 </div>
                                                 <Tag color="#D4A017" className={styles.diagTag}>CHẨN ĐOÁN</Tag>
                                             </div>
                                             <h3>{record.diagnosis}</h3>
                                             <div className={styles.doctorInfo}>
                                                 <Stethoscope size={16} />
-                                                <span>BS. <strong>{record.vet_name || 'Hệ thống'}</strong></span>
+                                                <span>BS. <strong>{record.vet?.user?.full_name || 'Hệ thống'}</strong></span>
                                             </div>
                                             <div className={styles.treatment}>
                                                 <FileText size={16} />
@@ -134,7 +134,7 @@ const UserHoSoBenhAn: React.FC = () => {
                             </div>
                             <div className={styles.metric}>
                                 <span>Lần cuối khám</span>
-                                <strong>{filteredRecords[0] ? new Date(filteredRecords[0].created_at).toLocaleDateString('vi-VN') : 'N/A'}</strong>
+                                <strong>{filteredRecords[0] ? new Date(filteredRecords[0].recorded_at).toLocaleDateString('vi-VN') : 'N/A'}</strong>
                             </div>
                         </div>
                         <div className={styles.actionBox}>
