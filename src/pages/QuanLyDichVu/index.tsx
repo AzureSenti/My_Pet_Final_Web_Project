@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Form, Input, InputNumber, Switch, message, Popconfirm } from 'antd';
+import { Modal, Form, Input, InputNumber, Switch, message, Popconfirm } from 'antd';
 import {
     Search,
     Plus,
-    Zap,
-    Settings,
-    Activity,
-    Clock,
-    DollarSign,
+    ListTodo,
+    CheckCircle2,
+    Tag,
     Edit2,
     Trash2,
-    CheckCircle2,
-    XCircle
+    Activity
 } from 'lucide-react';
 import HeaderProfile from '@/components/HeaderProfile';
 import {
@@ -30,12 +27,15 @@ const ServiceManagement: React.FC = () => {
     const [editingService, setEditingService] = useState<Service | null>(null);
     const [form] = Form.useForm();
     const [searchQuery, setSearchQuery] = useState('');
+    const [activeTab, setActiveTab] = useState('Tất cả');
+
+    const tabs = ['Tất cả', 'Khám bệnh', 'Spa & Grooming', 'Phẫu thuật'];
 
     const fetchData = async () => {
         setLoading(true);
         try {
             const data = await getServices();
-            setServices(data);
+            setServices(data || []);
         } catch (error) {
             message.error('Không thể tải danh sách dịch vụ');
         } finally {
@@ -54,7 +54,7 @@ const ServiceManagement: React.FC = () => {
         } else {
             setEditingService(null);
             form.resetFields();
-            form.setFieldsValue({ is_active: true });
+            form.setFieldsValue({ is_active: true, duration_minutes: 30 });
         }
         setIsModalOpen(true);
     };
@@ -82,86 +82,50 @@ const ServiceManagement: React.FC = () => {
         }
     };
 
-    const columns = [
-        {
-            title: 'Dịch vụ',
-            key: 'service',
-            render: (_: any, record: Service) => (
-                <div className="cell-service-info">
-                    <div className="icon-wrapper">
-                        <Activity size={20} />
-                    </div>
-                    <div className="name-box">
-                        <span className="name">{record.name}</span>
-                        <span className="desc">{record.description || 'Không có mô tả'}</span>
-                    </div>
-                </div>
-            )
-        },
-        {
-            title: 'Giá dịch vụ',
-            dataIndex: 'price',
-            key: 'price',
-            render: (price: number) => (
-                <span className="cell-price">
-                    {price.toLocaleString('vi-VN')} VND
-                </span>
-            )
-        },
-        {
-            title: 'Thời lượng',
-            dataIndex: 'duration_minutes',
-            key: 'duration',
-            render: (minutes: number) => (
-                <div className="cell-duration">
-                    <Clock size={16} />
-                    <span>{minutes} phút</span>
-                </div>
-            )
-        },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'is_active',
-            key: 'status',
-            render: (active: boolean) => (
-                <div className={`cell-status ${active ? 'active' : 'inactive'}`}>
-                    {active ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                    <span>{active ? 'Hoạt động' : 'Tạm ngưng'}</span>
-                </div>
-            )
-        },
-        {
-            title: 'Thao tác',
-            key: 'actions',
-            width: 120,
-            render: (_: any, record: Service) => (
-                <div className="cell-actions">
-                    <button className="action-btn" onClick={() => handleOpenModal(record)}>
-                        <Edit2 size={16} />
-                    </button>
-                    <Popconfirm
-                        title="Xoá dịch vụ này? Hành động này không thể hoàn tác."
-                        onConfirm={() => handleDelete(record.id)}
-                        okText="Xoá"
-                        cancelText="Hủy"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <button className="action-btn delete">
-                            <Trash2 size={16} />
-                        </button>
-                    </Popconfirm>
-                </div>
-            )
+    const calculateAvgPrice = () => {
+        if (!services || services.length === 0) return '0 VND';
+        let total = 0;
+        let validCount = 0;
+        services.forEach(s => {
+            const p = parseFloat(s.price as any);
+            if (!isNaN(p)) {
+                total += p;
+                validCount++;
+            }
+        });
+        if (validCount === 0) return '0 VND';
+        const avg = total / validCount;
+        if (avg >= 1000000) {
+            return `${(avg / 1000000).toFixed(1)}m VND`;
         }
-    ];
+        if (avg >= 1000) {
+            return `${Math.round(avg / 1000)}k VND`;
+        }
+        return `${Math.round(avg)} VND`;
+    };
 
-    const filteredServices = services.filter(s =>
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const activeCount = services.filter(s => s.is_active).length;
+    const activePercent = services.length > 0 ? Math.round((activeCount / services.length) * 100) : 0;
+
+    const filteredServices = services.filter(s => {
+        const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (s.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+        let matchesTab = true;
+        const nameLower = s.name.toLowerCase();
+        if (activeTab === 'Khám bệnh') {
+            matchesTab = nameLower.includes('khám') || nameLower.includes('tiêm') || nameLower.includes('xét nghiệm') || nameLower.includes('vaccine');
+        } else if (activeTab === 'Spa & Grooming') {
+            matchesTab = nameLower.includes('spa') || nameLower.includes('tỉa') || nameLower.includes('tắm') || nameLower.includes('lông');
+        } else if (activeTab === 'Phẫu thuật') {
+            matchesTab = nameLower.includes('phẫu thuật') || nameLower.includes('triệt sản') || nameLower.includes('mổ');
+        }
+
+        return matchesSearch && matchesTab;
+    });
 
     return (
-        <div className="service-management-container petcare-dashboard">
+        <div className="clinic-service-wrapper">
             {/* Top Bar */}
             <div className="pc-header">
                 <div className="pc-header-left" />
@@ -181,143 +145,195 @@ const ServiceManagement: React.FC = () => {
                 </div>
             </div>
 
-            <div className="sm-page-content">
-                {/* Page Header */}
-                <div className="sm-header-row">
-                    <div className="sm-title-left">
-                        <div className="sm-title-icon">
-                            <Settings size={22} strokeWidth={2.5} />
-                        </div>
-                        <div>
-                            <h1>Quản lý dịch vụ</h1>
-                            <p className="sm-subtitle">
-                                Thiết lập danh mục dịch vụ khám chữa bệnh, spa và bảng giá dành cho phòng khám.
-                            </p>
-                        </div>
+            <div className="clinic-service-container">
+                {/* Header */}
+                <div className="cs-header">
+                    <div className="cs-header-left">
+                        <h1>Quản lý dịch vụ</h1>
+                        <p>Danh mục khám chữa bệnh và chăm sóc thú cưng</p>
                     </div>
-                    <div className="sm-header-actions">
-                        <button className="sm-add-btn" onClick={() => handleOpenModal()}>
-                            <Plus size={18} strokeWidth={2.5} /> Thêm dịch vụ mới
-                        </button>
-                    </div>
+                    <button className="cs-add-btn" onClick={() => handleOpenModal()}>
+                        <Plus size={18} strokeWidth={2.5} />
+                        Thêm Dịch Vụ Mới
+                    </button>
                 </div>
 
                 {/* Metrics Grid */}
-                <div className="sm-metrics-grid">
-                    <div className="sm-metric-card blue">
-                        <div className="icon-box"><Zap size={24} /></div>
-                        <div className="content">
-                            <div className="label">Tổng dịch vụ</div>
+                <div className="cs-metrics-grid">
+                    <div className="cs-metric-card">
+                        <div className="icon-wrapper orange">
+                            <ListTodo size={24} />
+                        </div>
+                        <div className="info">
+                            <div className="label">Tổng số dịch vụ</div>
                             <div className="value">{services.length}</div>
                         </div>
                     </div>
-                    <div className="sm-metric-card green">
-                        <div className="icon-box"><CheckCircle2 size={24} /></div>
-                        <div className="content">
-                            <div className="label">Đang hoạt động</div>
-                            <div className="value">{services.filter(s => s.is_active).length}</div>
+                    <div className="cs-metric-card">
+                        <div className="icon-wrapper teal">
+                            <CheckCircle2 size={24} />
                         </div>
-                    </div>
-                    <div className="sm-metric-card yellow">
-                        <div className="icon-box"><DollarSign size={24} /></div>
-                        <div className="content">
-                            <div className="label">Giá trung bình</div>
-                            <div className="value">
-                                {services.length > 0
-                                    ? Math.round(services.reduce((acc, s) => acc + s.price, 0) / services.length).toLocaleString('vi-VN')
-                                    : 0} VND
+                        <div className="info">
+                            <div className="label">Đang hoạt động</div>
+                            <div className="value-wrap">
+                                <div className="value">{activeCount}</div>
+                                {services.length > 0 && <span className="badge teal">{activePercent}%</span>}
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Data Table */}
-                <div className="sm-table-container">
-                    <Table
-                        columns={columns}
-                        dataSource={filteredServices}
-                        pagination={false}
-                        rowKey="id"
-                        loading={loading}
-                    />
-                </div>
-            </div>
-
-            {/* Create/Edit Modal */}
-            <Modal
-                title={<h3>{editingService ? 'Chỉnh sửa dịch vụ 🛠️' : 'Thêm dịch vụ mới ✨'}</h3>}
-                visible={isModalOpen}
-                onCancel={() => setIsModalOpen(false)}
-                onOk={() => form.submit()}
-                okText="Lưu thông tin"
-                cancelText="Hủy"
-                destroyOnClose
-                width={560}
-            >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleSubmit}
-                    initialValues={{ is_active: true, duration_minutes: 30 }}
-                >
-                    <Form.Item
-                        name="name"
-                        label="Tên dịch vụ"
-                        rules={[{ required: true, message: 'Vui lòng nhập tên dịch vụ!' }]}
-                    >
-                        <Input prefix={<Zap size={16} color="#A3865A" />} placeholder="Ví dụ: Tiêm phòng vắc-xin 5 bệnh" />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="description"
-                        label="Mô tả chi tiết"
-                    >
-                        <Input.TextArea
-                            rows={3}
-                            placeholder="Mô tả ngắn gọn về dịch vụ và các bước thực hiện..."
-                        />
-                    </Form.Item>
-
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <Form.Item
-                            name="price"
-                            label="Đơn giá (VND)"
-                            style={{ flex: 1 }}
-                            rules={[{ required: true, message: 'Vui lòng nhập giá!' }]}
-                        >
-                            <InputNumber
-                                style={{ width: '100%' }}
-                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value: any) => value?.replace(/\$\s?|(,*)/g, '')}
-                                min={0}
-                                step={10000}
-                                placeholder="0"
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            name="duration_minutes"
-                            label="Thời lượng (Phút)"
-                            style={{ flex: 1 }}
-                            rules={[{ required: true, message: 'Vui lòng nhập thời lượng!' }]}
-                        >
-                            <InputNumber
-                                style={{ width: '100%' }}
-                                min={5}
-                                step={5}
-                                placeholder="30"
-                            />
-                        </Form.Item>
+                    <div className="cs-metric-card">
+                        <div className="icon-wrapper purple">
+                            <Tag size={24} />
+                        </div>
+                        <div className="info">
+                            <div className="label">Giá trung bình</div>
+                            <div className="value">{calculateAvgPrice()}</div>
+                        </div>
                     </div>
+                </div>
 
-                    <Form.Item
-                        name="is_active"
-                        label="Trạng thái hoạt động"
-                        valuePropName="checked"
+                {/* Filter Tabs */}
+                <div className="cs-toolbar">
+                    <div className="cs-tabs">
+                        {tabs.map(tab => (
+                            <button
+                                key={tab}
+                                className={`cs-tab ${activeTab === tab ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab)}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* List of Services */}
+                <div className="cs-list">
+                    {loading ? (
+                        <div className="loading-state">Đang tải dữ liệu...</div>
+                    ) : filteredServices.length > 0 ? (
+                        filteredServices.map(service => (
+                            <div key={service.id} className="cs-list-item">
+                                <div className="item-icon">
+                                    <Activity size={20} />
+                                </div>
+                                <div className="item-details">
+                                    <h4 className="item-name">{service.name}</h4>
+                                    <p className="item-desc">{service.description || 'Không có mô tả chi tiết'}</p>
+                                </div>
+                                <div className="item-price">
+                                    {parseFloat(service.price as any).toLocaleString('vi-VN')} đ
+                                </div>
+                                <div className="item-status">
+                                    {service.is_active ? (
+                                        <span className="status-pill active">Hoạt động</span>
+                                    ) : (
+                                        <span className="status-pill inactive">Tạm ngưng</span>
+                                    )}
+                                </div>
+                                <div className="item-actions">
+                                    <button className="action-btn edit" onClick={() => handleOpenModal(service)}>
+                                        <Edit2 size={16} />
+                                    </button>
+                                    <Popconfirm
+                                        title="Xoá dịch vụ này?"
+                                        onConfirm={() => handleDelete(service.id)}
+                                        okText="Xoá"
+                                        cancelText="Hủy"
+                                        okButtonProps={{ danger: true }}
+                                    >
+                                        <button className="action-btn delete">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </Popconfirm>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="empty-state">
+                            Không tìm thấy dịch vụ nào phù hợp.
+                        </div>
+                    )}
+                </div>
+
+                {/* Modal */}
+                <Modal
+                    title={<h3 style={{ margin: 0, fontWeight: 700, fontSize: 18 }}>{editingService ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới'}</h3>}
+                    visible={isModalOpen}
+                    onCancel={() => setIsModalOpen(false)}
+                    onOk={() => form.submit()}
+                    okText="Lưu thông tin"
+                    cancelText="Hủy"
+                    destroyOnClose
+                    width={500}
+                    className="cs-modal"
+                >
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={handleSubmit}
+                        initialValues={{ is_active: true, duration_minutes: 30 }}
+                        style={{ marginTop: 24 }}
                     >
-                        <Switch checkedChildren="Hoạt động" unCheckedChildren="Tạm ngưng" />
-                    </Form.Item>
-                </Form>
-            </Modal>
+                        <Form.Item
+                            name="name"
+                            label="Tên dịch vụ"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên dịch vụ!' }]}
+                        >
+                            <Input placeholder="Nhập tên dịch vụ" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="description"
+                            label="Mô tả chi tiết"
+                        >
+                            <Input.TextArea
+                                rows={3}
+                                placeholder="Mô tả về dịch vụ..."
+                            />
+                        </Form.Item>
+
+                        <div style={{ display: 'flex', gap: '16px' }}>
+                            <Form.Item
+                                name="price"
+                                label="Đơn giá (VND)"
+                                style={{ flex: 1 }}
+                                rules={[{ required: true, message: 'Vui lòng nhập giá!' }]}
+                            >
+                                <InputNumber
+                                    style={{ width: '100%' }}
+                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                    parser={(value: any) => value?.replace(/\$\s?|(,*)/g, '')}
+                                    min={0}
+                                    step={10000}
+                                    placeholder="0"
+                                />
+                            </Form.Item>
+                            <Form.Item
+                                name="duration_minutes"
+                                label="Thời lượng (Phút)"
+                                style={{ flex: 1 }}
+                                rules={[{ required: true, message: 'Vui lòng nhập thời lượng!' }]}
+                            >
+                                <InputNumber
+                                    style={{ width: '100%' }}
+                                    min={5}
+                                    step={5}
+                                    placeholder="30"
+                                />
+                            </Form.Item>
+                        </div>
+
+                        <Form.Item
+                            name="is_active"
+                            label="Trạng thái hoạt động"
+                            valuePropName="checked"
+                        >
+                            <Switch checkedChildren="Hoạt động" unCheckedChildren="Tạm ngưng" />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
         </div>
     );
 };

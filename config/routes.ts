@@ -122,13 +122,13 @@ export default [
 		path: '/quan-ly-dich-vu',
 		name: 'Quản lý dịch vụ',
 		component: './QuanLyDichVu',
-		icon: 'SettingOutlined',
+		icon: 'AppstoreOutlined',
 	},
 	{
 		path: '/quan-ly-thanh-toan',
 		name: 'Quản lý thanh toán',
 		component: './QuanLyThanhToan',
-		icon: 'DollarOutlined',
+		icon: 'CreditCardOutlined',
 	},
 	{
 		path: '/profile',
