@@ -1,0 +1,209 @@
+@import '../../../styles/theme.less';
+
+.loginPage {
+    min-height: 100vh;
+    background: @bg-page;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+
+    .formSection {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 10%;
+        background: white;
+        z-index: 2;
+
+        .backHome {
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: @text-secondary;
+            font-weight: 600;
+            cursor: pointer;
+            transition: @transition-smooth;
+
+            &:hover {
+                color: @primary;
+            }
+        }
+
+        .header {
+            margin-bottom: 40px;
+
+            .logoBox {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 24px;
+
+                .icon {
+                    width: 48px;
+                    height: 48px;
+                    background: @text-main;
+                    color: white;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: @shadow-md;
+                }
+
+                span {
+                    font-size: 24px;
+                    font-weight: 800;
+                    letter-spacing: -1px;
+                }
+            }
+
+            h1 {
+                font-size: 32px;
+                font-weight: 800;
+                color: @text-main;
+                margin-bottom: 12px;
+                letter-spacing: -0.5px;
+            }
+
+            p {
+                color: @text-secondary;
+                font-size: 16px;
+            }
+        }
+
+        .tabsWrapper {
+            :global {
+                .ant-tabs-nav {
+                    &::before {
+                        border-bottom: 1px solid @border-soft;
+                    }
+
+                    .ant-tabs-tab {
+                        font-weight: 700;
+                        padding: 12px 24px;
+                        color: @text-muted;
+
+                        &.ant-tabs-tab-active .ant-tabs-tab-btn {
+                            color: @text-main;
+                        }
+                    }
+
+                    .ant-tabs-ink-bar {
+                        background: @primary;
+                        height: 3px;
+                    }
+                }
+            }
+        }
+    }
+
+    .visualSection {
+        flex: 1.2;
+        position: relative;
+        background: @text-main;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        @media (max-width: 1024px) {
+            display: none;
+        }
+
+        .curveOverlay {
+            position: absolute;
+            left: -1px;
+            top: 0;
+            bottom: 0;
+            width: 120px;
+            z-index: 10;
+            fill: white;
+            pointer-events: none;
+        }
+
+        .bgImage {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            filter: grayscale(20%);
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(212, 160, 23, 0.2) 0%, rgba(29, 27, 26, 0.8) 100%);
+        }
+
+        .floatingContainer {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            padding: 80px;
+
+            .quoteBox {
+                max-width: 450px;
+
+                h2 {
+                    color: white;
+                    font-size: 42px;
+                    font-weight: 800;
+                    line-height: 1.1;
+                    margin-bottom: 24px;
+
+                    span {
+                        color: @primary;
+                    }
+                }
+
+                p {
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 18px;
+                    line-height: 1.6;
+                }
+            }
+
+            .reviewCard {
+                position: absolute;
+                bottom: 100px;
+                right: 80px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 24px;
+                border-radius: 24px;
+                display: flex;
+                gap: 16px;
+                max-width: 380px;
+
+                .userAvatar {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 12px;
+                    border: 2px solid @primary;
+                }
+
+                .reviewContent {
+                    p {
+                        color: white;
+                        font-size: 15px;
+                        font-weight: 600;
+                        font-style: italic;
+                        margin-bottom: 8px;
+                    }
+
+                    .author {
+                        color: @primary;
+                        font-weight: 800;
+                        font-size: 13px;
+                    }
+                }
+            }
+        }
+    }
+}

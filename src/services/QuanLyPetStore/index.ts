@@ -350,3 +350,40 @@ export const updateProfile = async (data: { full_name?: string; phone?: string; 
 		return false;
 	}
 };
+
+// --- OWNER PORTAL SERVICES ---
+
+export const getMyPets = async (): Promise<Pet[]> => {
+	const res = await axios.get(`${ip3}api/v1/owner/pets`);
+	return res.data;
+};
+
+export const createMyPet = async (data: any): Promise<boolean> => {
+	try {
+		await axios.post(`${ip3}api/v1/owner/pets`, data);
+		message.success('Đăng ký thú cưng thành công! 🐾');
+		return true;
+	} catch (error) {
+		return false;
+	}
+};
+
+export const getMyAppointments = async (): Promise<Appointment[]> => {
+	const res = await axios.get(`${ip3}api/v1/owner/appointments`);
+	return res.data;
+};
+
+export const bookAppointment = async (data: any): Promise<boolean> => {
+	try {
+		await axios.post(`${ip3}api/v1/owner/appointments`, data);
+		message.success('Đặt lịch hẹn thành công! 📅');
+		return true;
+	} catch (error) {
+		return false;
+	}
+};
+
+export const getMyMedicalRecords = async (): Promise<any[]> => {
+	const res = await axios.get(`${ip3}api/v1/owner/medical-records`);
+	return res.data;
+};

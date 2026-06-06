@@ -49,3 +49,15 @@ async def get_record_by_id(db: AsyncSession, record_id: uuid.UUID) -> MedicalRec
     if not record:
         raise HTTPException(status_code=404, detail="Hồ sơ bệnh án không tồn tại")
     return record
+
+
+async def list_records_by_owner(db: AsyncSession, owner_id: uuid.UUID) -> list[MedicalRecord]:
+    """Lấy toàn bộ bệnh án thuộc về các pet của một owner"""
+    from app.models.pet import Pet
+    result = await db.execute(
+        select(MedicalRecord)
+        .join(Pet, MedicalRecord.pet_id == Pet.id)
+        .where(Pet.owner_id == owner_id)
+        .order_by(MedicalRecord.recorded_at.desc())
+    )
+    return list(result.scalars().all())
