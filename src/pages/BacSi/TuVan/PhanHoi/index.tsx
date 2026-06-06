@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { history, Link, useLocation, useModel } from 'umi';
+import { history, useLocation, useModel } from 'umi';
 import { Spin, message as antMessage } from 'antd';
 import {
-  ArrowLeftOutlined, EditOutlined,
-  BoldOutlined, ItalicOutlined, UnorderedListOutlined,
-  PaperClipOutlined, PictureOutlined, LinkOutlined,
-  SendOutlined
-} from '@ant-design/icons';
+  Quote, Edit3, Send, Paperclip, Image, Link as LinkIcon,
+  Bold, Italic, List, ListOrdered
+} from 'lucide-react';
 import {
   getConversationDetail,
   getConversationMessages,
   sendMessage,
-} from '@/services/messageService/index';
+} from '@/services/messageService';
 import styles from './index.module.less';
 
 const PhanHoi: React.FC = () => {
@@ -80,6 +78,15 @@ const PhanHoi: React.FC = () => {
     return participants.find((p: any) => p.id !== currentUserId) || participants[0];
   };
 
+  const formatTime = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+    const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    return isToday ? `Hôm nay, ${timeStr}` : `${date.toLocaleDateString('vi-VN')} ${timeStr}`;
+  };
+
   if (loading) {
     return (
       <div className={styles.page} style={{ display: 'flex', justifyContent: 'center', padding: '100px' }}>
@@ -89,6 +96,7 @@ const PhanHoi: React.FC = () => {
   }
 
   const other = getOtherParticipant();
+  const avatarLetter = (other?.full_name || 'K')[0].toUpperCase();
 
   // Tách tin nhắn: tin nhắn từ khách (không phải mình) vs tin nhắn mình gửi
   const customerMessages = messages.filter((m) => m.sender?.id !== currentUserId);
@@ -98,73 +106,63 @@ const PhanHoi: React.FC = () => {
 
   return (
     <div className={styles.page}>
-      <div className={styles.breadcrumb}>
-        <Link to="/bac-si/tu-van">Tư vấn trực tuyến</Link> {'>'} Phản hồi tư vấn
-      </div>
-
+      
+      {/* Header */}
       <div className={styles.pageHeader}>
+        <div className={styles.titleGroup}>
+          <h1 className={styles.title}>Chi tiết tư vấn</h1>
+          <p className={styles.subtitle}>Manage and respond to customer inquiries.</p>
+        </div>
         <button className={styles.btnBack} onClick={() => history.push('/bac-si/tu-van')}>
-          <ArrowLeftOutlined />
+          ← Back to List
         </button>
-        <h1 className={styles.title}>
-          Cuộc trò chuyện với {other?.full_name || 'Người dùng'}
-        </h1>
       </div>
 
       <div className={styles.gridContainer}>
         {/* Left Column: Messages History */}
         <div className={styles.leftCol}>
           <div className={styles.card}>
-            <div className={styles.patientHeader}>
-              <div className={styles.patientInfo}>
-                <div className={styles.petIcon}>🐾</div>
-                <div>
-                  <div className={styles.petName}>{other?.full_name || 'Người dùng'}</div>
-                  <div className={styles.ownerName}>{other?.email}</div>
-                </div>
+            
+            <div className={styles.customerInfo}>
+              <div className={styles.avatar}>{avatarLetter}</div>
+              <div className={styles.infoText}>
+                <div className={styles.name}>{other?.full_name || 'Khách hàng'}</div>
+                <div className={styles.badge}>Khách hàng</div>
               </div>
-              {customerMessages.length > 0 && (
-                <div className={styles.tagNew}>
-                  {customerMessages.length} tin nhắn
+            </div>
+
+            <div className={styles.messageSection}>
+              <div className={styles.label}>TIN NHẮN CỦA KHÁCH</div>
+              
+              {firstQuestion ? (
+                <div className={styles.bubble}>
+                  <Quote size={20} className={styles.quoteIcon} />
+                  <div>
+                    {firstQuestion.content || (firstQuestion.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
+                  </div>
+                  <div className={styles.time}>{formatTime(firstQuestion.created_at)}</div>
                 </div>
+              ) : (
+                <div style={{ fontStyle: 'italic', color: '#999', fontSize: 13 }}>Khách hàng chưa gửi tin nhắn nào.</div>
               )}
             </div>
 
-            {firstQuestion && (
-              <>
-                <div className={styles.timeInfo}>
-                  🕒 Gửi lúc: {new Date(firstQuestion.created_at).toLocaleString('vi-VN')}
-                </div>
-                <div className={styles.quoteBox}>
-                  {firstQuestion.content || '(Hình ảnh / tệp đính kèm)'}
-                </div>
-              </>
-            )}
-
-            {/* All messages */}
+            {/* All remaining messages (History) */}
             {messages.length > 1 && (
-              <div style={{ marginTop: '16px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#706F6C', marginBottom: '8px', textTransform: 'uppercase' }}>
-                  Lịch sử tin nhắn ({messages.length})
-                </div>
-                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              <div className={styles.historySection}>
+                <div className={styles.historyLabel}>Lịch sử trao đổi</div>
+                <div className={styles.historyList}>
                   {messages.map((msg) => {
                     const isMe = msg.sender?.id === currentUserId;
+                    // Bỏ qua tin nhắn đầu tiên của khách đã hiện ở trên
+                    if (msg.id === firstQuestion?.id) return null;
+
                     return (
-                      <div
-                        key={msg.id}
-                        style={{
-                          padding: '10px 14px',
-                          marginBottom: '8px',
-                          borderRadius: '10px',
-                          background: isMe ? '#E8F5E9' : '#F5F5F5',
-                          borderLeft: isMe ? '3px solid #135D54' : '3px solid #706F6C',
-                        }}
-                      >
-                        <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>
-                          {msg.sender?.full_name} · {new Date(msg.created_at).toLocaleString('vi-VN')}
+                      <div key={msg.id} className={`${styles.historyItem} ${isMe ? styles.mine : styles.theirs}`}>
+                        <div className={styles.historyMeta}>
+                          {msg.sender?.full_name} · {formatTime(msg.created_at)}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#333' }}>
+                        <div>
                           {msg.content || (msg.message_type === 'image' ? '📷 Hình ảnh' : '📎 Tệp đính kèm')}
                         </div>
                       </div>
@@ -178,51 +176,44 @@ const PhanHoi: React.FC = () => {
 
         {/* Right Column: Editor */}
         <div className={styles.editorCard}>
-          <div className={styles.editorHeader}>
-            <h3>
-              <div className={styles.icon}><EditOutlined /></div>
-              Soạn thảo phản hồi
-            </h3>
-          </div>
-
-          <div className={styles.editorArea}>
-            <div className={styles.toolbar}>
-              <button><BoldOutlined /></button>
-              <button><ItalicOutlined /></button>
-              <button><UnorderedListOutlined /></button>
-              <button><PaperClipOutlined /></button>
-              <button><PictureOutlined /></button>
-              <button><LinkOutlined /></button>
+          <div className={styles.card}>
+            <div className={styles.editorHeader}>
+              <h3><Edit3 size={20} /> Soạn thảo phản hồi</h3>
             </div>
+
+            <div className={styles.toolbar}>
+              <button><Bold size={16} /></button>
+              <button><Italic size={16} /></button>
+              <button><List size={16} /></button>
+              <button><ListOrdered size={16} /></button>
+              <button><Paperclip size={16} /></button>
+              <button><Image size={16} /></button>
+              <button><LinkIcon size={16} /></button>
+            </div>
+
             <textarea
               ref={textareaRef}
               className={styles.textarea}
-              placeholder="Nhập nội dung tư vấn chuyên môn tại đây..."
+              placeholder="Nhập nội dung phản hồi tại đây..."
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
             />
-          </div>
 
-          <div className={styles.editorFooter}>
-            <div className={styles.autoSave}></div>
-            <div className={styles.actions}>
-              <button
-                className={styles.btnDraft}
-                onClick={() => history.push('/bac-si/tu-van')}
-              >
+            <div className={styles.editorFooter}>
+              <button className={styles.btnCancel} onClick={() => history.push('/bac-si/tu-van')}>
                 Hủy
               </button>
               <button
                 className={styles.btnSend}
                 onClick={handleSend}
                 disabled={sending || !replyText.trim()}
-                style={{ opacity: sending || !replyText.trim() ? 0.6 : 1 }}
               >
-                <SendOutlined /> {sending ? 'Đang gửi...' : 'Gửi phản hồi'}
+                {sending ? <Spin size="small" /> : <Send size={16} />} Gửi phản hồi
               </button>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
