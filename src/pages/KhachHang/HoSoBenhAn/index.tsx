@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Avatar, Button, Card, Tag, Timeline, Empty, message, Input, Select, } from 'antd';
+import { Row, Col, Avatar, Button, Card, message, Input, Select, Empty } from 'antd';
 import {
     ClipboardList,
     Search,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { getMyMedicalRecords, Pet, getMyPets } from '@/services/QuanLyPetStore';
 import { history } from 'umi';
+import { ip3 } from '@/utils/ip';
 import styles from './style.less';
 
 const UserHoSoBenhAn: React.FC = () => {
@@ -123,7 +124,7 @@ const UserHoSoBenhAn: React.FC = () => {
                 </Col>
 
                 <Col xs={{ span: 24, order: 1 }} lg={{ span: 8, order: 2 }}>
-                    <div className={styles.summaryCard}>
+                    <Card className={styles.summaryCard} bordered={false}>
                         <div className={styles.summaryHeader}>
                             <HeartPulse size={20} color="#c8960c" />
                             <h3>Chỉ số tổng quát</h3>
@@ -147,7 +148,7 @@ const UserHoSoBenhAn: React.FC = () => {
 
                     <div className={styles.infoBox} style={{ marginTop: 24 }}>
                         <h4><Activity size={18} /> Lưu ý sức khỏe</h4>
-                        <p>Theo dõi sát sao cân nặng và chế độ dinh dưỡng sau khi điều trị.</p>z
+                        <p>Theo dõi sát sao cân nặng và chế độ dinh dưỡng sau khi điều trị.</p>
                     </div>
                 </Col>
             </Row>
