@@ -1,237 +1,342 @@
-@import '../../../styles/theme.less';
+// ─── 🍯 Simplified Creamy Honey — Login Page ────────
+// Design System: Warm cream backgrounds, Honey Gold buttons/inputs, Quicksand typography
+
+// ─── Design Tokens ────────────────────────────
+@primary: #D4A017;
+@primary-dark: #B88A12;
+@primary-glass: rgba(212, 160, 23, 0.08);
+@honey-light: #FFF4CC;
+
+@bg-base: #FFF8F2;
+@text-heading: #3D2E1C;
+@text-body: #7A6B5D;
+@text-muted: #B5A48F;
+
+@radius-card: 28px;
+@radius-btn: 14px;
+
+@transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+@transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+@shadow-soft: 0 4px 24px rgba(212, 160, 23, 0.05);
+@shadow-premium: 0 24px 64px -12px rgba(212, 160, 23, 0.12);
 
 .loginPage {
-	min-height: 100vh;
-	background: @bg-page;
-	display: flex;
-	overflow: hidden;
-	position: relative;
+    min-height: 100vh;
+    background-color: @bg-base;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Quicksand', -apple-system, sans-serif;
+    font-weight: 500;
 
-	.formSection {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		padding: 0 10%;
-		background: white;
-		z-index: 2;
+    .formSection {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 60px 10%;
+        background-color: @bg-base;
+        z-index: 2;
+        position: relative;
 
-		.backHome {
-			position: absolute;
-			top: 40px;
-			left: 10%;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			color: @text-secondary;
-			font-weight: 600;
-			cursor: pointer;
-			transition: @transition-smooth;
-			border: none;
-			background: none;
-			padding: 0;
+        .backHome {
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: @text-body;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: @transition-smooth;
+            border: 1px solid rgba(212, 160, 23, 0.15);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: @shadow-soft;
 
-			&:hover {
-				color: @primary;
-			}
-		}
+            &:hover {
+                color: white;
+                background: linear-gradient(135deg, @primary, @primary-dark);
+                border-color: transparent;
+                transform: translateX(-4px);
+                box-shadow: 0 6px 16px rgba(212, 160, 23, 0.25);
+            }
+        }
 
-		.header {
-			margin-bottom: 40px;
+        .header {
+            margin-bottom: 36px;
+            margin-top: 40px;
 
-			.logoBox {
-				display: flex;
-				align-items: center;
-				gap: 12px;
-				margin-bottom: 24px;
+            .logoBox {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 24px;
 
-				.icon {
-					width: 48px;
-					height: 48px;
-					background: @text-main;
-					color: white;
-					border-radius: 12px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					box-shadow: @shadow-md;
-				}
+                .icon {
+                    width: 44px;
+                    height: 44px;
+                    background: linear-gradient(135deg, @primary, @primary-dark);
+                    color: white;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 4px 16px rgba(212, 160, 23, 0.25);
+                    transition: @transition-bounce;
+                }
 
-				span {
-					font-size: 24px;
-					font-weight: 800;
-					letter-spacing: -1px;
-				}
-			}
+                span {
+                    font-size: 22px;
+                    font-weight: 800;
+                    color: @text-heading;
+                    font-family: 'Quicksand', sans-serif;
+                }
+            }
 
-			h1 {
-				font-size: 32px;
-				font-weight: 800;
-				color: @text-main;
-				margin-bottom: 12px;
-				letter-spacing: -0.5px;
-			}
+            h1 {
+                font-size: 32px;
+                font-weight: 800;
+                color: @text-heading;
+                margin-bottom: 10px;
+                letter-spacing: -0.5px;
+                font-family: 'Quicksand', sans-serif;
 
-			p {
-				color: @text-secondary;
-				font-size: 16px;
-			}
-		}
+                span {
+                    display: inline-block;
+                    animation: float 4s ease-in-out infinite;
+                }
+            }
 
-		.tabsWrapper {
-			:global {
-				.ant-tabs-nav {
-					&::before {
-						border-bottom: 1px solid @border-soft;
-					}
+            p {
+                color: @text-body;
+                font-size: 16px;
+                margin: 0;
+                font-weight: 600;
+            }
+        }
 
-					.ant-tabs-tab {
-						font-weight: 700;
-						padding: 12px 24px;
-						color: @text-muted;
+        .tabsWrapper {
+            :global {
+                .ant-tabs-nav {
+                    margin-bottom: 24px;
 
-						&.ant-tabs-tab-active .ant-tabs-tab-btn {
-							color: @text-main;
-						}
-					}
+                    &::before {
+                        border-bottom: 2px solid rgba(212, 160, 23, 0.08);
+                    }
 
-					.ant-tabs-ink-bar {
-						background: @primary;
-						height: 3px;
-					}
-				}
+                    .ant-tabs-tab {
+                        font-weight: 700;
+                        padding: 12px 20px;
+                        color: @text-muted;
+                        font-size: 16px;
+                        font-family: 'Quicksand', sans-serif;
+                        transition: @transition-smooth;
 
-				.ant-btn-primary {
-					height: 52px;
-					border-radius: 12px;
-					background: @primary;
-					border: none;
-					font-weight: 800;
-					box-shadow: 0 8px 20px rgba(212, 160, 23, 0.2);
+                        &.ant-tabs-tab-active .ant-tabs-tab-btn {
+                            color: @primary-dark;
+                        }
 
-					&:hover {
-						background: @primary-hover;
-						transform: translateY(-2px);
-					}
-				}
+                        &:hover {
+                            color: @primary;
+                        }
+                    }
 
-				.ant-input-affix-wrapper {
-					padding: 12px 16px;
-					border-radius: 12px;
-					border: 2px solid @border-soft;
+                    .ant-tabs-ink-bar {
+                        background: linear-gradient(90deg, @primary, @primary-dark);
+                        height: 3px;
+                        border-radius: 3px 3px 0 0;
+                    }
+                }
 
-					&:hover,
-					&:focus,
-					&.ant-input-affix-wrapper-focused {
-						border-color: @primary;
-						box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.1);
-					}
-				}
-			}
-		}
-	}
+                .ant-form-item {
+                    margin-bottom: 20px;
+                }
 
-	.visualSection {
-		flex: 1.2;
-		position: relative;
-		background: @text-main;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		overflow: hidden;
-		margin: 24px;
-		border-radius: 40px;
-		box-shadow: @shadow-premium;
+                .ant-btn-primary {
+                    height: 52px;
+                    border-radius: @radius-btn;
+                    background: linear-gradient(135deg, @primary, @primary-dark);
+                    border: none;
+                    font-weight: 800;
+                    font-size: 16px;
+                    font-family: 'Quicksand', sans-serif;
+                    box-shadow: 0 8px 24px rgba(212, 160, 23, 0.2);
+                    transition: @transition-smooth;
 
-		@media (max-width: 1024px) {
-			display: none;
-		}
+                    &:hover, &:focus {
+                        background: linear-gradient(135deg, darken(@primary, 5%), darken(@primary-dark, 5%));
+                        transform: translateY(-2px);
+                        box-shadow: 0 12px 28px rgba(212, 160, 23, 0.3);
+                    }
+                }
 
-		.curveOverlay {
-			display: none;
-		}
+                .ant-btn-default {
+                    height: 52px;
+                    border-radius: @radius-btn;
+                    border: 1.5px solid rgba(212, 160, 23, 0.18);
+                    background: white;
+                    color: @text-heading;
+                    font-weight: 700;
+                    font-size: 15px;
+                    font-family: 'Quicksand', sans-serif;
+                    transition: @transition-smooth;
 
-		.bgImage {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			opacity: 0.6;
-			filter: grayscale(20%);
-		}
+                    &:hover, &:focus {
+                        background: @honey-light;
+                        border-color: @primary;
+                        color: @primary-dark;
+                        transform: translateY(-1px);
+                    }
+                }
 
-		.overlay {
-			position: absolute;
-			inset: 0;
-			background: linear-gradient(135deg, rgba(212, 160, 23, 0.2) 0%, rgba(29, 27, 26, 0.8) 100%);
-		}
+                .ant-input-affix-wrapper {
+                    padding: 12px 18px;
+                    border-radius: @radius-btn;
+                    border: 2px solid rgba(212, 160, 23, 0.12);
+                    background: white;
+                    transition: @transition-smooth;
 
-		.floatingContainer {
-			position: relative;
-			z-index: 5;
-			width: 100%;
-			padding: 80px;
+                    &:hover {
+                        border-color: rgba(212, 160, 23, 0.3);
+                    }
 
-			.quoteBox {
-				max-width: 450px;
+                    &:focus,
+                    &.ant-input-affix-wrapper-focused {
+                        border-color: @primary;
+                        box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.08);
+                        background: white;
+                    }
 
-				h2 {
-					color: white;
-					font-size: 42px;
-					font-weight: 800;
-					line-height: 1.2;
-					margin-bottom: 24px;
+                    input {
+                        font-family: 'Quicksand', sans-serif;
+                        font-weight: 600;
+                        color: @text-heading;
 
-					span {
-						color: @primary;
-					}
-				}
+                        &::placeholder {
+                            color: @text-muted;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-				p {
-					color: rgba(255, 255, 255, 0.7);
-					font-size: 18px;
-					line-height: 1.6;
-				}
-			}
+    .visualSection {
+        flex: 1.2;
+        position: relative;
+        background: @text-heading;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin: 24px;
+        border-radius: 36px;
+        box-shadow: @shadow-premium;
 
-			.reviewCard {
-				position: absolute;
-				bottom: 60px;
-				right: 80px;
-				background: rgba(255, 255, 255, 0.1);
-				backdrop-filter: blur(20px);
-				border: 1px solid rgba(255, 255, 255, 0.2);
-				padding: 24px;
-				border-radius: 24px;
-				display: flex;
-				gap: 16px;
-				max-width: 380px;
-				box-shadow: @shadow-premium;
+        @media (max-width: 1024px) {
+            display: none;
+        }
 
-				.userAvatar {
-					width: 48px;
-					height: 48px;
-					border-radius: 12px;
-					border: 2px solid @primary;
-					object-fit: cover;
-				}
+        .bgImage {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.65;
+            filter: sepia(15%) contrast(105%);
+        }
 
-				.reviewContent {
-					p {
-						color: white;
-						font-size: 15px;
-						font-weight: 600;
-						font-style: italic;
-						margin-bottom: 8px;
-					}
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(212, 160, 23, 0.22) 0%, rgba(61, 46, 28, 0.85) 100%);
+        }
 
-					.author {
-						color: @primary;
-						font-weight: 800;
-						font-size: 13px;
-					}
-				}
-			}
-		}
-	}
+        .floatingContainer {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+            padding: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            .quoteBox {
+                max-width: 450px;
+
+                h2 {
+                    color: white;
+                    font-size: 42px;
+                    font-weight: 800;
+                    line-height: 1.25;
+                    margin-bottom: 20px;
+                    font-family: 'Quicksand', sans-serif;
+
+                    span {
+                        display: block;
+                        color: @honey-light;
+                    }
+                }
+
+                p {
+                    color: rgba(255, 255, 255, 0.85);
+                    font-size: 17px;
+                    line-height: 1.65;
+                    font-weight: 500;
+                }
+            }
+
+            .reviewCard {
+                background: rgba(255, 248, 242, 0.15);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                padding: 24px;
+                border-radius: 24px;
+                display: flex;
+                gap: 16px;
+                max-width: 380px;
+                box-shadow: @shadow-premium;
+                align-self: flex-start;
+                margin-top: 40px;
+
+                .userAvatar {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    border: 2px solid @primary;
+                    object-fit: cover;
+                }
+
+                .reviewContent {
+                    p {
+                        color: white;
+                        font-size: 15px;
+                        font-weight: 700;
+                        font-style: italic;
+                        margin-bottom: 6px;
+                        font-family: 'Quicksand', sans-serif;
+                    }
+
+                    .author {
+                        color: @honey-light;
+                        font-weight: 800;
+                        font-size: 13px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
 }
