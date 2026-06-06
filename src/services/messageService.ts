@@ -49,3 +49,22 @@ export async function getUnreadCount() {
   const res = await axios.get(`${API}/messages/unread-count`);
   return res.data;
 }
+
+export async function sendMessageWithAttachment(conversationId: string, file: File, content?: string) {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (content) {
+    formData.append('content', content);
+  }
+
+  const res = await axios.post(
+    `${API}/messages/conversations/${conversationId}/messages/upload`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+  return res.data;
+}
