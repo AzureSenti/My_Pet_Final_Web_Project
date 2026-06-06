@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Avatar, Button, Card, Tag, Timeline, Empty, message, Input, Select } from 'antd';
+import { Row, Col, Avatar, Button, Card, Tag, Timeline, Empty, message, Input, Select, Modal, Form } from 'antd';
 import {
     ClipboardList,
     Search,
@@ -16,6 +16,8 @@ const UserHoSoBenhAn: React.FC = () => {
     const [records, setRecords] = useState<any[]>([]);
     const [pets, setPets] = useState<Pet[]>([]);
     const [selectedPet, setSelectedPet] = useState<string | null>(null);
+    const [isConsultModalOpen, setIsConsultModalOpen] = useState(false);
+    const [form] = Form.useForm();
 
     const fetchData = async () => {
         try {
@@ -137,16 +139,54 @@ const UserHoSoBenhAn: React.FC = () => {
                         </div>
                         <div className={styles.actionBox}>
                             <p>Cần tư vấn thêm về kết quả chẩn đoán?</p>
-                            <Button block className={styles.btnChat}>Trò chuyện với bác sĩ</Button>
+                            <Button block className={styles.btnChat} onClick={() => setIsConsultModalOpen(true)}>Trò chuyện với bác sĩ</Button>
                         </div>
                     </Card>
 
-                    <Card className={styles.infoBox} bordered={false} style={{ marginTop: 24 }}>
+                    <div className={styles.infoBox} style={{ marginTop: 24 }}>
                         <h4><Activity size={18} /> Lưu ý sức khỏe</h4>
                         <p>Theo dõi sát sao cân nặng và chế độ dinh dưỡng sau khi điều trị.</p>
-                    </Card>
+                    </div>
                 </Col>
             </Row>
+
+            <Modal
+                title={<h3>Gửi yêu cầu tư vấn 🩺</h3>}
+                visible={isConsultModalOpen}
+                onCancel={() => setIsConsultModalOpen(false)}
+                onOk={() => form.submit()}
+                className={styles.saasModal}
+                okText="Gửi yêu cầu"
+                cancelText="Hủy bỏ"
+                destroyOnClose
+            >
+                <div style={{ marginBottom: 24 }}>
+                    <p style={{ color: '#7A6B5D', fontSize: 15 }}>
+                        Vui lòng nhập câu hỏi hoặc thắc mắc của bạn về bệnh án. Bác sĩ phụ trách sẽ xem xét và phản hồi cho bạn qua Số điện thoại hoặc Email trong thời gian sớm nhất.
+                    </p>
+                </div>
+                <Form 
+                    form={form} 
+                    layout="vertical" 
+                    onFinish={() => {
+                        setIsConsultModalOpen(false);
+                        form.resetFields();
+                        message.success('Yêu cầu tư vấn đã được gửi thành công! Bác sĩ sẽ sớm liên hệ với bạn.');
+                    }}
+                >
+                    <Form.Item 
+                        name="question" 
+                        label="Câu hỏi của bạn" 
+                        rules={[{ required: true, message: 'Vui lòng nhập câu hỏi!' }]}
+                    >
+                        <Input.TextArea 
+                            rows={4} 
+                            placeholder="Ví dụ: Bác sĩ cho em hỏi thức ăn nào tốt cho bé sau khi mổ ạ?" 
+                            size="large"
+                        />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };
