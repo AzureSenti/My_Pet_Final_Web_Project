@@ -3,6 +3,8 @@ import { history, useLocation } from 'umi';
 import { ArrowLeftOutlined, CameraOutlined, PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 import { Switch, Spin, message } from 'antd';
 import { getAppointmentDetail, createMedicalRecord } from '@/services/BacSi/doctorService';
+import UploadFile from '@/components/Upload/UploadFile';
+import { buildUpLoadMultiFile, EFileScope } from '@/services/uploadFile';
 import styles from './index.module.less';
 
 interface MedicineRow {
@@ -26,6 +28,7 @@ const KhamMoi: React.FC = () => {
   const [diagnosis, setDiagnosis] = useState('');
   const [treatment, setTreatment] = useState('');
   const [notes, setNotes] = useState('');
+  const [attachments, setAttachments] = useState<any[]>([]);
   const [medicines, setMedicines] = useState<MedicineRow[]>([
     { id: 1, name: '', dosage: '', frequency: '', duration: '' },
   ]);
@@ -80,12 +83,29 @@ const KhamMoi: React.FC = () => {
 
     try {
       setSubmitting(true);
+      
+      let finalNotes = notes.trim();
+      if (attachments.length > 0) {
+        const uploadedUrls = await buildUpLoadMultiFile(
+          { attachments: { fileList: attachments } },
+          'attachments',
+          EFileScope.PUBLIC
+        );
+        
+        if (uploadedUrls && uploadedUrls.length > 0) {
+          const validUrls = uploadedUrls.filter(Boolean);
+          if (validUrls.length > 0) {
+            finalNotes += `\n\n[Ảnh đính kèm]:\n${validUrls.join('\n')}`;
+          }
+        }
+      }
+
       await createMedicalRecord({
         appointment_id: appointmentId,
         diagnosis: diagnosis.trim(),
         treatment: treatment.trim(),
         prescription: prescriptionText || undefined,
-        notes: notes.trim() || undefined,
+        notes: finalNotes || undefined,
       });
       message.success('Đã lưu hồ sơ bệnh án thành công!');
       history.push('/bac-si/lich-hen');
@@ -283,9 +303,15 @@ const KhamMoi: React.FC = () => {
           </div>
 
           <div className={`${styles.card} ${styles.uploadCard}`}>
-            <CameraOutlined className={styles.uploadIcon} />
-            <div className={styles.uploadText}>Đính kèm ảnh lâm sàng</div>
-            <div className={styles.uploadSub}>PNG, JPG tối đa 10MB</div>
+            <UploadFile
+              fileList={attachments}
+              onChange={(val) => setAttachments(val.fileList || [])}
+              buttonDescription="Đính kèm ảnh lâm sàng"
+              accept="image/png, image/jpeg"
+              maxFileSize={10}
+              isAvatarSmall={false}
+              drag={true}
+            />
           </div>
         </div>
       </div>
