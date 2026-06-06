@@ -99,13 +99,20 @@ async def admin_only_route(current_user: User = Depends(admin_only)):
     """Chỉ admin mới vào được."""
     return {"message": "Khu vực quản trị", "user": current_user.full_name}
 # ─────────────────────────── Static Files ───────────────────────────
-if not os.path.exists("uploads"):
-    os.makedirs("uploads")
+from pathlib import Path
 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+UPLOAD_BASE_DIR = Path(__file__).resolve().parent / "uploads"
 
-if not os.path.exists("uploads/avatars"):
-    os.makedirs("uploads/avatars")
+if not os.path.exists(UPLOAD_BASE_DIR):
+    os.makedirs(UPLOAD_BASE_DIR)
 
-if not os.path.exists("uploads/messages"):
-    os.makedirs("uploads/messages")
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_BASE_DIR)), name="uploads")
+
+if not os.path.exists(UPLOAD_BASE_DIR / "avatars"):
+    os.makedirs(UPLOAD_BASE_DIR / "avatars")
+
+if not os.path.exists(UPLOAD_BASE_DIR / "messages"):
+    os.makedirs(UPLOAD_BASE_DIR / "messages")
+
+if not os.path.exists(UPLOAD_BASE_DIR / "files"):
+    os.makedirs(UPLOAD_BASE_DIR / "files")
