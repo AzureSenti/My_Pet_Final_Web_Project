@@ -17,7 +17,7 @@
   # Một số package yêu cầu python để build node-gyp
   PYTHON_VERSION = "3.10"
   # ⚠️ QUAN TRỌNG: Thay URL bên dưới bằng URL backend Render thực tế
-  APP_CONFIG_IP_ROOT = "https://mypet-api.onrender.com/"
+  APP_CONFIG_IP_ROOT = "https://my-pet-final-web-project.onrender.com"
   APP_CONFIG_APP_VERSION = "1.0.0"
   APP_CONFIG_CO_QUAN_CHU_QUAN = "MyPet"
   APP_CONFIG_TEN_TRUONG = "MyPet Shop"
