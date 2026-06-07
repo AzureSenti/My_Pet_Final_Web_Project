@@ -25,7 +25,7 @@ class Settings(BaseSettings):
         from urllib.parse import quote_plus
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USER}:{quote_plus(self.POSTGRES_PASSWORD)}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}?prepared_statement_cache_size=0"
         )
 
     @property
@@ -37,5 +37,9 @@ class Settings(BaseSettings):
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
+import os
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+UPLOAD_DIR = BASE_DIR / "app" / "uploads"
 
 settings = Settings()

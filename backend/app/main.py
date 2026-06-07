@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.core.config import settings
 from app.core.dependencies import get_current_user, admin_only, vet_or_admin, require_role
@@ -15,6 +17,10 @@ from app.api.v1 import payment as payment_router
 from app.api.v1 import doctor_appointments as doctor_appointments_router
 from app.api.v1 import doctor_medical_records as doctor_medical_records_router
 from app.api.v1 import doctor_stats as doctor_stats_router
+from app.api.v1 import owner as owner_router
+from app.api.v1 import upload as upload_router
+from app.api.v1 import notification as notification_router
+from app.api.v1 import messages as messages_router
 from app.models.user import User
 
 app = FastAPI(
@@ -27,20 +33,19 @@ app = FastAPI(
 
 # ─────────────────────────── CORS ───────────────────────────
 
-# Định nghĩa danh sách các nguồn (origins) được phép truy cập vào backend này
-allowed_origins = [
-    settings.FRONTEND_URL,       # URL cấu hình từ file env công ty/cá nhân
-    "http://localhost:8000",     # Port cũ phòng hờ
-    "http://localhost:8001",     # Port thực tế backend đang chạy trong terminal của bạn
-    "http://localhost:3000",     # Port mặc định của React (Create React App)
-    "http://localhost:5173",     # Port mặc định của React (Vite)
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=[
+        "http://localhost:8000",
+        "http://localhost:8001",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "https://petcare-mypet.netlify.app",
+        "https://mypet-api.onrender.com",
+    ],
+    allow_origin_regex=r"https://.*\.netlify\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -60,6 +65,10 @@ app.include_router(payment_router.router, prefix="/api/v1")
 app.include_router(doctor_appointments_router.router, prefix="/api/v1")
 app.include_router(doctor_medical_records_router.router, prefix="/api/v1")
 app.include_router(doctor_stats_router.router, prefix="/api/v1")
+app.include_router(owner_router.router, prefix="/api/v1")
+app.include_router(upload_router.router, prefix="/api/v1")
+app.include_router(notification_router.router, prefix="/api/v1")
+app.include_router(messages_router.router, prefix="/api/v1")
 
 
 # ─────────────────────────── Health ───────────────────────────
@@ -92,3 +101,21 @@ async def vet_area(current_user: User = Depends(vet_or_admin)):
 async def admin_only_route(current_user: User = Depends(admin_only)):
     """Chỉ admin mới vào được."""
     return {"message": "Khu vực quản trị", "user": current_user.full_name}
+# ─────────────────────────── Static Files ───────────────────────────
+from pathlib import Path
+
+UPLOAD_BASE_DIR = Path(__file__).resolve().parent / "uploads"
+
+if not os.path.exists(UPLOAD_BASE_DIR):
+    os.makedirs(UPLOAD_BASE_DIR)
+
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_BASE_DIR)), name="uploads")
+
+if not os.path.exists(UPLOAD_BASE_DIR / "avatars"):
+    os.makedirs(UPLOAD_BASE_DIR / "avatars")
+
+if not os.path.exists(UPLOAD_BASE_DIR / "messages"):
+    os.makedirs(UPLOAD_BASE_DIR / "messages")
+
+if not os.path.exists(UPLOAD_BASE_DIR / "files"):
+    os.makedirs(UPLOAD_BASE_DIR / "files")

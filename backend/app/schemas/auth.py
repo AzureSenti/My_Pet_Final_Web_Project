@@ -15,6 +15,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(..., min_length=8, max_length=64, examples=["StrongPass@1"])
     phone: str | None = Field(default=None, max_length=20)
     role: UserRole = UserRole.owner
+    avatar_url: Optional[str] = None
 
     @field_validator("password")
     @classmethod
@@ -72,6 +73,13 @@ class LogoutRequest(BaseModel):
 
 # ─────────────────────────── Current User ───────────────────────────
 
+class VetProfileOut(BaseModel):
+    bio: Optional[str] = None
+    certificate_url: Optional[str] = None
+    specialization: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
 class UserOut(BaseModel):
     id: uuid.UUID
     full_name: str
@@ -79,7 +87,9 @@ class UserOut(BaseModel):
     phone: str | None
     role: UserRole
     is_active: bool
+    avatar_url: Optional[str] = None
     created_at: datetime
+    vet_profile: Optional[VetProfileOut] = None
 
     model_config = {"from_attributes": True}
 
@@ -88,3 +98,6 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
     password: Optional[str] = None
+    avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    certificate_url: Optional[str] = None

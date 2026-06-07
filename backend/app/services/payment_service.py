@@ -3,10 +3,12 @@ import math
 from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy import select, func
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
 from app.models.payment import Payment, PaymentStatus
+from app.models.appointment import Appointment
 from app.schemas.payment import (
     PaymentCreateRequest,
     PaymentUpdateStatusRequest,
@@ -21,9 +23,17 @@ async def list_payments(
     status: Optional[PaymentStatus] = None,
     owner_id: Optional[uuid.UUID] = None,
 ) -> PaymentListResponse:
-    query = select(Payment)
+    query = (
+        select(Payment)
+        .options(
+            joinedload(Payment.owner),
+            joinedload(Payment.appointment).joinedload(Appointment.pet),
+            joinedload(Payment.appointment).joinedload(Appointment.vet),
+            joinedload(Payment.appointment).joinedload(Appointment.service),
+        )
+    )
     count_query = select(func.count()).select_from(Payment)
-
+    
     if status:
         query = query.where(Payment.status == status)
         count_query = count_query.where(Payment.status == status)
@@ -36,11 +46,11 @@ async def list_payments(
     pages = math.ceil(total / limit) if total > 0 else 1
 
     result = await db.execute(
-        query.order_by(Payment.paid_at.desc().nullslast())
+        query.order_by(Payment.created_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
     )
-    items = result.scalars().all()
+    items = result.scalars().unique().all()
 
     return PaymentListResponse(
         items=items, total=total, page=page, limit=limit, pages=pages

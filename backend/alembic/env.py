@@ -25,7 +25,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Override URL từ settings (dùng sync driver)
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC)
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC.replace("%", "%%"))
 
 
 def run_migrations_offline() -> None:

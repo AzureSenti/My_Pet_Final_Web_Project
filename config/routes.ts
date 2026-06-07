@@ -119,15 +119,73 @@ export default [
 		icon: 'CalendarOutlined',
 	},
 	{
+		path: '/quan-ly-dich-vu',
+		name: 'Quản lý dịch vụ',
+		component: '@/pages/QuanLyDichVu/index',
+		icon: 'AppstoreOutlined',
+	},
+	{
+		path: '/quan-ly-thanh-toan',
+		name: 'Quản lý thanh toán',
+		component: '@/pages/QuanLyThanhToan/index',
+		icon: 'CreditCardOutlined',
+	},
+	{
 		path: '/profile',
 		name: 'Hồ sơ cá nhân',
 		component: './HoSo',
 		hideInMenu: true,
 	},
 
+	///////////////////////////////////
+	// KHÁCH HÀNG — USER PORTAL
+	{
+		path: '/khach-hang',
+		layout: false,
+		component: '@/layouts/UserLayout',
+		routes: [
+			{
+				path: '/khach-hang',
+				redirect: '/khach-hang/dashboard',
+			},
+			{
+				name: 'Dashboard',
+				path: '/khach-hang/dashboard',
+				component: './KhachHang/Dashboard',
+			},
+			{
+				name: 'Thú cưng của tôi',
+				path: '/khach-hang/thu-cung',
+				component: './KhachHang/ThuCung',
+			},
+			{
+				name: 'Lịch hẹn cá nhân',
+				path: '/khach-hang/lich-hen',
+				component: './KhachHang/LichHen',
+			},
+			{
+				name: 'Hồ sơ bệnh án',
+				path: '/khach-hang/benh-an',
+				component: './KhachHang/HoSoBenhAn',
+			},
+			{
+				name: 'Tư vấn trực tuyến',
+				path: '/khach-hang/tu-van',
+				component: '@/pages/KhachHang/TuVan/index',
+			},
+			{
+				name: 'Chi tiết tư vấn',
+				path: '/khach-hang/tu-van/phan-hoi',
+				component: '@/pages/KhachHang/TuVan/PhanHoi/index',
+				hideInMenu: true,
+			},
+		],
+	},
+
 	{
 		path: '/',
-		redirect: '/dashboard',
+		layout: false,
+		component: './LandingPage',
 	},
 	{
 		path: '/403',
@@ -143,3 +201,5 @@ export default [
 		component: './exception/404',
 	},
 ];
+// trigger rebuild
+

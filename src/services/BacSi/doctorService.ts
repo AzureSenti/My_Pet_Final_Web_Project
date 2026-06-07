@@ -125,6 +125,9 @@ export async function updateProfile(data: {
   full_name?: string;
   phone?: string;
   password?: string;
+  bio?: string;
+  certificate_url?: string;
+  avatar_url?: string;
 }) {
   const res = await axios.patch(`${API}/auth/me`, data);
   return res.data;

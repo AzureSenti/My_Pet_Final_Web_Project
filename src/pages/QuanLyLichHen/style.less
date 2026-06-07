@@ -8,11 +8,11 @@
 @card-bg: #FFFFFF; // Warm off-white card background
 @radius-card: 16px;
 @radius-btn: 8px;
-@shadow-light: 0 2px 16px rgba(0,0,0,0.03);
+@shadow-light: 0 2px 16px rgba(0, 0, 0, 0.03);
 
 .appointment-dashboard {
 	padding: 0;
-	
+
 	.appointment-content {
 		padding: 0;
 	}
@@ -33,6 +33,7 @@
 				margin: 0;
 				line-height: 1.2;
 			}
+
 			p {
 				color: @text-gray;
 				font-size: 14px;
@@ -59,6 +60,7 @@
 					background: transparent;
 					border: 1px solid #D1D5DB;
 					color: @text-dark;
+
 					&:hover {
 						background: #F3F4F6;
 					}
@@ -68,6 +70,7 @@
 					background: @primary-olive;
 					border: 1px solid @primary-olive;
 					color: #FFFFFF;
+
 					&:hover {
 						background: darken(@primary-olive, 5%);
 					}
@@ -90,7 +93,7 @@
 			align-items: center;
 			gap: 16px;
 			box-shadow: @shadow-light;
-			border: 1px solid rgba(0,0,0,0.03);
+			border: 1px solid rgba(0, 0, 0, 0.03);
 
 			.stat-icon {
 				width: 52px;
@@ -99,15 +102,17 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				
+
 				&.icon-yellow {
 					background: fade(@accent-gold, 20%);
 					color: #4A3518;
 				}
+
 				&.icon-teal {
 					background: #D0E8F5;
 					color: #0260A0;
 				}
+
 				&.icon-pink {
 					background: #F0E2E5;
 					color: #6E3542;
@@ -158,7 +163,7 @@
 		background: @card-bg;
 		border-radius: @radius-card;
 		box-shadow: @shadow-light;
-		border: 1px solid rgba(0,0,0,0.03);
+		border: 1px solid rgba(0, 0, 0, 0.03);
 		overflow: hidden;
 
 		.table-tabs {
@@ -183,6 +188,7 @@
 
 				&.active {
 					color: @accent-gold;
+
 					&::after {
 						content: '';
 						position: absolute;
@@ -224,9 +230,11 @@
 
 			tr {
 				transition: background 0.2s;
+
 				&:hover {
 					background: rgba(0, 0, 0, 0.02);
 				}
+
 				&:last-child td {
 					border-bottom: none;
 				}
@@ -269,6 +277,7 @@
 					color: @text-dark;
 					font-size: 14px;
 				}
+
 				.service-time {
 					font-size: 12px;
 					color: @text-gray;
@@ -287,22 +296,30 @@
 					border-radius: 99px;
 					font-size: 12px;
 					font-weight: 600;
+					display: inline-block;
+					min-width: 100px;
+					text-align: center;
 
 					&.badge-confirmed {
 						background: #E0EDE8;
 						color: #0F2E1E; // Very deep green
 					}
+
 					&.badge-pending {
 						background: #F5ECD8;
 						color: #4A3518; // Very deep gold
 					}
+
 					&.badge-completed {
-						background: #F0E2E5;
-						color: #4D2530; // Very deep crimson
+						background: #D1E7DD;
+						color: #0F5132;
+						border: 1px solid #0F5132;
 					}
+
 					&.badge-cancelled {
-						background: #EADADA;
-						color: #5A1F2B; // Very deep red
+						background: #F8D7DA;
+						color: #842029;
+						border: 1px solid #842029;
 					}
 				}
 
@@ -330,14 +347,17 @@
 					&.btn-confirm {
 						background: @primary-olive;
 						color: #fff;
+
 						&:hover {
 							background: darken(@primary-olive, 5%);
 						}
 					}
+
 					&.btn-text {
 						background: transparent;
 						color: @text-gray;
 						padding: 6px;
+
 						&:hover {
 							color: @text-dark;
 							background: rgba(0, 0, 0, 0.04);
@@ -353,7 +373,7 @@
 		border-radius: @radius-card;
 		padding: 24px;
 		box-shadow: @shadow-light;
-		border: 1px solid rgba(0,0,0,0.03);
+		border: 1px solid rgba(0, 0, 0, 0.03);
 
 		&.tip-card {
 			background: #F5ECD8;
@@ -379,6 +399,7 @@
 				font-weight: 600;
 				color: #4A3518;
 				text-decoration: none;
+
 				&:hover {
 					text-decoration: underline;
 				}
@@ -455,9 +476,66 @@
 				color: #fff;
 				font-weight: 700;
 			}
+
 			&.empty {
 				cursor: default;
 			}
 		}
+	}
+}
+
+// ─── Shared Premium Elements ───
+.btn-export-premium {
+	background: linear-gradient(135deg, #A3865A 0%, #D4A017 100%);
+	color: #FFFFFF !important;
+	border: none;
+	padding: 10px 24px;
+	border-radius: 12px;
+	font-weight: 700;
+	font-size: 14px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	position: relative;
+	overflow: hidden;
+
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(120deg,
+				transparent,
+				rgba(255, 255, 255, 0.2),
+				transparent);
+		transition: all 0.6s;
+	}
+
+	&:hover {
+		transform: translateY(-2px) scale(1.02);
+		box-shadow: 0 8px 25px rgba(212, 160, 23, 0.3);
+		filter: brightness(1.15);
+
+		&::after {
+			left: 100%;
+		}
+
+		svg {
+			transform: translateY(2px);
+		}
+	}
+
+	&:active {
+		transform: translateY(0) scale(0.98);
+	}
+
+	svg {
+		transition: transform 0.3s;
+		color: #FFFFFF;
 	}
 }

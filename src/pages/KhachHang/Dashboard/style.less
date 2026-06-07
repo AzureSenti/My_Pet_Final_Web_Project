@@ -1,0 +1,383 @@
+@import '../../../styles/theme.less';
+
+.saasDashboard {
+    background: #FAF6F0;
+    min-height: 100vh;
+    padding-bottom: 40px;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 24px;
+    }
+
+    .welcomeSection {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+
+        .welcomeText {
+            h1 {
+                font-size: 32px;
+                font-weight: 800;
+                color: #1A1A1A;
+                margin: 0 0 8px;
+
+                span {
+                    color: #1A1A1A; /* Giữ chữ đen đậm */
+                }
+            }
+
+            p {
+                font-size: 15px;
+                color: #888888;
+                margin: 0;
+            }
+        }
+
+        .btnOutlineNew {
+            background: transparent;
+            border: 1px solid #D4A017;
+            color: #D4A017;
+            height: 40px;
+            padding: 0 20px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s;
+
+            &:hover {
+                background: #FEF3C7;
+            }
+        }
+    }
+
+    .twoColumnLayout {
+        display: grid;
+        grid-template-columns: 65% 1fr;
+        gap: 32px;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .leftColumn {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+
+        .statsRow {
+            display: flex;
+            gap: 20px;
+
+            @media (max-width: 768px) {
+                flex-direction: column;
+            }
+
+            .statCard {
+                flex: 1;
+                background: #FFFFFF;
+                border-radius: 16px;
+                padding: 16px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+
+                .statIconBrown, .statIconYellow, .statIconBlue {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .statIconBrown { background: #F5F0E6; color: #8C6B4A; }
+                .statIconYellow { background: #FEF3C7; color: #D4A017; }
+                .statIconBlue { background: #E0F2FE; color: #0284C7; }
+
+                .statInfo {
+                    display: flex;
+                    flex-direction: column;
+
+                    .statValue {
+                        font-size: 24px;
+                        font-weight: 800;
+                        color: #1A1A1A;
+                        line-height: 1.2;
+                    }
+
+                    .statLabel {
+                        font-size: 13px;
+                        color: #888888;
+                    }
+                }
+            }
+        }
+
+        .contentCard {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+
+            .cardHeader {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 24px;
+
+                h3 {
+                    font-size: 18px;
+                    font-weight: 800;
+                    color: #1A1A1A;
+                    margin: 0;
+                }
+
+                .cardHeaderActions {
+                    display: flex;
+                    gap: 16px;
+                    align-items: center;
+                }
+
+                .linkMuted {
+                    color: #888888;
+                    font-size: 14px;
+                    font-weight: 500;
+                    &:hover { color: #D4A017; }
+                }
+
+                .btnAddSmall {
+                    color: #D4A017;
+                    font-weight: 600;
+                    padding: 0;
+                }
+            }
+
+            .appointmentItem {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #FAF6F0;
+                border-radius: 12px;
+                padding: 16px;
+
+                .appLeft {
+                    .badgeGreen {
+                        display: inline-block;
+                        background: #D1FAE5;
+                        color: #065F46;
+                        padding: 4px 10px;
+                        border-radius: 999px;
+                        font-size: 11px;
+                        font-weight: 700;
+                        margin-bottom: 8px;
+                    }
+
+                    h4 {
+                        font-size: 16px;
+                        font-weight: 700;
+                        color: #1A1A1A;
+                        margin: 0 0 4px;
+                    }
+
+                    .appTime {
+                        font-size: 13px;
+                        color: #888888;
+                    }
+                }
+
+                .appRight {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    text-align: right;
+
+                    .petName {
+                        display: flex;
+                        flex-direction: column;
+
+                        strong {
+                            font-size: 14px;
+                            color: #1A1A1A;
+                        }
+
+                        span {
+                            font-size: 12px;
+                            color: #888888;
+                        }
+                    }
+                }
+            }
+
+            .petList {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+
+                .petListItem {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    padding-bottom: 16px;
+                    border-bottom: 1px solid #F0F0F0;
+
+                    &:last-child {
+                        border-bottom: none;
+                        padding-bottom: 0;
+                    }
+
+                    .petInfo {
+                        display: flex;
+                        flex-direction: column;
+
+                        strong {
+                            font-size: 15px;
+                            color: #1A1A1A;
+                            margin-bottom: 2px;
+                        }
+
+                        span {
+                            font-size: 13px;
+                            color: #888888;
+                        }
+                    }
+                }
+
+                .morePetsLink {
+                    text-align: center;
+                    color: #888888;
+                    font-size: 14px;
+                    cursor: pointer;
+                    padding-top: 8px;
+
+                    &:hover {
+                        color: #D4A017;
+                    }
+                }
+            }
+        }
+    }
+
+    .rightColumn {
+        .sidebarCard {
+            background: #1A1A1A;
+            border-radius: 16px;
+            padding: 24px;
+            color: #FFFFFF;
+
+            .sidebarHeader {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 24px;
+
+                .pinIcon {
+                    font-size: 20px;
+                }
+
+                h3 {
+                    color: #FFFFFF;
+                    font-size: 18px;
+                    font-weight: 700;
+                    margin: 0;
+                }
+            }
+
+            .tipItem {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 20px;
+
+                .tipDot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: #D4A017;
+                    margin-top: 6px;
+                    flex-shrink: 0;
+                }
+
+                .tipText {
+                    strong {
+                        display: block;
+                        font-size: 15px;
+                        color: #FFFFFF;
+                        margin-bottom: 4px;
+                    }
+
+                    p {
+                        font-size: 13px;
+                        color: #888888;
+                        margin: 0;
+                        line-height: 1.5;
+                    }
+                }
+            }
+
+            .divider {
+                height: 1px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 24px 0;
+            }
+
+            .vipBox {
+                .vipHeader {
+                    color: #D4A017;
+                    font-size: 15px;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                }
+
+                p {
+                    font-size: 13px;
+                    color: #888888;
+                    margin: 0 0 16px;
+                }
+
+                .btnGoldFull {
+                    width: 100%;
+                    background: #D4A017;
+                    border: none;
+                    color: #FFFFFF;
+                    height: 40px;
+                    border-radius: 999px;
+                    font-weight: 600;
+                    transition: all 0.3s;
+
+                    &:hover {
+                        background: #B88A12;
+                    }
+                }
+            }
+        }
+    }
+
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #888888;
+        font-size: 13px;
+
+        p {
+            margin: 0 0 8px;
+        }
+
+        .footerLinks {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+
+            a {
+                color: #888888;
+                cursor: pointer;
+
+                &:hover {
+                    color: #1A1A1A;
+                }
+            }
+        }
+    }
+}
