@@ -44,6 +44,12 @@ allowed_origins = [
     "http://127.0.0.1:5173",
 ]
 
+# Thêm các URL deploy (Netlify) nếu có trong env
+import os
+netlify_url = os.getenv("NETLIFY_FRONTEND_URL", "")
+if netlify_url:
+    allowed_origins.append(netlify_url)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
