@@ -20,6 +20,7 @@ import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
 import { getDoctors, deleteDoctor, toggleDoctorStatus, createDoctor } from '@/services/QuanLyPetStore';
+import { ip3 } from '@/utils/ip';
 
 const QuanLyBacSi: React.FC = () => {
 	const [doctors, setDoctors] = useState<any[]>([]);
@@ -180,15 +181,19 @@ const QuanLyBacSi: React.FC = () => {
 					</div>
 				</div>
 
-				{/* 2. Lưới danh sách Bác sĩ (Doctor Cards Grid) */}
 				<div className="doctor-grid" style={{ opacity: loading ? 0.6 : 1 }}>
-					{displayedDoctors.map(doc => (
+					{displayedDoctors.map(doc => {
+						const avatarSrc = doc.avatar_url 
+							? (doc.avatar_url.startsWith('http') ? doc.avatar_url : `${ip3}${doc.avatar_url.replace(/^\//, '')}`) 
+							: `https://api.dicebear.com/7.x/notionists/svg?seed=${doc.full_name}`;
+						
+						return (
 						<div className={`doctor-card ${!doc.is_active ? 'pending' : ''}`} key={doc.id}>
 							{doc.is_active ? (
 								<>
 									<div className="card-header">
 										<div className="avatar-wrapper">
-											<img src={doc.avatar_url || 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=150'} alt="Avatar" className="avatar-img" />
+											<img src={avatarSrc} alt="Avatar" className="avatar-img" />
 										</div>
 										<div className="info">
 											<h3>{doc.full_name}</h3>
@@ -229,7 +234,7 @@ const QuanLyBacSi: React.FC = () => {
 								<>
 									<div className="card-header">
 										<div className="avatar-wrapper">
-											<img src={doc.avatar_url || 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150'} alt="Avatar" className="avatar-img" />
+											<img src={avatarSrc} alt="Avatar" className="avatar-img" />
 										</div>
 										<div className="info">
 											<h3>{doc.full_name}</h3>
@@ -259,7 +264,7 @@ const QuanLyBacSi: React.FC = () => {
 								</>
 							)}
 						</div>
-					))}
+					)})}
 
 					{/* THẺ 3: Thẻ mời bác sĩ mới */}
 					<div className="doctor-card invite-card" onClick={() => setIsModalOpen(true)} style={{ cursor: 'pointer' }}>

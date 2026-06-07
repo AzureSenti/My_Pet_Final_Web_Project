@@ -6,6 +6,7 @@ import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
 
 import { getPets, createPet, getOwners, User, deletePet } from '@/services/QuanLyPetStore';
+import { ip3 } from '@/utils/ip';
 
 const FILTER_TABS = ['Tất cả', 'Chó', 'Mèo', 'Khác'] as const;
 
@@ -118,7 +119,13 @@ const QuanLyThuCung: React.FC = () => {
 
 				{/* ─── Pet Card Grid ─── */}
 				<div className="pet-card-grid" style={{ opacity: loading ? 0.6 : 1 }}>
-					{pets.map((pet, idx) => (
+					{pets.map((pet, idx) => {
+						const petOwner = owners.find(o => o.id === pet.owner_id);
+						const avatarSrc = petOwner?.avatar_url 
+							? (petOwner.avatar_url.startsWith('http') ? petOwner.avatar_url : `${ip3}${petOwner.avatar_url.replace(/^\//, '')}`) 
+							: `https://api.dicebear.com/7.x/notionists/svg?seed=${pet.owner_name}`;
+
+						return (
 						<div
 							className="pet-card"
 							key={pet.id}
@@ -166,7 +173,7 @@ const QuanLyThuCung: React.FC = () => {
 
 								{/* Owner */}
 								<div className="pet-owner-row">
-									<img className="owner-avatar" src={pet.owner?.avatar_url || `https://i.pravatar.cc/150?u=${pet.owner_name}`} alt={pet.owner_name} />
+									<img className="owner-avatar" src={avatarSrc} alt={pet.owner_name} />
 									<div className="owner-text">
 										<span className="owner-label">Chủ nuôi</span>
 										<span className="owner-name">{pet.owner_name}</span>
@@ -174,7 +181,7 @@ const QuanLyThuCung: React.FC = () => {
 								</div>
 							</div>
 						</div>
-					))}
+					)})}
 
 					{/* ─── Add New Card ─── */}
 					<div className="pet-card-add" onClick={() => setIsModalOpen(true)} style={{ cursor: 'pointer' }}>

@@ -163,11 +163,7 @@ export default [
 				path: '/khach-hang/lich-hen',
 				component: './KhachHang/LichHen',
 			},
-			{
-				name: 'Hồ sơ bệnh án',
-				path: '/khach-hang/benh-an',
-				component: './KhachHang/HoSoBenhAn',
-			},
+
 			{
 				name: 'Tư vấn trực tuyến',
 				path: '/khach-hang/tu-van',

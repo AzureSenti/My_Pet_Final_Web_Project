@@ -26,6 +26,7 @@ class VetUserOut(BaseModel):
     full_name: str
     email: str
     phone: Optional[str]
+    avatar_url: Optional[str] = None
     is_active: bool
 
     class Config:
