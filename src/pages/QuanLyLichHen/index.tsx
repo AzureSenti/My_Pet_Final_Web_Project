@@ -322,7 +322,7 @@ const QuanLyLichHen: React.FC = () => {
 											<tr key={item.id}>
 												<td>
 													<div className="cell-pet">
-														<img src={item.pet?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150'} alt={item.pet?.name} />
+														<img src={item.pet?.avatar_url || '/assets/images/pet_placeholder.png'} alt={item.pet?.name} />
 														<div>
 															<div className="pet-name">{item.pet?.name || 'Không rõ'}</div>
 															<div className="pet-breed">{item.pet?.breed || 'Chưa rõ'}</div>
@@ -598,7 +598,7 @@ const QuanLyLichHen: React.FC = () => {
 						</Descriptions.Item>
 						<Descriptions.Item label="Thú cưng">
 							<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-								<img src={selectedAppointment.pet?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150'} alt="pet" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
+								<img src={selectedAppointment.pet?.avatar_url || '/assets/images/pet_placeholder.png'} alt="pet" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
 								<strong>{selectedAppointment.pet?.name}</strong> ({selectedAppointment.pet?.breed})
 							</div>
 						</Descriptions.Item>
