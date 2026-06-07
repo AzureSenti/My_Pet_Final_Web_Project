@@ -1,5 +1,5 @@
 import { history, useLocation } from 'umi';
-import { Home, PawPrint, Calendar, ClipboardList } from 'lucide-react';
+import { Home, PawPrint, Calendar, MessageCircle } from 'lucide-react';
 import HeaderProfile from '@/components/HeaderProfile';
 import styles from './style.less';
 
@@ -11,7 +11,7 @@ const UserLayout: React.FC = ({ children }) => {
         { label: 'Tổng quan', path: '/khach-hang/dashboard', icon: <Home size={18} /> },
         { label: 'Thú cưng', path: '/khach-hang/thu-cung', icon: <PawPrint size={18} /> },
         { label: 'Lịch hẹn', path: '/khach-hang/lich-hen', icon: <Calendar size={18} /> },
-        { label: 'Bệnh án', path: '/khach-hang/benh-an', icon: <ClipboardList size={18} /> },
+        { label: 'Trò chuyện', path: '/khach-hang/tu-van', icon: <MessageCircle size={18} /> },
     ];
 
     return (

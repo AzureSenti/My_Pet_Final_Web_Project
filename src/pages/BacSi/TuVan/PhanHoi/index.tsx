@@ -9,6 +9,7 @@ import {
   getConversationDetail,
   getConversationMessages,
   sendMessage,
+  sendMessageWithAttachment,
 } from '@/services/messageService';
 import { ip3 } from '@/utils/ip';
 import styles from './index.module.less';
@@ -26,7 +27,9 @@ const PhanHoi: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = async () => {
     if (!conversationId) {
@@ -54,15 +57,20 @@ const PhanHoi: React.FC = () => {
   }, [conversationId]);
 
   const handleSend = async () => {
-    if (!conversationId || !replyText.trim()) {
-      antMessage.warning('Vui lòng nhập nội dung phản hồi');
+    if (!conversationId || (!replyText.trim() && !selectedFile)) {
+      antMessage.warning('Vui lòng nhập nội dung phản hồi hoặc chọn tệp đính kèm');
       return;
     }
     try {
       setSending(true);
-      await sendMessage(conversationId, replyText.trim());
+      if (selectedFile) {
+        await sendMessageWithAttachment(conversationId, selectedFile, replyText.trim());
+      } else {
+        await sendMessage(conversationId, replyText.trim());
+      }
       antMessage.success('Đã gửi phản hồi thành công!');
       setReplyText('');
+      setSelectedFile(null);
       // Reload messages
       const msgData = await getConversationMessages(conversationId, 1, 100);
       setMessages(msgData.items || []);
@@ -72,6 +80,44 @@ const PhanHoi: React.FC = () => {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const insertText = (before: string, after: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selected = text.substring(start, end);
+    const newText = text.substring(0, start) + before + (selected || 'văn bản') + after + text.substring(end);
+    setReplyText(newText);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, start + before.length + (selected ? selected.length : 'văn bản'.length));
+    }, 0);
+  };
+
+  const renderContent = (text: string) => {
+    if (!text) return null;
+    return text.split('\n').map((line, i) => {
+      // Very simple parsing for **bold** and *italic*
+      let html = line
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      return (
+        <span key={i}>
+          <span dangerouslySetInnerHTML={{ __html: html }} />
+          {i < text.split('\n').length - 1 && <br />}
+        </span>
+      );
+    });
   };
 
   const getOtherParticipant = () => {
@@ -149,7 +195,7 @@ const PhanHoi: React.FC = () => {
                         </a>
                       </div>
                     ) : null}
-                    {firstQuestion.content}
+                    {renderContent(firstQuestion.content)}
                   </div>
                   <div className={styles.time}>{formatTime(firstQuestion.created_at)}</div>
                 </div>
@@ -185,7 +231,7 @@ const PhanHoi: React.FC = () => {
                               </a>
                             </div>
                           ) : null}
-                          {msg.content}
+                          {renderContent(msg.content)}
                         </div>
                       </div>
                     );
@@ -204,14 +250,22 @@ const PhanHoi: React.FC = () => {
             </div>
 
             <div className={styles.toolbar}>
-              <button><Bold size={16} /></button>
-              <button><Italic size={16} /></button>
-              <button><List size={16} /></button>
-              <button><ListOrdered size={16} /></button>
-              <button><Paperclip size={16} /></button>
-              <button><Image size={16} /></button>
-              <button><LinkIcon size={16} /></button>
+              <button onClick={() => insertText('**', '**')} title="In đậm"><Bold size={16} /></button>
+              <button onClick={() => insertText('*', '*')} title="In nghiêng"><Italic size={16} /></button>
+              <button onClick={() => insertText('\n- ', '')} title="Danh sách"><List size={16} /></button>
+              <button onClick={() => insertText('\n1. ', '')} title="Danh sách số"><ListOrdered size={16} /></button>
+              <button onClick={() => fileInputRef.current?.click()} title="Đính kèm tệp"><Paperclip size={16} /></button>
+              <button onClick={() => fileInputRef.current?.click()} title="Thêm ảnh"><Image size={16} /></button>
+              <button onClick={() => insertText('[', '](url)')} title="Chèn link"><LinkIcon size={16} /></button>
+              <input type="file" hidden ref={fileInputRef} onChange={handleFileChange} />
             </div>
+
+            {selectedFile && (
+              <div style={{ padding: '8px 16px', background: '#f5f5f5', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, color: '#666' }}>📎 {selectedFile.name}</span>
+                <span style={{ cursor: 'pointer', color: 'red', fontWeight: 'bold' }} onClick={() => setSelectedFile(null)}>X</span>
+              </div>
+            )}
 
             <textarea
               ref={textareaRef}

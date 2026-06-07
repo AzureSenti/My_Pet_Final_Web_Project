@@ -11,6 +11,7 @@ const MyPets: React.FC = () => {
     const [pets, setPets] = useState<Pet[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPet, setEditingPet] = useState<Pet | null>(null);
+    const [isViewingMode, setIsViewingMode] = useState(false);
     const [imageUrl, setImageUrl] = useState<string>('');
     const [uploading, setUploading] = useState(false);
     const [form] = Form.useForm();
@@ -29,7 +30,9 @@ const MyPets: React.FC = () => {
     }, []);
 
     const handleAddPet = async (values: any) => {
-        const payload = { ...values, avatar_url: imageUrl || '' };
+        const date_of_birth = values.age ? new Date(new Date().getFullYear() - (parseInt(values.age) || 0), 0, 1).toISOString().split('T')[0] : undefined;
+        const { age, checkup_count, ...restValues } = values;
+        const payload = { ...restValues, avatar_url: imageUrl || '', date_of_birth };
         const success = editingPet
             ? await updateMyPet(editingPet.id, payload)
             : await createMyPet(payload);
@@ -44,9 +47,20 @@ const MyPets: React.FC = () => {
     };
 
     const handleEdit = (pet: Pet) => {
+        setIsViewingMode(false);
         setEditingPet(pet);
         setImageUrl(pet.avatar_url || '');
-        form.setFieldsValue(pet);
+        const age = pet.date_of_birth ? new Date().getFullYear() - new Date(pet.date_of_birth).getFullYear() : undefined;
+        form.setFieldsValue({ ...pet, age, checkup_count: (pet as any).checkup_count || 0 });
+        setIsModalOpen(true);
+    };
+
+    const handleView = (pet: Pet) => {
+        setIsViewingMode(true);
+        setEditingPet(pet);
+        setImageUrl(pet.avatar_url || '');
+        const age = pet.date_of_birth ? new Date().getFullYear() - new Date(pet.date_of_birth).getFullYear() : undefined;
+        form.setFieldsValue({ ...pet, age, checkup_count: (pet as any).checkup_count || 0 });
         setIsModalOpen(true);
     };
 
@@ -86,7 +100,7 @@ const MyPets: React.FC = () => {
                     type="primary"
                     className={styles.btnPrimary}
                     icon={<Plus size={18} />}
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => { setIsViewingMode(false); setIsModalOpen(true); }}
                 >
                     Thêm thành viên mới
                 </Button>
@@ -137,8 +151,8 @@ const MyPets: React.FC = () => {
                                     </div>
 
                                     <div className={styles.cardFooter}>
-                                        <Button block className={styles.btnAction} onClick={() => history.push(`/khach-hang/benh-an?pet_id=${pet.id}`)}>
-                                            Xem bệnh án <ChevronRight size={14} />
+                                        <Button block className={styles.btnAction} onClick={() => handleView(pet)}>
+                                            Xem chi tiết <ChevronRight size={14} />
                                         </Button>
                                     </div>
                                 </Card>
@@ -155,7 +169,7 @@ const MyPets: React.FC = () => {
                                     </div>
                                 }
                             >
-                                <Button type="primary" className={styles.btnPrimaryPill} onClick={() => setIsModalOpen(true)}>Đăng ký bé ngay</Button>
+                                <Button type="primary" className={styles.btnPrimaryPill} onClick={() => { setIsViewingMode(false); setIsModalOpen(true); }}>Đăng ký bé ngay</Button>
                             </Empty>
                         </div>
                     )}
@@ -186,11 +200,12 @@ const MyPets: React.FC = () => {
             </div>
 
             <Modal
-                title={<h3>{editingPet ? 'Cập nhật thông tin bé 🔄' : 'Đăng ký thành viên mới 🐶🐱'}</h3>}
+                title={<h3>{isViewingMode ? 'Thông tin chi tiết bé 📋' : (editingPet ? 'Cập nhật thông tin bé 🔄' : 'Đăng ký thành viên mới 🐶🐱')}</h3>}
                 visible={isModalOpen}
                 onCancel={() => {
                     setIsModalOpen(false);
                     setEditingPet(null);
+                    setIsViewingMode(false);
                     setImageUrl('');
                     form.resetFields();
                 }}
@@ -198,9 +213,14 @@ const MyPets: React.FC = () => {
                 className={styles.saasModal}
                 okText="Lưu hồ sơ"
                 cancelText="Hủy bỏ"
+                footer={isViewingMode ? [
+                    <Button key="close" onClick={() => { setIsModalOpen(false); setIsViewingMode(false); form.resetFields(); }}>
+                        Đóng
+                    </Button>
+                ] : undefined}
                 destroyOnClose
             >
-                <Form form={form} layout="vertical" onFinish={handleAddPet}>
+                <Form form={form} layout="vertical" onFinish={handleAddPet} disabled={isViewingMode}>
                     <Form.Item name="name" label="Tên gọi của bé" rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}>
                         <Input size="large" placeholder="Ví dụ: Buddy, Lucky..." />
                     </Form.Item>
@@ -223,9 +243,24 @@ const MyPets: React.FC = () => {
                             </Form.Item>
                         </Col>
                     </Row>
-                    <Form.Item name="breed" label="Giống loài">
-                        <Input size="large" placeholder="Poodle, Golden, Mèo Anh..." />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item name="breed" label="Giống loài">
+                                <Input size="large" placeholder="Poodle, Golden, Mèo Anh..." />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item name="age" label="Tuổi (năm)">
+                                <Input type="number" size="large" placeholder="Ví dụ: 2" min={0} />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    {editingPet && (
+                        <Form.Item name="checkup_count" label="Số lần khám">
+                            <Input size="large" disabled style={{ backgroundColor: '#f5f5f5', color: '#666' }} />
+                        </Form.Item>
+                    )}
 
                     <Form.Item label="Ảnh đại diện">
                         <Upload
