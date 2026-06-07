@@ -3,6 +3,7 @@ import { Avatar, Badge, Card, Col, Row, Spin, Tag, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { getDoctorStats, getUpcomingAppointments } from '@/services/BacSi/doctorService';
+import { thongKeNotification, getThongBao } from '@/services/ThongBao';
 import styles from './index.module.less';
 
 const { Text, Title } = Typography;
@@ -43,18 +44,24 @@ const VetDashboard: React.FC = () => {
 
   const [stats, setStats] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [statsData, appointmentsData] = await Promise.all([
+        const [statsData, appointmentsData, unreadRes, notifRes] = await Promise.all([
           getDoctorStats(),
           getUpcomingAppointments(5),
+          thongKeNotification().catch(() => ({ data: { unread_count: 0 } })),
+          getThongBao({ page: 1, limit: 5, condition: {}, sort: { createdAt: -1 } }).catch(() => ({ data: { items: [] } }))
         ]);
         setStats(statsData);
         setAppointments(appointmentsData);
+        setUnreadCount(unreadRes?.data?.unread_count || 0);
+        setNotifications(notifRes?.data?.items || []);
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu dashboard:', error);
       } finally {
@@ -66,7 +73,6 @@ const VetDashboard: React.FC = () => {
 
   const todayCount = stats?.appointments_by_status?.confirmed ?? 0;
   const pendingCount = stats?.appointments_by_status?.pending ?? 0;
-  const unreadMessages = 0; // TODO: Kết nối API unread-count khi cần
   const avgRating = 4.8; // TODO: Kết nối API đánh giá khi backend sẵn sàng
 
   return (
@@ -101,10 +107,10 @@ const VetDashboard: React.FC = () => {
           </Col>
           <Col xs={12} sm={6}>
             <Card className={`${styles.statCard} ${styles.statGreen}`}>
-              <div className={styles.statLabel}>TIN NHẮN</div>
+              <div className={styles.statLabel}>THÔNG BÁO</div>
               <MessageOutlined className={styles.statIcon} />
-              <div className={styles.statNumber}>{unreadMessages}</div>
-              <div className={styles.statDesc}>Tư vấn chờ phản hồi</div>
+              <div className={styles.statNumber}>{unreadCount}</div>
+              <div className={styles.statDesc}>Thông báo chưa đọc</div>
             </Card>
           </Col>
           <Col xs={12} sm={6}>
@@ -164,22 +170,41 @@ const VetDashboard: React.FC = () => {
           </Card>
         </Col>
 
-        {/* System Notifications — TODO: Kết nối API notifications khi backend sẵn sàng */}
+        {/* System Notifications */}
         <Col xs={24} lg={10}>
           <Card
             className={styles.sectionCard}
             title={<span className={styles.cardTitle}>Thông báo hệ thống</span>}
           >
-            {systemNotifications.map((notif) => (
-              <div key={notif.id} className={`${styles.notifItem} ${styles[`notif_${notif.type}`]}`}>
-                <div className={styles.notifIcon}>{notif.icon}</div>
-                <div className={styles.notifContent}>
-                  <div className={styles.notifTitle}>{notif.title}</div>
-                  <div className={styles.notifDesc}>{notif.desc}</div>
-                  <div className={styles.notifTime}>{notif.time}</div>
-                </div>
+            {loading ? (
+              <Spin />
+            ) : notifications.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '24px', color: '#999' }}>
+                Không có thông báo nào
               </div>
-            ))}
+            ) : (
+              notifications.map((notif: any) => {
+                const isUnread = !notif.is_read;
+                const dateStr = new Date(notif.created_at).toLocaleDateString('vi-VN');
+                return (
+                  <div key={notif.id} className={`${styles.notifItem} ${styles[`notif_${notif.type}`]}`} style={{ opacity: isUnread ? 1 : 0.6 }}>
+                    <div className={styles.notifIcon}>
+                      {notif.type === 'APPOINTMENT' ? <CalendarOutlined /> : 
+                       notif.type === 'MESSAGE' ? <MessageOutlined /> : 
+                       notif.type === 'PROMOTION' ? <StarOutlined /> : <InfoCircleOutlined />}
+                    </div>
+                    <div className={styles.notifContent}>
+                      <div className={styles.notifTitle} style={{ fontWeight: isUnread ? 'bold' : 'normal' }}>
+                        {notif.title}
+                        {isUnread && <Badge dot style={{ marginLeft: 8 }} />}
+                      </div>
+                      <div className={styles.notifDesc}>{notif.content}</div>
+                      <div className={styles.notifTime}>{dateStr}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </Card>
         </Col>
       </Row>

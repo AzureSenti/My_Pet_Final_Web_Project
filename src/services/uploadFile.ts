@@ -25,7 +25,7 @@ export async function uploadFile(payload: { file: string | Blob; scope: EFileSco
 	const form = new FormData();
 	form.append('file', payload?.file);
 	form.append('scope', payload?.scope);
-	return axios.post(`${ip3}/file`, form);
+	return axios.post(`${ip3}api/v1/upload/file`, form);
 }
 
 /**
@@ -73,5 +73,5 @@ export const buildUpLoadMultiFile = async (
 };
 
 export const getFileInfo = (id: string, ip?: string) => {
-	return axios.get(`${ip ?? ip3}/file/${id}/info`);
+	return axios.get(`${ip ?? ip3}api/v1/upload/file/${id}/info`);
 };

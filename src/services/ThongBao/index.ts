@@ -7,10 +7,10 @@ export async function postReceiver(payload: any, params: { page: number; limit: 
 }
 
 export async function readNotification(payload: { type: 'ONE' | 'ALL'; notificationId?: any }) {
-	return axios.post(`${ipNotif}/notification/read`, payload);
+	return axios.put(`${ipNotif}/${payload.notificationId}/read`);
 }
 export async function thongKeNotification() {
-	return axios.get(`${ipNotif}/notification/thong-ke`);
+	return axios.get(`${ipNotif}/unread-count`);
 }
 export async function deleteThongBao(id: string) {
 	return axios.delete(`${ipNotif}/notification/${id}`);
@@ -50,10 +50,8 @@ export async function guiThongBaoDanhSach(payload: {
 export async function getThongBao(payload: {
 	page: number;
 	limit: number;
-	condition: any;
-	sort: { createdAt: 1 | -1 };
 }) {
-	return axios.get(`${ipNotif}/notification/me/page`, { params: payload });
+	return axios.get(`${ipNotif}`, { params: { page: payload.page, limit: payload.limit } });
 }
 
 export async function getReceiver(

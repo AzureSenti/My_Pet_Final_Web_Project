@@ -1,0 +1,468 @@
+@import '../../../styles/theme.less';
+
+@bg-surface: #FFF8F2;
+
+.saasAppointmentsPage {
+    background: #FDF6EE;
+    min-height: 100vh;
+    padding: 0;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 32px;
+
+        .headerLeft {
+            h1 {
+                font-size: 32px;
+                font-weight: 800;
+                color: #1A1A1A;
+                margin: 0;
+            }
+
+            p {
+                font-size: 15px;
+                color: #6B6B6B;
+                margin: 4px 0 0;
+            }
+        }
+
+        .btnPrimary {
+            background: #D4A017;
+            border: none;
+            height: 48px;
+            padding: 0 24px;
+            border-radius: 999px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2);
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: #B88A12;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(212, 160, 23, 0.3);
+            }
+        }
+    }
+
+    .layoutBody {
+        display: grid;
+        grid-template-columns: 60% 40%;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .timelineSection {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .horizontalCard {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+
+            &:hover {
+                box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            }
+
+            .cardLeft {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                .avatarWrap {
+                    width: 64px;
+                    height: 64px;
+                    flex-shrink: 0;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 16px;
+                        object-fit: cover;
+                    }
+                }
+
+                .infoContent {
+                    .tagsRow {
+                        display: flex;
+                        gap: 8px;
+                        margin-bottom: 8px;
+
+                        .tagMint {
+                            background: #D1FAE5;
+                            color: #065F46;
+                            padding: 4px 12px;
+                            border-radius: 999px;
+                            font-size: 12px;
+                            font-weight: 700;
+                        }
+
+                        .tagYellow {
+                            background: #FEF3C7;
+                            color: #92400E;
+                            padding: 4px 12px;
+                            border-radius: 999px;
+                            font-size: 12px;
+                            font-weight: 700;
+                        }
+                    }
+
+                    .mainTitle {
+                        font-size: 18px;
+                        font-weight: 800;
+                        color: #1A1A1A;
+                        margin: 0 0 4px;
+                    }
+
+                    .subText {
+                        font-size: 13px;
+                        color: #6B6B6B;
+                        margin: 0;
+                    }
+                }
+            }
+
+            .cardRight {
+                text-align: right;
+
+                .timeWrap {
+                    margin-bottom: 8px;
+
+                    .timeTxt {
+                        display: block;
+                        font-size: 20px;
+                        font-weight: 800;
+                        color: #1A1A1A;
+                        line-height: 1.2;
+                    }
+
+                    .dateTxt {
+                        display: block;
+                        font-size: 13px;
+                        color: #6B6B6B;
+                    }
+                }
+
+                .statusBadge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 13px;
+                    font-weight: 700;
+
+                    .iconCircle {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        font-size: 11px;
+                        color: white;
+                    }
+
+                    &.confirmed {
+                        color: #10B981;
+                        .iconCircle {
+                            background: #10B981;
+                        }
+                    }
+
+                    &.pending {
+                        color: #F59E0B;
+                        .iconCircle {
+                            background: #F59E0B;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .infoSection {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .infoBox {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+
+            .boxHeader {
+                margin-bottom: 20px;
+
+                .boxTitle {
+                    font-size: 18px;
+                    font-weight: 800;
+                    color: #1A1A1A;
+                    margin: 0;
+                }
+
+                .boxSub {
+                    font-size: 14px;
+                    color: #6B6B6B;
+                    margin: 4px 0 0;
+                }
+            }
+
+            .boxTitle {
+                font-size: 18px;
+                font-weight: 800;
+                color: #1A1A1A;
+                margin: 0 0 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .checkIcon {
+                    font-size: 18px;
+                }
+            }
+
+            .contactList {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+
+                .contactItem {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 12px;
+
+                    .iconPin, .iconPhone {
+                        font-size: 20px;
+                        margin-top: 2px;
+                    }
+
+                    strong {
+                        display: block;
+                        color: #1A1A1A;
+                        font-size: 15px;
+                        margin-bottom: 4px;
+                    }
+
+                    span {
+                        display: block;
+                        color: #6B6B6B;
+                        font-size: 13px;
+                    }
+                }
+            }
+
+            .checkList {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                li {
+                    position: relative;
+                    padding-left: 16px;
+                    margin-bottom: 12px;
+                    font-size: 14px;
+                    color: #6B6B6B;
+                    line-height: 1.5;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    &::before {
+                        content: '•';
+                        position: absolute;
+                        left: 0;
+                        color: #D4A017;
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        .promoBanner {
+            background: #4A4A2A;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+
+            h3 {
+                font-size: 24px;
+                font-weight: 800;
+                color: white;
+                margin: 0 0 8px;
+            }
+
+            p {
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.8);
+                margin: 0 0 24px;
+            }
+
+            .btnBanner {
+                background: white;
+                border: none;
+                height: 40px;
+                padding: 0 24px;
+                border-radius: 999px;
+                color: #1A1A1A;
+                font-weight: 700;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background: #FEF3C7;
+                    color: #D4A017;
+                }
+            }
+        }
+    }
+}
+
+/* Enhanced Premium SaaS Modal Styling */
+.saasModal {
+    :global {
+        .ant-modal-content {
+            border-radius: 32px;
+            background: @bg-surface;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .ant-modal-header {
+            background: white;
+            padding: 32px 40px;
+            border-bottom: 1px solid @border-soft;
+
+            .ant-modal-title {
+                h3 {
+                    font-size: 26px;
+                    font-weight: 800;
+                    color: @text-main;
+                    margin: 0;
+                    letter-spacing: -0.5px;
+                }
+            }
+        }
+
+        .ant-modal-close {
+            top: 32px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            background: @bg-container;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+
+            &:hover {
+                background: #E5E7EB;
+                color: @text-main;
+            }
+        }
+
+        .ant-modal-body {
+            padding: 40px;
+            background: @bg-surface;
+        }
+
+        .ant-modal-footer {
+            border-top: 1px solid @border-soft;
+            padding: 24px 40px;
+            background: white;
+
+            .ant-btn {
+                height: 52px;
+                padding: 0 32px;
+                border-radius: 16px;
+                font-weight: 800;
+                font-size: 15px;
+                border: 2px solid @border-soft;
+                color: @text-main;
+
+                &:hover {
+                    border-color: @text-main;
+                }
+
+                &.ant-btn-primary {
+                    background: #D4A017;
+                    border: none;
+                    color: white;
+                    box-shadow: 0 10px 20px rgba(212, 160, 23, 0.2);
+
+                    &:hover {
+                        background: #B88A12;
+                        transform: translateY(-2px);
+                        box-shadow: 0 15px 30px rgba(212, 160, 23, 0.3);
+                    }
+                }
+            }
+        }
+
+        /* Form Fields Redesign */
+        .ant-form-item-label {
+            padding-bottom: 12px;
+
+            label {
+                font-weight: 800;
+                color: @text-main;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        .ant-input,
+        .ant-select-selector,
+        .ant-picker {
+            border: 2px solid @border-soft !important;
+            border-radius: 16px !important;
+            background: white !important;
+            padding: 12px 20px !important;
+            height: auto !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+
+            &:hover {
+                border-color: @primary !important;
+            }
+
+            &:focus,
+            &-focused {
+                border-color: @primary !important;
+                box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.1) !important;
+            }
+        }
+
+        .ant-select-selection-item {
+            font-weight: 600;
+            line-height: 24px !important;
+        }
+
+        .ant-input-textarea {
+            border: 2px solid @border-soft !important;
+            border-radius: 18px !important;
+            padding: 16px 20px !important;
+
+            &:focus {
+                border-color: @primary !important;
+            }
+        }
+    }
+}

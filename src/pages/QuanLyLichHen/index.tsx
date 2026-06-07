@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
+import { Search, Filter, Plus, Calendar as CalendarIcon, Clock, CheckCircle, Download } from 'lucide-react';
 import { Modal, Form, Input, Select, message, Button, DatePicker, Descriptions, Tag } from 'antd';
+import * as XLSX from 'xlsx';
 import '../TrangChu/components/style.less'; // Inherit base dashboard layout
 import HeaderProfile from '@/components/HeaderProfile';
 import './style.less';
@@ -90,6 +91,13 @@ const QuanLyLichHen: React.FC = () => {
 		});
 	};
 
+	const handleCompleteAppointment = (id: string) => {
+		updateAppointmentStatus(id, 'completed').then(() => {
+			message.success('Đã hoàn thành lịch hẹn và tạo hóa đơn!');
+			fetchData();
+		});
+	};
+
 	const handleCancelAppointment = (id: string) => {
 		updateAppointmentStatus(id, 'cancelled').then(() => {
 			message.success('Đã hủy lịch hẹn!');
@@ -114,6 +122,52 @@ const QuanLyLichHen: React.FC = () => {
 		setServiceFilter('Tất cả');
 		setVetFilter('Tất cả');
 		setIsFilterModalOpen(false);
+	};
+
+	const handleExportExcel = () => {
+		if (displayedAppointments.length === 0) {
+			message.warning('Không có dữ liệu để xuất báo cáo!');
+			return;
+		}
+
+		const dataToExport = displayedAppointments.map(app => ({
+			'Mã lịch hẹn': app.id.substring(0, 8).toUpperCase(),
+			'Thú cưng': app.pet?.name || 'Không rõ',
+			'Loại': app.pet?.species || 'N/A',
+			'Chủ sở hữu': app.owner?.full_name || 'Không rõ',
+			'Điện thoại': app.owner?.phone || 'N/A',
+			'Bác sĩ': app.vet?.user?.full_name || 'Không rõ',
+			'Dịch vụ': app.service?.name || 'Dịch vụ lẻ',
+			'Thời gian': new Date(app.scheduled_at).toLocaleString('vi-VN'),
+			'Trạng thái': app.status === 'confirmed' ? 'Đã xác nhận' :
+				app.status === 'pending' ? 'Chờ xác nhận' :
+					app.status === 'completed' ? 'Hoàn thành' : 'Đã hủy',
+			'Ghi chú': app.notes || ''
+		}));
+
+		const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+		// Style header (optional, standard xlsx is limited in styling without extra plugins, but we can set column widths)
+		const wscols = [
+			{ wch: 15 }, // Mã
+			{ wch: 15 }, // Thú cưng
+			{ wch: 10 }, // Loại
+			{ wch: 20 }, // Chủ sở hữu
+			{ wch: 15 }, // Điện thoại
+			{ wch: 20 }, // Bác sĩ
+			{ wch: 20 }, // Dịch vụ
+			{ wch: 20 }, // Thời gian
+			{ wch: 15 }, // Trạng thái
+			{ wch: 30 }, // Ghi chú
+		];
+		worksheet['!cols'] = wscols;
+
+		const workbook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workbook, worksheet, 'Lịch hẹn');
+
+		const fileName = `Bao_cao_lich_hen_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+		XLSX.writeFile(workbook, fileName);
+		message.success(`Đã xuất báo cáo: ${fileName}`);
 	};
 
 	const getStatusBadge = (status: string, text: string) => {
@@ -147,7 +201,7 @@ const QuanLyLichHen: React.FC = () => {
 				return false;
 			}
 		}
-		
+
 		return true;
 	});
 
@@ -190,6 +244,10 @@ const QuanLyLichHen: React.FC = () => {
 						>
 							<Filter size={16} />
 							Lọc lịch hẹn {(statusFilter !== 'Tất cả' || serviceFilter !== 'Tất cả' || vetFilter !== 'Tất cả') && '•'}
+						</button>
+						<button className="btn-export-premium" onClick={handleExportExcel}>
+							<Download size={16} />
+							Xuất báo cáo
 						</button>
 						<button className="btn-primary" onClick={() => setIsModalOpen(true)}>
 							<Plus size={16} />
@@ -264,7 +322,7 @@ const QuanLyLichHen: React.FC = () => {
 											<tr key={item.id}>
 												<td>
 													<div className="cell-pet">
-														<img src={item.pet?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150'} alt={item.pet?.name} />
+														<img src={item.pet?.avatar_url || '/assets/images/pet_placeholder.png'} alt={item.pet?.name} />
 														<div>
 															<div className="pet-name">{item.pet?.name || 'Không rõ'}</div>
 															<div className="pet-breed">{item.pet?.breed || 'Chưa rõ'}</div>
@@ -300,7 +358,10 @@ const QuanLyLichHen: React.FC = () => {
 															<>
 																<button className="btn-action btn-text" onClick={() => { setSelectedAppointment(item); setDetailModalOpen(true); }}>Chi tiết</button>
 																{item.status === 'confirmed' && (
-																	<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
+																	<>
+																		<button className="btn-action btn-confirm" style={{ backgroundColor: '#10B981' }} onClick={() => handleCompleteAppointment(item.id)}>Hoàn thành</button>
+																		<button className="btn-action btn-text" style={{ color: '#E11D48' }} onClick={() => handleCancelAppointment(item.id)}>Hủy</button>
+																	</>
 																)}
 															</>
 														)}
@@ -359,11 +420,11 @@ const QuanLyLichHen: React.FC = () => {
 									<div key={`empty-${i}`} className="cal-day empty"></div>
 								))}
 								{Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => (
-									<div 
-										key={day} 
+									<div
+										key={day}
 										className={`cal-day ${selectedDay === day ? 'active' : ''}`}
-										onClick={() => { 
-											setSelectedDay(selectedDay === day ? null : day); 
+										onClick={() => {
+											setSelectedDay(selectedDay === day ? null : day);
 										}}
 										title={selectedDay === day ? "Bấm để bỏ chọn ngày" : `Xem lịch hẹn ngày ${day}`}
 									>
@@ -527,17 +588,17 @@ const QuanLyLichHen: React.FC = () => {
 							{selectedAppointment.id.substring(0, 8).toUpperCase()}
 						</Descriptions.Item>
 						<Descriptions.Item label="Trạng thái">
-							{getStatusBadge(selectedAppointment.status, 
-								selectedAppointment.status === 'confirmed' ? 'Đã xác nhận' : 
-								selectedAppointment.status === 'pending' ? 'Chờ xác nhận' : 
-								selectedAppointment.status === 'completed' ? 'Hoàn thành' : 'Đã hủy')}
+							{getStatusBadge(selectedAppointment.status,
+								selectedAppointment.status === 'confirmed' ? 'Đã xác nhận' :
+									selectedAppointment.status === 'pending' ? 'Chờ xác nhận' :
+										selectedAppointment.status === 'completed' ? 'Hoàn thành' : 'Đã hủy')}
 						</Descriptions.Item>
 						<Descriptions.Item label="Thời gian">
 							{new Date(selectedAppointment.scheduled_at).toLocaleString('vi-VN')}
 						</Descriptions.Item>
 						<Descriptions.Item label="Thú cưng">
 							<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-								<img src={selectedAppointment.pet?.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=150'} alt="pet" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
+								<img src={selectedAppointment.pet?.avatar_url || '/assets/images/pet_placeholder.png'} alt="pet" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
 								<strong>{selectedAppointment.pet?.name}</strong> ({selectedAppointment.pet?.breed})
 							</div>
 						</Descriptions.Item>

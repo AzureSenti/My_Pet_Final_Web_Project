@@ -7,8 +7,12 @@ import {
   FileTextOutlined,
   ToolOutlined,
   CheckCircleFilled,
+  CameraOutlined,
 } from '@ant-design/icons';
 import { updateProfile } from '@/services/BacSi/doctorService';
+import { Upload } from 'antd';
+import axios from '@/utils/axios';
+import { ip3 } from '@/utils/ip';
 import styles from './index.module.less';
 
 const HoSoEdit: React.FC = () => {
@@ -17,7 +21,30 @@ const HoSoEdit: React.FC = () => {
 
   const [fullName, setFullName] = useState(currentUser?.full_name || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [bio, setBio] = useState(currentUser?.vet_profile?.bio || '');
+  const [avatarUrl, setAvatarUrl] = useState(currentUser?.avatar_url || '');
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleUploadAvatar = async (options: any) => {
+    const { file, onSuccess, onError } = options;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      setUploading(true);
+      const res = await axios.post(`${ip3}api/v1/upload/file`, formData);
+      const url = res.data.data.url;
+      // Prepend ip3 so it loads locally if not absolute (but url from api starts with /)
+      setAvatarUrl(url.startsWith('http') ? url : `${ip3}${url.replace(/^\//, '')}`);
+      onSuccess("ok");
+      message.success('Tải ảnh lên thành công!');
+    } catch (err) {
+      onError(err);
+      message.error('Tải ảnh lên thất bại');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!fullName.trim()) {
@@ -30,6 +57,8 @@ const HoSoEdit: React.FC = () => {
       const updatedUser = await updateProfile({
         full_name: fullName.trim(),
         phone: phone.trim() || undefined,
+        bio: bio.trim() || undefined,
+        avatar_url: avatarUrl || undefined,
       });
 
       // Cập nhật lại initialState để các trang khác cũng hiện dữ liệu mới
@@ -67,7 +96,17 @@ const HoSoEdit: React.FC = () => {
         <div className={styles.leftCol}>
           <div className={`${styles.card} ${styles.avatarCard}`}>
             <div className={styles.avatarBox}>
-              <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${fullName}`} alt="Doctor Avatar" />
+              <img src={avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${fullName}`} alt="Doctor Avatar" />
+              <Upload
+                name="file"
+                showUploadList={false}
+                customRequest={handleUploadAvatar}
+                accept="image/*"
+              >
+                <button className={styles.btnUploadAvatar} disabled={uploading}>
+                  <CameraOutlined /> {uploading ? 'Đang tải...' : 'Đổi ảnh'}
+                </button>
+              </Upload>
             </div>
             <h2 className={styles.docName}>Dr. {fullName || currentUser?.full_name}</h2>
             <span className={styles.docRole}>Bác sĩ Thú y</span>
@@ -154,7 +193,8 @@ const HoSoEdit: React.FC = () => {
               {/* TODO: Thêm field bio vào backend UserUpdate schema nếu cần */}
               <textarea
                 className={styles.textarea}
-                defaultValue={`Bác sĩ ${fullName} chuyên sâu trong lĩnh vực thú y.`}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
                 placeholder="Mô tả tiểu sử chuyên môn của bạn..."
               />
             </div>

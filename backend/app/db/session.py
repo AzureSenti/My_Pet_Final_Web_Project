@@ -1,14 +1,19 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 
-# Async engine
+# Async engine - Cấu hình tối ưu cho Supabase Pooler (PgBouncer)
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.APP_ENV == "development",
     pool_pre_ping=True,
-    connect_args={"statement_cache_size": 0, "prepared_statement_cache_size": 0},
+    poolclass=NullPool,
+    connect_args={
+        "statement_cache_size": 0,
+        "prepared_statement_cache_size": 0
+    },
 )
 
 # Session factory

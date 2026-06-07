@@ -1,0 +1,468 @@
+@import '../../../styles/theme.less';
+
+@bg-page: #faf6f1;
+@text-main: #2d1f0e;
+@text-muted: #8a7560;
+@primary-amber: #c8960c;
+
+.hoSoPage {
+    background-color: @bg-page;
+    min-height: 100vh;
+    padding-bottom: 40px;
+
+    .pageHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 24px;
+
+        .titleArea {
+            h1 {
+                font-size: 28px;
+                font-weight: 800;
+                color: @text-main;
+                letter-spacing: -0.5px;
+                margin-bottom: 4px;
+            }
+
+            p {
+                font-size: 14px;
+                color: @text-muted;
+                margin: 0;
+            }
+        }
+
+        .filterArea {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .petSelect {
+                :global {
+                    .ant-select-selector {
+                        border-radius: 999px !important;
+                        border: 1px solid #e5e0d8 !important;
+                        background: white !important;
+                        box-shadow: 0 4px 15px rgba(212, 160, 23, 0.03) !important;
+                        font-weight: 700;
+                        color: @text-main;
+                        padding: 0 16px !important;
+                        height: 44px !important;
+                        display: flex;
+                        align-items: center;
+                    }
+                }
+            }
+
+            .searchBar {
+                width: 260px;
+                border-radius: 999px !important;
+                border: 1px solid #e5e0d8 !important;
+                background: white !important;
+                box-shadow: 0 4px 15px rgba(212, 160, 23, 0.03) !important;
+                font-size: 14px;
+                height: 44px;
+                padding: 0 20px !important;
+
+                &:hover,
+                &:focus,
+                &.ant-input-affix-wrapper-focused {
+                    border-color: @primary-amber !important;
+                    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.08) !important;
+                }
+            }
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+
+            .filterArea {
+                width: 100%;
+                flex-direction: column;
+
+                .petSelect, .searchBar {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .recordList {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .recordCard {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 16px;
+            border: 1px solid #e5e0d8;
+            box-shadow: none;
+
+            .cardHeader {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+
+                .dateInfo {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: @text-muted;
+                    font-weight: 600;
+                    font-size: 13px;
+
+                    svg {
+                        color: @primary-amber;
+                    }
+                }
+
+                .diagBadge {
+                    background: #fdf5e6;
+                    color: @primary-amber;
+                    font-size: 12px;
+                    font-weight: 700;
+                    padding: 4px 12px;
+                    border-radius: 99px;
+                }
+            }
+
+            .diagnosisTitle {
+                font-size: 20px;
+                font-weight: 800;
+                color: @text-main;
+                margin-bottom: 8px;
+            }
+
+            .doctorInfo {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                color: @text-muted;
+                font-size: 13px;
+                font-weight: 500;
+                margin-bottom: 16px;
+            }
+
+            .treatmentBox {
+                background: #faf6f1;
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+
+                .treatmentLabel {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: @primary-amber;
+                    font-size: 13px;
+                    margin-bottom: 4px;
+
+                    strong {
+                        font-weight: 800;
+                    }
+                }
+
+                .treatmentText {
+                    margin: 0;
+                    color: @text-main;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    font-weight: 500;
+                }
+            }
+
+            .notesBox {
+                font-size: 13px;
+                color: #a39687;
+                font-style: italic;
+                line-height: 1.5;
+            }
+        }
+
+        .loadMoreWrap {
+            text-align: center;
+            margin-top: 8px;
+
+            .btnLoadMore {
+                color: @text-muted;
+                font-weight: 600;
+                font-size: 13px;
+                background: #f0e9df;
+                border-radius: 99px;
+                padding: 4px 20px;
+
+                &:hover {
+                    color: @text-main;
+                    background: #e5e0d8;
+                }
+            }
+        }
+
+        .emptyState {
+            background: white;
+            border: 1px solid #e5e0d8;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            
+            .ant-empty-description {
+                color: @text-muted;
+                font-size: 14px;
+                margin-top: 16px;
+            }
+        }
+    }
+
+    .summaryCard {
+        background: #2d1f0e;
+        border-radius: 16px;
+        padding: 24px;
+        color: white;
+
+        .summaryHeader {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+
+            h3 {
+                color: white;
+                margin: 0;
+                font-size: 16px;
+                font-weight: 800;
+            }
+        }
+
+        .metricList {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+
+            .metricItem {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                flex: 1;
+
+                .metricLabel {
+                    color: #a39687;
+                    font-size: 13px;
+                    font-weight: 500;
+                }
+
+                .metricValue {
+                    color: white;
+                    font-size: 18px;
+                    font-weight: 800;
+                }
+            }
+
+            .metricSeparator {
+                width: 1px;
+                height: 36px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 0 16px;
+            }
+        }
+
+        .ctaBox {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+
+            p {
+                color: #a39687;
+                font-size: 12px;
+                margin-bottom: 12px;
+            }
+
+            .btnChat {
+                background: @primary-amber;
+                color: white;
+                border: none;
+                height: 40px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:hover {
+                    background: darken(@primary-amber, 5%);
+                }
+            }
+        }
+    }
+
+    .infoBox {
+        background: #FFFBEB;
+        border: 1px dashed rgba(212, 160, 23, 0.3);
+        box-shadow: none;
+        padding: 16px;
+        border-radius: 16px;
+
+        h4 {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: @text-main;
+            font-weight: 800;
+            margin-bottom: 8px;
+            font-size: 14px;
+
+            svg {
+                color: #D4A017;
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        p {
+            color: @text-muted;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+        }
+    }
+
+    .emptyState {
+        background: white;
+        border: none;
+        box-shadow: 0 10px 40px rgba(212, 160, 23, 0.06);
+        border-radius: 36px;
+        padding: 120px 40px;
+        text-align: center;
+        
+        .ant-empty-description {
+            color: @text-muted;
+            font-size: 16px;
+            margin-top: 24px;
+        }
+    }
+}
+
+.saasModal {
+    :global {
+        .ant-modal-content {
+            border-radius: 36px;
+            background: #FFF8F2;
+            box-shadow: 0 25px 60px rgba(212, 160, 23, 0.15);
+            border: none;
+            overflow: hidden;
+        }
+
+        .ant-modal-header {
+            background: white;
+            padding: 32px 40px;
+            border-bottom: none;
+
+            .ant-modal-title {
+                h3 {
+                    font-size: 26px;
+                    font-weight: 800;
+                    color: @text-main;
+                    margin: 0;
+                    letter-spacing: -0.5px;
+                }
+            }
+        }
+
+        .ant-modal-close {
+            top: 32px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            background: #F3F4F6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+
+            &:hover {
+                background: #FEF3C7;
+                color: #D4A017;
+            }
+        }
+
+        .ant-modal-body {
+            padding: 40px;
+            background: #FFF8F2;
+        }
+
+        .ant-modal-footer {
+            border-top: none;
+            padding: 24px 40px;
+            background: white;
+
+            .ant-btn {
+                height: 52px;
+                padding: 0 32px;
+                border-radius: 16px;
+                font-weight: 800;
+                font-size: 15px;
+                border: 2px solid @border-soft;
+                color: @text-main;
+
+                &:hover {
+                    border-color: @text-main;
+                }
+
+                &.ant-btn-primary {
+                    background: #D4A017;
+                    border: none;
+                    color: white;
+                    box-shadow: 0 10px 20px rgba(212, 160, 23, 0.2);
+
+                    &:hover {
+                        background: #B88A12;
+                        transform: translateY(-2px);
+                        box-shadow: 0 15px 30px rgba(212, 160, 23, 0.3);
+                    }
+                }
+            }
+        }
+
+        .ant-form-item-label {
+            padding-bottom: 12px;
+
+            label {
+                font-weight: 800;
+                color: @text-main;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        .ant-input,
+        .ant-select-selector,
+        .ant-picker {
+            border: none !important;
+            border-radius: 20px !important;
+            background: white !important;
+            padding: 16px 20px !important;
+            height: auto !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 15px rgba(212, 160, 23, 0.05) !important;
+            transition: all 0.3s !important;
+
+            &:hover {
+                box-shadow: 0 6px 20px rgba(212, 160, 23, 0.1) !important;
+            }
+
+            &:focus,
+            &-focused {
+                box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.15) !important;
+            }
+        }
+    }
+}

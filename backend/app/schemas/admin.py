@@ -13,6 +13,7 @@ class UserAdminResponse(BaseModel):
     phone: Optional[str] = None
     role: UserRole
     is_active: bool
+    avatar_url: Optional[str] = None
     created_at: datetime
 
     class Config:

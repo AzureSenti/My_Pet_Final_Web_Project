@@ -199,9 +199,19 @@ async def create_conversation(
         db.add(msg)
 
     await db.commit()
-    await db.refresh(conv)
+    
+    # Reload with all relationships
+    query = (
+        select(Conversation)
+        .where(Conversation.id == conv.id)
+        .options(
+            selectinload(Conversation.participants).selectinload(ConversationParticipant.user)
+        )
+    )
+    result = await db.execute(query)
+    conv_fully_loaded = result.scalar_one()
 
-    return await _build_conversation_response(db, conv, user.id)
+    return await _build_conversation_response(db, conv_fully_loaded, user.id)
 
 
 async def _find_direct_conversation(
@@ -238,6 +248,9 @@ async def _find_direct_conversation(
                     ConversationParticipant.user_id == user_id_2,
                 )
             ),
+        )
+        .options(
+            selectinload(Conversation.participants).selectinload(ConversationParticipant.user)
         )
     )
     result = await db.execute(query)
@@ -276,6 +289,9 @@ async def get_conversations(
     query = (
         select(Conversation)
         .where(Conversation.id.in_(select(participant_subq)))
+        .options(
+            selectinload(Conversation.participants).selectinload(ConversationParticipant.user)
+        )
         .order_by(Conversation.updated_at.desc())
         .offset((page - 1) * limit)
         .limit(limit)
@@ -302,10 +318,6 @@ async def _build_conversation_response(
     current_user_id: uuid.UUID,
 ) -> ConversationResponse:
     """Build ConversationResponse từ Conversation ORM."""
-
-    # Load participants nếu chưa load
-    if not conv.participants:
-        await db.refresh(conv, ["participants"])
 
     participants = [_participant_brief(p.user) for p in conv.participants]
 
@@ -352,7 +364,11 @@ async def get_conversation_detail(
     await _check_participant(db, conversation_id, user.id)
 
     result = await db.execute(
-        select(Conversation).where(Conversation.id == conversation_id)
+        select(Conversation)
+        .where(Conversation.id == conversation_id)
+        .options(
+            selectinload(Conversation.participants).selectinload(ConversationParticipant.user)
+        )
     )
     conv = result.scalar_one_or_none()
     if not conv:
@@ -361,7 +377,6 @@ async def get_conversation_detail(
             detail="Không tìm thấy cuộc trò chuyện.",
         )
 
-    await db.refresh(conv, ["participants"])
     participants = [_participant_brief(p.user) for p in conv.participants]
 
     my_participant = next(

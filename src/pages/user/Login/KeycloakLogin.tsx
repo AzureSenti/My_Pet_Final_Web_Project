@@ -1,5 +1,5 @@
 import { adminlogin, getUserInfo } from '@/services/base/api';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Mail, Lock } from 'lucide-react';
 import { Button, Form, Input, message } from 'antd';
 import React, { useState } from 'react';
 import { history, useModel } from 'umi';
@@ -12,15 +12,12 @@ const LoginWithCredentials: React.FC = () => {
 	const handleSubmit = async (values: { email: string; password: string }) => {
 		setSubmitting(true);
 		try {
-			// Gọi API login thực tế
 			const res = await adminlogin(values);
 
 			if (res.status === 200 && res.data?.access_token) {
-				// Lưu token vào localStorage
 				localStorage.setItem('token', res.data.access_token);
 				localStorage.setItem('refreshToken', res.data.refresh_token);
 
-				// Lấy thông tin user hiện tại từ API /me
 				const info = await getUserInfo();
 				const userData = info?.data;
 
@@ -29,9 +26,12 @@ const LoginWithCredentials: React.FC = () => {
 					currentUser: userData,
 				});
 
-				message.success('Đăng nhập thành công!');
+				message.success('Đăng nhập thành công! 🐾');
+
 				if (userData?.role === 'vet') {
 					history.push('/bac-si/dashboard');
+				} else if (userData?.role === 'owner') {
+					history.push('/khach-hang/dashboard');
 				} else {
 					history.push('/dashboard');
 				}
@@ -57,22 +57,22 @@ const LoginWithCredentials: React.FC = () => {
 				]}
 			>
 				<Input
-					prefix={<UserOutlined />}
-					placeholder="Nhập email (admin@gmail.com)"
+					prefix={<Mail size={18} style={{ opacity: 0.5, marginRight: 8 }} />}
+					placeholder="Nhập email"
 					size="large"
 				/>
 			</Form.Item>
 
 			<Form.Item name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
 				<Input.Password
-					prefix={<LockOutlined />}
-					placeholder="Nhập mật khẩu (123456)"
+					prefix={<Lock size={18} style={{ opacity: 0.5, marginRight: 8 }} />}
+					placeholder="Nhập mật khẩu"
 					size="large"
 				/>
 			</Form.Item>
 
 			<Button type="primary" htmlType="submit" block size="large" loading={submitting}>
-				Đăng nhập
+				Tiếp tục trải nghiệm
 			</Button>
 
 			<Button

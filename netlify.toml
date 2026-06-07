@@ -1,0 +1,39 @@
+# ─────────────────────────────────────────────────────────
+# Netlify Configuration for MyPet Frontend (UmiJS)
+# ─────────────────────────────────────────────────────────
+
+[build]
+  # Thư mục chứa source code
+  base = "/"
+  # Sử dụng --legacy-peer-deps để tránh xung đột version dependencies
+  command = "npm install --legacy-peer-deps && npm run build"
+  # Thư mục output
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "16"
+  # Giúp npm tự động xử lý peer dependencies
+  NPM_FLAGS = "--legacy-peer-deps"
+  # Một số package yêu cầu python để build node-gyp
+  PYTHON_VERSION = "3.10"
+  # ⚠️ QUAN TRỌNG: Thay URL bên dưới bằng URL backend Render thực tế
+  APP_CONFIG_IP_ROOT = "https://my-pet-final-web-project.onrender.com/"
+  APP_CONFIG_APP_VERSION = "1.0.0"
+  APP_CONFIG_CO_QUAN_CHU_QUAN = "MyPet"
+  APP_CONFIG_TEN_TRUONG = "MyPet Shop"
+  APP_CONFIG_TIEN_TO_TRUONG = "Cửa hàng"
+  APP_CONFIG_TEN_TRUONG_VIET_TAT_TIENG_ANH = "MYPET"
+  APP_CONFIG_PRIMARY_COLOR = "#F6D776"
+  APP_CONFIG_URL_LANDING = "/"
+  APP_CONFIG_TITLE_LANDING = "Cổng thông tin MyPet"
+  APP_CONFIG_TITLE_CONNECT = "MyPet"
+  APP_CONFIG_TITLE_CAN_BO = "Quản trị hệ thống"
+
+# ─────────────────────────────────────────────────────────
+# SPA Redirect: Tất cả routes đều trả về index.html
+# (Cần cho UmiJS client-side routing)
+# ─────────────────────────────────────────────────────────
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
