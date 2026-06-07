@@ -50,9 +50,19 @@ netlify_url = os.getenv("NETLIFY_FRONTEND_URL", "")
 if netlify_url:
     allowed_origins.append(netlify_url)
 
+# ─────────────────────────── CORS ───────────────────────────
+
+allowed_origins = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://petcare-mypet.netlify.app",  # URL Netlify của bạn
+    "https://mypet-api.onrender.com",     # URL Backend của bạn
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cho phép tất cả mọi nguồn để tránh lỗi CORS khi deploy
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
