@@ -6,7 +6,7 @@
 @primary-amber: #c8960c;
 
 .hoSoPage {
-    background-color: @bg-page;
+    background-color: transparent;
     min-height: 100vh;
     padding-bottom: 40px;
 
@@ -44,25 +44,61 @@
                         border: 1px solid #e5e0d8 !important;
                         background: white !important;
                         box-shadow: 0 4px 15px rgba(212, 160, 23, 0.03) !important;
-                        font-weight: 700;
+                        font-weight: 600;
+                        font-family: inherit;
                         color: @text-main;
-                        padding: 0 16px !important;
-                        height: 44px !important;
+                        padding: 0 20px !important;
+                        height: 48px !important;
+                        transition: all 0.3s ease;
+                    }
+                    .ant-select-selection-item,
+                    .ant-select-selection-placeholder {
+                        line-height: 46px !important;
                         display: flex;
                         align-items: center;
+                        gap: 8px;
                     }
+                    .ant-select-arrow {
+                        color: @primary-amber;
+                    }
+                }
+                
+                &:hover :global(.ant-select-selector) {
+                    border-color: @primary-amber !important;
+                    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.08) !important;
+                }
+                
+                &.ant-select-focused :global(.ant-select-selector) {
+                    border-color: @primary-amber !important;
+                    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.15) !important;
                 }
             }
 
             .searchBar {
-                width: 260px;
+                width: 280px;
                 border-radius: 999px !important;
                 border: 1px solid #e5e0d8 !important;
                 background: white !important;
                 box-shadow: 0 4px 15px rgba(212, 160, 23, 0.03) !important;
-                font-size: 14px;
-                height: 44px;
+                font-weight: 600;
+                font-family: inherit;
+                font-size: 15px;
+                height: 48px;
                 padding: 0 20px !important;
+                color: @text-main;
+                transition: all 0.3s ease;
+
+                :global {
+                    .ant-input {
+                        font-weight: 600;
+                        font-family: inherit;
+                        color: @text-main;
+                    }
+                    .ant-input-prefix {
+                        color: @primary-amber;
+                        margin-right: 8px;
+                    }
+                }
 
                 &:hover,
                 &:focus,
