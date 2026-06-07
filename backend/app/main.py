@@ -21,6 +21,7 @@ from app.api.v1 import owner as owner_router
 from app.api.v1 import upload as upload_router
 from app.api.v1 import notification as notification_router
 from app.api.v1 import messages as messages_router
+from app.api.v1 import report as report_router
 from app.models.user import User
 
 app = FastAPI(
@@ -33,20 +34,19 @@ app = FastAPI(
 
 # ─────────────────────────── CORS ───────────────────────────
 
-# Định nghĩa danh sách các nguồn (origins) được phép truy cập vào backend này
-allowed_origins = [
-    settings.FRONTEND_URL,       # URL cấu hình từ file env công ty/cá nhân
-    "http://localhost:8000",     # Port cũ phòng hờ
-    "http://localhost:8001",     # Port thực tế backend đang chạy trong terminal của bạn
-    "http://localhost:3000",     # Port mặc định của React (Create React App)
-    "http://localhost:5173",     # Port mặc định của React (Vite)
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=[
+        "http://localhost:8000",
+        "http://localhost:8001",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "https://petcare-mypet.netlify.app",
+        "https://mypet-api.onrender.com",
+    ],
+    allow_origin_regex=r"https://.*\.netlify\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,7 +70,7 @@ app.include_router(owner_router.router, prefix="/api/v1")
 app.include_router(upload_router.router, prefix="/api/v1")
 app.include_router(notification_router.router, prefix="/api/v1")
 app.include_router(messages_router.router, prefix="/api/v1")
-
+app.include_router(report_router.router, prefix="/api/v1")
 
 # ─────────────────────────── Health ───────────────────────────
 

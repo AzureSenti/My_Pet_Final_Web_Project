@@ -61,6 +61,20 @@ async def register_user(data: RegisterRequest, db: AsyncSession) -> RegisterResp
         avatar_url=data.avatar_url,
     )
     db.add(user)
+    await db.flush() # Để lấy user.id
+
+    # Nếu vai trò là Bác sĩ (vet), tự động tạo hồ sơ bác sĩ
+    from app.models.user import UserRole
+    if user.role == UserRole.vet:
+        from app.models.veterinarian import Veterinarian
+        vet_profile = Veterinarian(
+            user_id=user.id,
+            specialization="Đang cập nhật",
+            bio="Thông tin bác sĩ đang được cập nhật...",
+            is_active=True
+        )
+        db.add(vet_profile)
+
     await db.commit()
     await db.refresh(user)
 
