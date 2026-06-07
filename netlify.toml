@@ -3,16 +3,19 @@
 # ─────────────────────────────────────────────────────────
 
 [build]
-  # Thư mục chứa source code (root của monorepo)
+  # Thư mục chứa source code
   base = "/"
-  # Lệnh build frontend
-  command = "npm install && npm run build"
-  # Thư mục output sau build (UmiJS build ra dist/)
+  # Sử dụng --legacy-peer-deps để tránh xung đột version dependencies
+  command = "npm install --legacy-peer-deps && npm run build"
+  # Thư mục output
   publish = "dist"
 
 [build.environment]
-  # Node 16 theo yêu cầu của package.json
   NODE_VERSION = "16"
+  # Giúp npm tự động xử lý peer dependencies
+  NPM_FLAGS = "--legacy-peer-deps"
+  # Một số package yêu cầu python để build node-gyp
+  PYTHON_VERSION = "3.10"
   # ⚠️ QUAN TRỌNG: Thay URL bên dưới bằng URL backend Render thực tế
   APP_CONFIG_IP_ROOT = "https://mypet-api.onrender.com/"
   APP_CONFIG_APP_VERSION = "1.0.0"
