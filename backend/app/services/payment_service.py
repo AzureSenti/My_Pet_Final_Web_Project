@@ -76,7 +76,16 @@ async def update_payment_status(
     payment_id: uuid.UUID,
     data: PaymentUpdateStatusRequest,
 ) -> Payment:
-    result = await db.execute(select(Payment).where(Payment.id == payment_id))
+    result = await db.execute(
+        select(Payment)
+        .options(
+            joinedload(Payment.owner),
+            joinedload(Payment.appointment).joinedload(Appointment.pet),
+            joinedload(Payment.appointment).joinedload(Appointment.vet),
+            joinedload(Payment.appointment).joinedload(Appointment.service),
+        )
+        .where(Payment.id == payment_id)
+    )
     payment = result.scalar_one_or_none()
     if not payment:
         raise HTTPException(status_code=404, detail="Thanh toán không tồn tại")
@@ -99,3 +108,18 @@ async def get_payments_by_owner(db: AsyncSession, owner_id: uuid.UUID) -> list[P
         .order_by(Payment.paid_at.desc().nullslast())
     )
     return result.scalars().all()
+
+
+async def get_payment_by_id(db: AsyncSession, payment_id: uuid.UUID) -> Optional[Payment]:
+    result = await db.execute(
+        select(Payment)
+        .options(
+            joinedload(Payment.owner),
+            joinedload(Payment.appointment).joinedload(Appointment.pet),
+            joinedload(Payment.appointment).joinedload(Appointment.vet),
+            joinedload(Payment.appointment).joinedload(Appointment.service),
+        )
+        .where(Payment.id == payment_id)
+    )
+    return result.scalar_one_or_none()
+
