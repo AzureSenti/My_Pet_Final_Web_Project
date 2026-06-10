@@ -8,7 +8,7 @@ from app.models.appointment import Appointment, AppointmentStatus
 from app.models.payment import Payment, PaymentStatus
 from app.models.service import Service
 
-async def get_dashboard_stats(db: AsyncSession):
+async def get_dashboard_stats(db: AsyncSession, period: str = "7 days"):
     # Đếm tổng số lượng cơ bản
     count_users = await db.scalar(select(func.count()).select_from(User))
     count_vets = await db.scalar(select(func.count()).select_from(Veterinarian))
@@ -49,19 +49,59 @@ async def get_dashboard_stats(db: AsyncSession):
         .where(Payment.status == PaymentStatus.pending)
     )
 
-    # Thống kê time-series (Lịch hẹn 7 ngày qua)
+    # Thống kê time-series (Lịch hẹn)
     today = datetime.now(timezone.utc).date()
-    last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
-    app_series = {str(d): 0 for d in last_7_days}
-    
-    start_date_app = datetime.combine(last_7_days[0], datetime.min.time()).replace(tzinfo=timezone.utc)
+    app_series = {}
+    categories = []
+    start_date_app = None
+
+    if period == "30 days":
+        date_range = [today - timedelta(days=i) for i in range(29, -1, -1)]
+        app_series = {str(d): 0 for d in date_range}
+        categories = [d.strftime('%d/%m') for d in date_range]
+        start_date_app = datetime.combine(date_range[0], datetime.min.time()).replace(tzinfo=timezone.utc)
+    elif period == "3 months":
+        # last 12 weeks
+        date_range = [today - timedelta(days=i*7) for i in range(11, -1, -1)]
+        for dt in date_range:
+            y, w, _ = dt.isocalendar()
+            key = f"{y}-W{w:02d}"
+            app_series[key] = 0
+            categories.append(f"Tuần {w}")
+        start_date_app = datetime.combine(date_range[0] - timedelta(days=date_range[0].weekday()), datetime.min.time()).replace(tzinfo=timezone.utc)
+    elif period == "1 year":
+        # last 12 months
+        current_month = today.replace(day=1)
+        last_12_months = []
+        for _ in range(12):
+            last_12_months.insert(0, current_month)
+            prev_month_day = current_month - timedelta(days=1)
+            current_month = prev_month_day.replace(day=1)
+        app_series = {m.strftime('%Y-%m'): 0 for m in last_12_months}
+        categories = [m.strftime('Th%m') for m in last_12_months]
+        start_date_app = datetime.combine(last_12_months[0], datetime.min.time()).replace(tzinfo=timezone.utc)
+    else: # 7 days
+        date_range = [today - timedelta(days=i) for i in range(6, -1, -1)]
+        app_series = {str(d): 0 for d in date_range}
+        categories = [d.strftime('%d/%m') for d in date_range]
+        start_date_app = datetime.combine(date_range[0], datetime.min.time()).replace(tzinfo=timezone.utc)
+
     stmt_app = select(Appointment.created_at).where(Appointment.created_at >= start_date_app)
     res_app = await db.execute(stmt_app)
     for row in res_app.all():
         if row[0]:
-            day_str = str(row[0].date())
-            if day_str in app_series:
-                app_series[day_str] += 1
+            if period in ["7 days", "30 days"]:
+                key = str(row[0].date())
+            elif period == "3 months":
+                y, w, _ = row[0].isocalendar()
+                key = f"{y}-W{w:02d}"
+            elif period == "1 year":
+                key = row[0].strftime('%Y-%m')
+            else:
+                key = str(row[0].date())
+                
+            if key in app_series:
+                app_series[key] += 1
                 
     # Thống kê time-series (Tăng trưởng khách hàng 6 tháng qua)
     current_month = today.replace(day=1)
@@ -105,7 +145,7 @@ async def get_dashboard_stats(db: AsyncSession):
         ],
         # Charts Data
         "appointment_chart": {
-            "categories": [d.strftime('%d/%m') for d in last_7_days],
+            "categories": categories,
             "data": list(app_series.values())
         },
         "growth_chart": {

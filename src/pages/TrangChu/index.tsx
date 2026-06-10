@@ -277,9 +277,15 @@ const TrangChu = () => {
 		setIsExportModalOpen(true);
 	};
 
-	const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setFilterPeriod(e.target.value);
-		// Note: Trong thực tế sẽ fetch lại data theo period, ở đây tạm set về 0 vì backend chưa hỗ trợ history
+	const handleFilterChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const newPeriod = e.target.value;
+		setFilterPeriod(newPeriod);
+		try {
+			const statsData = await getDashboardStats(newPeriod);
+			setStats(statsData);
+		} catch (error) {
+			console.error('Error fetching dashboard stats by period:', error);
+		}
 	};
 
 	// ─── Real Data Logic ────────────────────────
@@ -413,6 +419,7 @@ const TrangChu = () => {
 							<option value="7 days">7 ngày qua</option>
 							<option value="30 days">30 ngày qua</option>
 							<option value="3 months">3 tháng qua</option>
+							<option value="1 year">1 năm qua</option>
 						</select>
 					</div>
 					<div className="pc-card-body">

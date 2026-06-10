@@ -96,8 +96,8 @@ import { ip3 } from '@/utils/ip';
 
 // --- DASHBOARD SERVICES ---
 
-export const getDashboardStats = async (): Promise<any> => {
-	const res = await axios.get(`${ip3}api/v1/admin/dashboard/stats`);
+export const getDashboardStats = async (period: string = "7 days"): Promise<any> => {
+	const res = await axios.get(`${ip3}api/v1/admin/dashboard/stats`, { params: { period } });
 	return res.data;
 };
 
