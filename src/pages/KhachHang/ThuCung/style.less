@@ -173,23 +173,30 @@
 
         .cardFooter {
             padding: 24px;
-            background: #FFF8F2;
-            border-top: none;
+            background: transparent;
+            border-top: 1px solid #F3F4F6;
 
             .btnAction {
                 height: 48px;
                 border-radius: 20px;
                 background: white;
-                border: none;
+                border: 1px solid #1F2937 !important;
                 font-weight: 800;
-                color: @text-heading;
-                box-shadow: 0 4px 15px rgba(212, 160, 23, 0.05);
+                color: #1F2937 !important;
+                box-shadow: none !important;
+                transition: all 0.2s ease;
+                outline: none !important;
 
-                &:hover {
-                    background: #D4A017;
-                    color: white;
+                &::after {
+                    display: none !important;
+                }
+
+                &:hover, &:focus, &:active {
+                    background: #1F2937 !important;
+                    color: white !important;
+                    border-color: #1F2937 !important;
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 20px rgba(212, 160, 23, 0.15);
+                    box-shadow: 0 4px 12px rgba(31, 41, 55, 0.15) !important;
                 }
             }
         }
