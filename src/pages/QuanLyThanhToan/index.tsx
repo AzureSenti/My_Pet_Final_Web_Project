@@ -26,6 +26,7 @@ const QuanLyThanhToan: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPayment, setSelectedPayment] = useState<any>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [paymentStep, setPaymentStep] = useState<'details' | 'select_method' | 'qr_code' | 'success'>('details');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -77,7 +78,7 @@ const QuanLyThanhToan: React.FC = () => {
         const success = await updatePaymentStatus(id, 'paid');
         if (success) {
             fetchData();
-            setIsDetailModalOpen(false);
+            setPaymentStep('success');
         }
     };
 
@@ -245,7 +246,11 @@ const QuanLyThanhToan: React.FC = () => {
                                         )}
                                     </div>
                                     <div className="bm-td col-actions">
-                                        <button className="action-btn" onClick={() => { setSelectedPayment(row); setIsDetailModalOpen(true); }}>
+                                        <button className="action-btn" onClick={() => { 
+                                            setSelectedPayment(row); 
+                                            setPaymentStep('details');
+                                            setIsDetailModalOpen(true); 
+                                        }}>
                                             <Eye size={18} />
                                         </button>
                                         <button className="action-btn delete">
@@ -285,14 +290,21 @@ const QuanLyThanhToan: React.FC = () => {
             </div>
 
             <Modal
-                title={<h3 style={{ margin: 0, fontWeight: 700, fontSize: 18 }}>Chi tiết hóa đơn</h3>}
+                title={
+                    <h3 style={{ margin: 0, fontWeight: 700, fontSize: 18 }}>
+                        {paymentStep === 'details' ? 'Chi tiết hóa đơn' :
+                         paymentStep === 'select_method' ? 'Chọn phương thức thanh toán' :
+                         paymentStep === 'confirm_cash' ? 'Xác nhận thanh toán tiền mặt' :
+                         paymentStep === 'qr_code' ? 'Thanh toán chuyển khoản' : 'Hoàn tất'}
+                    </h3>
+                }
                 visible={isDetailModalOpen}
                 onCancel={() => setIsDetailModalOpen(false)}
                 footer={null}
                 width={480}
                 className="bm-modal"
             >
-                {selectedPayment && (
+                {selectedPayment && paymentStep === 'details' && (
                     <div className="invoice-detail">
                         <div className="amount-display">
                             <div className="label">TỔNG TIỀN</div>
@@ -315,10 +327,6 @@ const QuanLyThanhToan: React.FC = () => {
                             </div>
                             <div className="divider" />
                             <div className="info-row">
-                                <span className="lbl">Phương thức</span>
-                                <span className="val">{selectedPayment.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</span>
-                            </div>
-                            <div className="info-row">
                                 <span className="lbl">Ngày tạo</span>
                                 <span className="val">{new Date(selectedPayment.created_at).toLocaleString('vi-VN')}</span>
                             </div>
@@ -328,20 +336,100 @@ const QuanLyThanhToan: React.FC = () => {
                             <Button
                                 icon={<Printer size={16} />}
                                 onClick={handlePrint}
-                                style={{ borderRadius: 8 }}
+                                style={{ borderRadius: 8, height: 44 }}
                             >
                                 In hóa đơn
                             </Button>
                             {selectedPayment.status !== 'paid' && (
                                 <Button
                                     type="primary"
-                                    onClick={() => handleConfirmPayment(selectedPayment.id)}
-                                    style={{ borderRadius: 8, background: '#F5C842', borderColor: '#F5C842', color: 'black', fontWeight: 600 }}
+                                    onClick={() => setPaymentStep('select_method')}
+                                    style={{ borderRadius: 8, height: 44, background: '#F5C842', borderColor: '#F5C842', color: 'black', fontWeight: 600 }}
                                 >
                                     Xác nhận thu
                                 </Button>
                             )}
                         </div>
+                    </div>
+                )}
+
+                {selectedPayment && paymentStep === 'select_method' && (
+                    <div style={{ padding: '24px 0', textAlign: 'center' }}>
+                        <p style={{ marginBottom: 24, color: '#666' }}>Vui lòng chọn phương thức thanh toán cho hóa đơn trị giá <strong>{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</strong></p>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                            <Button 
+                                type="primary" 
+                                style={{ height: 60, borderRadius: 12, fontSize: 16, background: '#10b981', borderColor: '#10b981' }}
+                                onClick={() => setPaymentStep('confirm_cash')}
+                            >
+                                Tiền mặt
+                            </Button>
+                            <Button 
+                                type="primary" 
+                                style={{ height: 60, borderRadius: 12, fontSize: 16, background: '#3b82f6', borderColor: '#3b82f6' }}
+                                onClick={() => setPaymentStep('qr_code')}
+                            >
+                                Chuyển khoản MB
+                            </Button>
+                        </div>
+                        <Button type="link" style={{ marginTop: 24, color: '#999' }} onClick={() => setPaymentStep('details')}>Quay lại</Button>
+                    </div>
+                )}
+
+                {selectedPayment && paymentStep === 'confirm_cash' && (
+                    <div style={{ padding: '24px 0', textAlign: 'center' }}>
+                        <p style={{ marginBottom: 24, color: '#666', fontSize: 16 }}>
+                            Xác nhận thu số tiền <strong>{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</strong> bằng tiền mặt từ khách hàng {selectedPayment.owner?.full_name}?
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <Button 
+                                type="primary" 
+                                style={{ height: 48, borderRadius: 8, background: '#10b981', borderColor: '#10b981', fontSize: 16, fontWeight: 'bold' }}
+                                onClick={() => handleConfirmPayment(selectedPayment.id)}
+                            >
+                                Hoàn tất thu tiền
+                            </Button>
+                            <Button type="default" style={{ height: 48, borderRadius: 8 }} onClick={() => setPaymentStep('select_method')}>Quay lại</Button>
+                        </div>
+                    </div>
+                )}
+
+                {selectedPayment && paymentStep === 'qr_code' && (
+                    <div style={{ padding: '12px 0', textAlign: 'center' }}>
+                        <div style={{ background: '#f5f5f5', padding: 16, borderRadius: 12, display: 'inline-block', marginBottom: 20 }}>
+                            <img 
+                                src={`https://img.vietqr.io/image/970422-0988408295-compact.png?amount=${selectedPayment.amount}&addInfo=Thanh toan hoa don ${selectedPayment.displayId || selectedPayment.id.substring(0, 6)}&accountName=MY PET CLINIC`} 
+                                alt="QR Code" 
+                                style={{ width: 250, height: 250, objectFit: 'contain' }}
+                            />
+                        </div>
+                        <p style={{ color: '#666', marginBottom: 8 }}>Vui lòng quét mã QR trên bằng ứng dụng ngân hàng để thanh toán số tiền <strong>{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</strong>.</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
+                            <Button 
+                                type="primary" 
+                                style={{ height: 48, borderRadius: 8, background: '#F5C842', borderColor: '#F5C842', color: '#000', fontWeight: 'bold' }}
+                                onClick={() => handleConfirmPayment(selectedPayment.id)}
+                            >
+                                Đã nhận được tiền
+                            </Button>
+
+                            <Button type="default" style={{ height: 48, borderRadius: 8 }} onClick={() => setPaymentStep('select_method')}>Quay lại</Button>
+                        </div>
+                    </div>
+                )}
+
+                {paymentStep === 'success' && (
+                    <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                        <CheckCircle2 size={64} color="#10b981" style={{ marginBottom: 16 }} />
+                        <h2 style={{ margin: 0, color: '#10b981', marginBottom: 8 }}>Thanh toán thành công!</h2>
+                        <p style={{ color: '#666', marginBottom: 32 }}>Hóa đơn đã được ghi nhận thanh toán hoàn tất.</p>
+                        <Button 
+                            type="primary" 
+                            style={{ height: 48, borderRadius: 8, padding: '0 32px' }}
+                            onClick={() => setIsDetailModalOpen(false)}
+                        >
+                            Đóng
+                        </Button>
                     </div>
                 )}
             </Modal>

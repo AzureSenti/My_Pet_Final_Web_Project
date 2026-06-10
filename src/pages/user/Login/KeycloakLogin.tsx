@@ -80,7 +80,7 @@ const LoginWithCredentials: React.FC = () => {
 				<ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
 					<li><b>Admin:</b> phamnamkhanh1107@gmail.com <br/> <span>Mật khẩu: Admin123</span></li>
 					<li style={{ marginTop: '4px' }}><b>Bác sĩ:</b> chinhthuc1@bacsi.com <br/> <span>Mật khẩu: Bacsi123</span></li>
-					<li style={{ marginTop: '4px' }}><b>Khách hàng:</b> khach1@nguoidung.com <br/> <span>Mật khẩu: Nguoidung123</span></li>
+					<li style={{ marginTop: '4px' }}><b>Khách hàng:</b> khach1@nguoidung.com <br/> <span>Mật khẩu: Nguoidung1</span></li>
 				</ul>
 			</div>
 
