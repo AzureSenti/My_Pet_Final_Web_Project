@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     # CORS
     FRONTEND_URL: str = "http://localhost:8000"
 
+    # VNPay Configuration
+    VNPAY_TMN_CODE: str = ""
+    VNPAY_HASH_SECRET: str = ""
+    VNPAY_PAYMENT_URL: str = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    VNPAY_RETURN_URL: str = "https://petcare-mypet.netlify.app/"
+    
     @property
     def DATABASE_URL(self) -> str:
         from urllib.parse import quote_plus

@@ -16,8 +16,9 @@ import {
     Printer
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { QRCodeSVG } from 'qrcode.react';
 import HeaderProfile from '@/components/HeaderProfile';
-import { getPayments, updatePaymentStatus } from '@/services/QuanLyPetStore';
+import { getPayments, updatePaymentStatus, getVNPayUrl, getPaymentById } from '@/services/QuanLyPetStore';
 import './style.less';
 
 const QuanLyThanhToan: React.FC = () => {
@@ -26,8 +27,10 @@ const QuanLyThanhToan: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPayment, setSelectedPayment] = useState<any>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [paymentStep, setPaymentStep] = useState<'details' | 'select_method' | 'qr_code' | 'success'>('details');
+    const [paymentStep, setPaymentStep] = useState<'details' | 'select_method' | 'qr_code' | 'success' | 'confirm_cash'>('details');
     const [currentPage, setCurrentPage] = useState(1);
+    const [vnpayUrl, setVnpayUrl] = useState<string | null>(null);
+    const [isGeneratingUrl, setIsGeneratingUrl] = useState(false);
     const itemsPerPage = 5;
 
     const fetchData = async () => {
@@ -73,6 +76,34 @@ const QuanLyThanhToan: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (paymentStep === 'qr_code' && selectedPayment && isDetailModalOpen) {
+            interval = setInterval(async () => {
+                const payment = await getPaymentById(selectedPayment.id);
+                if (payment && payment.status === 'paid') {
+                    clearInterval(interval);
+                    fetchData();
+                    setPaymentStep('success');
+                }
+            }, 3000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [paymentStep, selectedPayment, isDetailModalOpen]);
+
+    const handleSelectVNPay = async (paymentId: string) => {
+        setPaymentStep('qr_code');
+        setIsGeneratingUrl(true);
+        setVnpayUrl(null);
+        const url = await getVNPayUrl(paymentId);
+        if (url) {
+            setVnpayUrl(url);
+        }
+        setIsGeneratingUrl(false);
+    };
 
     const handleConfirmPayment = async (id: string) => {
         const success = await updatePaymentStatus(id, 'paid');
@@ -367,9 +398,9 @@ const QuanLyThanhToan: React.FC = () => {
                             <Button 
                                 type="primary" 
                                 style={{ height: 60, borderRadius: 12, fontSize: 16, background: '#3b82f6', borderColor: '#3b82f6' }}
-                                onClick={() => setPaymentStep('qr_code')}
+                                onClick={() => handleSelectVNPay(selectedPayment.id)}
                             >
-                                Chuyển khoản MB
+                                Chuyển khoản VNPay
                             </Button>
                         </div>
                         <Button type="link" style={{ marginTop: 24, color: '#999' }} onClick={() => setPaymentStep('details')}>Quay lại</Button>
@@ -397,22 +428,21 @@ const QuanLyThanhToan: React.FC = () => {
                 {selectedPayment && paymentStep === 'qr_code' && (
                     <div style={{ padding: '12px 0', textAlign: 'center' }}>
                         <div style={{ background: '#f5f5f5', padding: 16, borderRadius: 12, display: 'inline-block', marginBottom: 20 }}>
-                            <img 
-                                src={`https://img.vietqr.io/image/970422-0988408295-compact.png?amount=${selectedPayment.amount}&addInfo=Thanh toan hoa don ${selectedPayment.displayId || selectedPayment.id.substring(0, 6)}&accountName=MY PET CLINIC`} 
-                                alt="QR Code" 
-                                style={{ width: 250, height: 250, objectFit: 'contain' }}
-                            />
+                            {isGeneratingUrl ? (
+                                <div style={{ width: 250, height: 250, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <p>Đang tạo mã QR VNPay...</p>
+                                </div>
+                            ) : vnpayUrl ? (
+                                <QRCodeSVG value={vnpayUrl} size={250} level="H" />
+                            ) : (
+                                <div style={{ width: 250, height: 250, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <p>Không thể tải mã QR.</p>
+                                </div>
+                            )}
                         </div>
-                        <p style={{ color: '#666', marginBottom: 8 }}>Vui lòng quét mã QR trên bằng ứng dụng ngân hàng để thanh toán số tiền <strong>{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</strong>.</p>
+                        <p style={{ color: '#666', marginBottom: 8 }}>Vui lòng quét mã QR bằng ứng dụng ngân hàng hoặc VNPay để thanh toán số tiền <strong>{parseFloat(selectedPayment.amount).toLocaleString('vi-VN')} VND</strong>.</p>
+                        <p style={{ color: '#10b981', fontSize: '13px', fontWeight: 'bold' }}>Hệ thống sẽ tự động cập nhật khi thanh toán thành công.</p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
-                            <Button 
-                                type="primary" 
-                                style={{ height: 48, borderRadius: 8, background: '#F5C842', borderColor: '#F5C842', color: '#000', fontWeight: 'bold' }}
-                                onClick={() => handleConfirmPayment(selectedPayment.id)}
-                            >
-                                Đã nhận được tiền
-                            </Button>
-
                             <Button type="default" style={{ height: 48, borderRadius: 8 }} onClick={() => setPaymentStep('select_method')}>Quay lại</Button>
                         </div>
                     </div>

@@ -216,6 +216,25 @@ export const updatePaymentStatus = async (id: string, status: string, transactio
 	}
 };
 
+export const getPaymentById = async (id: string): Promise<Payment | null> => {
+	try {
+		const res = await axios.get(`${ip3}api/v1/admin/payments/${id}`);
+		return res.data;
+	} catch (error) {
+		return null;
+	}
+};
+
+export const getVNPayUrl = async (id: string): Promise<string | null> => {
+	try {
+		const res = await axios.post(`${ip3}api/v1/admin/payments/${id}/vnpay-url`);
+		return res.data.paymentUrl;
+	} catch (error) {
+		message.error('Không thể tạo URL thanh toán VNPay!');
+		return null;
+	}
+};
+
 export const getServices = async (): Promise<Service[]> => {
 	const res = await axios.get(`${ip3}api/v1/admin/services`, { params: { limit: 100 } });
 	return res.data.items;
