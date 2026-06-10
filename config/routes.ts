@@ -189,6 +189,11 @@ export default [
 		component: './LandingPage',
 	},
 	{
+		path: '/payment/vnpay-return',
+		layout: false,
+		component: './ThanhToan/KetQua',
+	},
+	{
 		path: '/403',
 		component: './exception/403/403Page',
 		layout: false,

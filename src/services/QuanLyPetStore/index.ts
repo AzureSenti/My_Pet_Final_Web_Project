@@ -536,3 +536,9 @@ export const uploadFile = async (file: File): Promise<string | null> => {
 		return null;
 	}
 };
+
+export const getPublicPaymentById = async (id: string): Promise<Payment> => {
+	const res = await axios.get(`${ip3}api/v1/admin/payments/public/`);
+	return res.data;
+};
+

@@ -144,3 +144,17 @@ async def get_payment(
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Thanh toÃ¡n khÃ´ng tá»“n táº¡i")
     return payment
+
+
+@router.get("/public/{payment_id}", response_model=PaymentResponse)
+async def get_public_payment(
+    payment_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """L?y chi ti?t thanh toán công khai (Dùng cho biên lai khách hàng)"""
+    payment = await payment_service.get_payment_by_id(db, payment_id)
+    if not payment:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Thanh toán không t?n t?i")
+    return payment
+
