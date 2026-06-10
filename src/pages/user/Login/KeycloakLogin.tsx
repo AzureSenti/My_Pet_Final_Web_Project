@@ -75,6 +75,14 @@ const LoginWithCredentials: React.FC = () => {
 				Tiếp tục trải nghiệm
 			</Button>
 
+			<div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px', fontSize: '13px', color: '#4b5563', border: '1px dashed #d1d5db' }}>
+				<p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#1f2937' }}>Tài khoản dành cho người kiểm thử (Tester):</p>
+				<ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
+					<li><b>Admin:</b> phamnamkhanh1107@gmail.com <br/> <span>Mật khẩu: Admin123</span></li>
+					<li style={{ marginTop: '4px' }}><b>Bác sĩ:</b> chinhthuc1@bacsi.com <br/> <span>Mật khẩu: Bacsi123</span></li>
+					<li style={{ marginTop: '4px' }}><b>Khách hàng:</b> khach1@nguoidung.com <br/> <span>Mật khẩu: Nguoidung123</span></li>
+				</ul>
+			</div>
 
 		</Form>
 	);
