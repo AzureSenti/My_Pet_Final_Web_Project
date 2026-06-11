@@ -234,7 +234,6 @@ const QuanLyThanhToan: React.FC = () => {
                             <div className="bm-th col-customer">KHÁCH HÀNG</div>
                             <div className="bm-th col-service">DỊCH VỤ</div>
                             <div className="bm-th col-amount">SỐ TIỀN</div>
-                            <div className="bm-th col-method">PHƯƠNG THỨC</div>
                             <div className="bm-th col-status">TRẠNG THÁI</div>
                             <div className="bm-th col-actions">THAO TÁC</div>
                         </div>
@@ -261,11 +260,6 @@ const QuanLyThanhToan: React.FC = () => {
                                     </div>
                                     <div className="bm-td col-amount">
                                         {parseFloat(row.amount).toLocaleString('vi-VN')} VND
-                                    </div>
-                                    <div className="bm-td col-method">
-                                        <span className="method-text">
-                                            {row.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}
-                                        </span>
                                     </div>
                                     <div className="bm-td col-status">
                                         {row.status === 'paid' ? (
